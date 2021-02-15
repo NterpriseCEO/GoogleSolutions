@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import "package:best_before_app/pages/CameraPage.dart";
 
-void main() => runApp(MaterialApp(
-  debugShowCheckedModeBanner: false,
-  home: Menu()
-));
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  runApp(MaterialApp(
+    debugShowCheckedModeBanner: false,
+    home: Menu()
+  ));
+}
 
 class Menu extends StatefulWidget {
   @override
@@ -38,10 +43,7 @@ class _MenuState extends State<Menu> {
                 ),
               ),
               Container(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text("page 2"),
-                ),
+                child: ScanPicture()
               ),
               Container(
                 child: Padding(
@@ -69,7 +71,7 @@ class _MenuState extends State<Menu> {
               duration: Duration(
                 milliseconds: 500,
               ),
-              curve: Curves.easeIn,
+              curve: Curves.easeInOut,
             );
           },
           currentIndex: currentPage,
