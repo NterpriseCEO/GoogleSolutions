@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import "package:best_before_app/pages/CameraPage.dart";
 import "package:best_before_app/pages/ExpirationPage.dart";
-import 'package:flutter/services.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
