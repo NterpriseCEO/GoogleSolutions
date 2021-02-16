@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import "package:best_before_app/pages/CameraPage.dart";
+import "package:best_before_app/pages/ExpirationPage.dart";
+import 'package:flutter/services.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
-    home: Menu()
+    home: Menu(),
   ));
 }
 
@@ -48,12 +50,7 @@ class _MenuState extends State<Menu> {
             //The pages in the PageView
             children: <Widget>[
               //The page pages
-              Container(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text("page 1"),
-                ),
-              ),
+              ExpirationPage(),
               Container(
                   //The ScanPicture() page
                   child: ScanPicture()
@@ -78,6 +75,8 @@ class _MenuState extends State<Menu> {
           //Disable text labels
           showSelectedLabels: false,
           showUnselectedLabels: false,
+          backgroundColor: Colors.amber,
+          selectedItemColor: Colors.white,
           //When tapping the labels
           //change the page
           onTap: (int index) {

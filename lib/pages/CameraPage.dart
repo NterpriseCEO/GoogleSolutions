@@ -68,6 +68,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
     if(controller != null) {
       //A Widget for absolute positioning other widgets
       return Stack(
+        fit: StackFit.expand,
         children: <Widget>[
           //The camera viewfinder
           CameraPreview(controller),
@@ -90,10 +91,10 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
                   child: TextButton(
                     onPressed: () {},
                     style: ElevatedButton.styleFrom(
-                      primary: Colors.amber[600].withOpacity(0.8),
+                      primary: Colors.black.withOpacity(0.2),
                       shape: CircleBorder(
                         side: BorderSide(
-                          color: Colors.white,
+                          color: Colors.amber,
                           width:5.0,
                         ),
                       ),
