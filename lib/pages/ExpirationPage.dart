@@ -1,4 +1,5 @@
 import "package:flutter/material.dart";
+import "package:best_before_app/pages/components/ExpiryList.dart";
 
 class ExpirationPage extends StatefulWidget {
   @override
@@ -6,6 +7,8 @@ class ExpirationPage extends StatefulWidget {
 }
 
 class _ExpirationPageState extends State<ExpirationPage> {
+
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -56,108 +59,7 @@ class _ExpirationPageState extends State<ExpirationPage> {
             flex: 7,
             child: Container(
               width: MediaQuery.of(context).size.width,
-              child: SingleChildScrollView(
-                child: Column(
-                  children: <Widget>[
-                    Text(
-                      "alex",
-                      style: TextStyle(
-                        fontSize: 100.0,
-                      )
-                    ),
-                    Text(
-                        "alex",
-                        style: TextStyle(
-                          fontSize: 100.0,
-                        )
-                    ),
-                    Text(
-                        "alex",
-                        style: TextStyle(
-                          fontSize: 100.0,
-                        )
-                    ),
-                    Text(
-                        "alex",
-                        style: TextStyle(
-                          fontSize: 100.0,
-                        )
-                    ),
-                    Text(
-                        "alex",
-                        style: TextStyle(
-                          fontSize: 100.0,
-                        )
-                    ),
-                    Text(
-                        "alex",
-                        style: TextStyle(
-                          fontSize: 100.0,
-                        )
-                    ),
-                    Text(
-                        "alex",
-                        style: TextStyle(
-                          fontSize: 100.0,
-                        )
-                    ),
-                    Text(
-                        "alex",
-                        style: TextStyle(
-                          fontSize: 100.0,
-                        )
-                    ),
-                    Text(
-                        "alex",
-                        style: TextStyle(
-                          fontSize: 100.0,
-                        )
-                    ),
-                    Text(
-                        "alex",
-                        style: TextStyle(
-                          fontSize: 100.0,
-                        )
-                    ),
-                    Text(
-                        "alex",
-                        style: TextStyle(
-                          fontSize: 100.0,
-                        )
-                    ),
-                    Text(
-                        "alex",
-                        style: TextStyle(
-                          fontSize: 100.0,
-                        )
-                    ),
-                    Text(
-                        "alex",
-                        style: TextStyle(
-                          fontSize: 100.0,
-                        )
-                    ),
-                    Text(
-                        "alex",
-                        style: TextStyle(
-                          fontSize: 100.0,
-                        )
-                    ),
-                    Text(
-                        "alex",
-                        style: TextStyle(
-                          fontSize: 100.0,
-                        )
-                    ),
-                    Text(
-                        "alex",
-                        style: TextStyle(
-                          fontSize: 100.0,
-                        )
-                    ),
-                  ],
-                ),
-              ),
+              child: ExpiryList(),
             ),
           ),
         ],
