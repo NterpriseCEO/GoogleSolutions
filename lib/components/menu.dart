@@ -23,85 +23,95 @@ class _MenuState extends State<Menu> {
   Widget build(BuildContext context) {
     //This widget is used to process whether should
     //the current page or not
-    return WillPopScope(
-      //Does nothing?
-      onWillPop: () {
-        return;
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+        new TextEditingController().clear();
       },
-      //Scaffold provides APIs for showing
-      //drawers, snack bars, etc
-      child: Scaffold(
-        //Inserts padding to avoid the status bar on Android / IOS
-        body: SafeArea(
-          //Scrollable list of pages
-          child: PageView(
-            //the pageController
-            controller: pageController,
-            //The pages in the PageView
-            children: <Widget>[
-              //The page pages
-              ExpirationPage(),
-              Container(
-                //The ScanPicture() page
-                  child: ScanPicture()
-              ),
-              Container(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text("page 3"),
+      child: WillPopScope(
+        //Does nothing?
+        onWillPop: () {
+          return;
+        },
+        //Scaffold provides APIs for showing
+        //drawers, snack bars, etc
+        child: Scaffold(
+          resizeToAvoidBottomInset: false,
+          //Inserts padding to avoid the status bar on Android / IOS
+          body: SafeArea(
+            //Scrollable list of pages
+            child: PageView(
+              //the pageController
+              controller: pageController,
+              //The pages in the PageView
+              children: <Widget>[
+                //The page pages
+                Container(
+                  color: Colors.white,
+                  child: ExpirationPage(),
                 ),
-              ),
-            ],
-            //Check if the page is changed and set the currentPage index
-            onPageChanged: (int index) {
+                Container(
+                  //The ScanPicture() page
+                  child: ScanPicture()
+                ),
+                Container(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text("page 3"),
+                  ),
+                ),
+              ],
+              //Check if the page is changed and set the currentPage index
+              onPageChanged: (int index) {
+                setState(() {
+                  currentPage = index;
+                });
+              },
+            ),
+          ),
+          //The bottom menu
+          bottomNavigationBar: BottomNavigationBar(
+            //Disable text labels
+            showSelectedLabels: false,
+            showUnselectedLabels: false,
+            backgroundColor: Colors.amber,
+            selectedItemColor: Colors.white,
+            //When tapping the labels
+            //change the page
+            onTap: (int index) {
+              //Set states of variables in here
               setState(() {
                 currentPage = index;
               });
+              //Animates to the page at this specific index
+              pageController.animateToPage(
+                index,
+                //The animation speed
+                duration: Duration(
+                  milliseconds: 500,
+                ),
+                //The animation tweening effect
+                curve: Curves.easeInOut,
+              );
             },
-          ),
-        ),
-        //The bottom menu
-        bottomNavigationBar: BottomNavigationBar(
-          //Disable text labels
-          showSelectedLabels: false,
-          showUnselectedLabels: false,
-          backgroundColor: Colors.amber,
-          selectedItemColor: Colors.white,
-          //When tapping the labels
-          //change the page
-          onTap: (int index) {
-            //Set states of variables in here
-            setState(() {
-              currentPage = index;
-            });
-            //Animates to the page at this specific index
-            pageController.animateToPage(
-              index,
-              //The animation speed
-              duration: Duration(
-                milliseconds: 500,
+            //set the current page
+            currentIndex: currentPage,
+            //The buttons in the navigation bar
+            items: <BottomNavigationBarItem>[
+              BottomNavigationBarItem(
+                icon: Icon(Icons.access_time),
+                label: "",
               ),
-              //The animation tweening effect
-              curve: Curves.easeInOut,
-            );
-          },
-          //set the current page
-          currentIndex: currentPage,
-          //The buttons in the navigation bar
-          items: <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: Icon(Icons.access_time),
-              label: "",
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.camera_alt_outlined),
-              label: "",
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.set_meal_outlined),
-              label: "",
-            ),
-          ],
+              BottomNavigationBarItem(
+                icon: Icon(Icons.camera_alt_outlined),
+                label: "",
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.set_meal_outlined),
+                label: "",
+              ),
+            ],
+          ),
         ),
       ),
     );

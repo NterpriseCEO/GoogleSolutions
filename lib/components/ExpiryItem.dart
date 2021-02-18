@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ExpiryItem extends StatelessWidget {
-  String expiryDate;
+  int expiryDate;
   String product;
   int quantity;
 
@@ -12,25 +12,30 @@ class ExpiryItem extends StatelessWidget {
     return Card(
       elevation:0,
       child: Padding(
-        padding: EdgeInsets.all(15.0),
+        padding: EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 15.0),
         child: Row(
           children: <Widget>[
             Expanded(
+              flex: 3,
               child:Text(
-                expiryDate,
-                textAlign: TextAlign.center,
+                expiryDate.toString(),
               ),
             ),
             Expanded(
+              flex: 4,
               child:Text(
                 product,
                 textAlign: TextAlign.center,
               ),
             ),
             Expanded(
+              flex: 2,
               child:Text(
                 quantity.toString(),
                 textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ],
