@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import "package:best_before_app/components/ExpiryItem.dart";
+import "package:flutter_sticky_header/flutter_sticky_header.dart";
 
 class ExpiryList extends StatefulWidget {
   String search;
@@ -17,77 +18,116 @@ class _ExpiryListState extends State<ExpiryList> {
     //List of dummy data items
     List items = CalculateItems().getItems(widget.search);
     //Scrollable page
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            //Title
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "Today",
-                  style: TextStyle(
-                    fontSize: 25.0,
-                    fontWeight: FontWeight.bold,
-                  )
-                ),
-                Text(
-                  "Quantity",
-                  style: TextStyle(
-                    fontSize: 20.0,
+    return Padding(
+      padding: const EdgeInsets.all(10.0),
+      child: Stack(
+        children: <Widget>[
+          CustomScrollView(
+            slivers: <Widget>[
+              SliverStickyHeader(
+                header: Container(
+                  alignment: Alignment.centerLeft,
+                  color: Colors.white,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Today',
+                        style: TextStyle(
+                          fontSize: 25.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
-            //Today's expiring items list
-            Container(
-              child: Column(
-                children: items[0].length > 0 ? items[0] : <Widget>[Text("Good, Nothing is going off!")],
-              ),
-            ),
-            //Expiring next 5 days title
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "Next 5 Days",
-                  style: TextStyle(
-                    fontSize: 25.0,
-                    fontWeight: FontWeight.bold,
+                sliver: SliverList(
+                  delegate: SliverChildListDelegate(
+                    items[0].length > 0 ? items[0] : [Text("Good, Nothing is going off!")]
                   ),
                 ),
-              ],
-            ),
-            //Expiring next five days list
-            Container(
-              child: Column(
-                children: items[1].length > 0 ? items[1] : <Widget>[Text("Good, Nothing is going off!")],
               ),
-            ),
-            //Expiring next 7 days title
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "Next 7 Days",
-                  style: TextStyle(
-                    fontSize: 25.0,
-                    fontWeight: FontWeight.bold,
+              SliverStickyHeader(
+                header: Container(
+                  alignment: Alignment.centerLeft,
+                  color: Colors.white,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Tomorrow',
+                        style: TextStyle(
+                          fontSize: 25.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
-            //Expiring next 7 days list
-            Container(
-              child: Column(
-                children: items[2].length > 0 ? items[2] : <Widget>[Text("Good, Nothing is going off!")],
+                sliver: SliverList(
+                  delegate: SliverChildListDelegate(
+                      items[1].length > 0 ? items[1] : [Text("Good, Nothing is going off!")]
+                  ),
+                ),
+              ),
+              SliverStickyHeader(
+                header: Container(
+                  alignment: Alignment.centerLeft,
+                  color: Colors.white,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Next 5 Days',
+                        style: TextStyle(
+                          fontSize: 25.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                sliver: SliverList(
+                  delegate: SliverChildListDelegate(
+                      items[2].length > 0 ? items[2] : [Text("Good, Nothing is going off!")]
+                  ),
+                ),
+              ),
+              SliverStickyHeader(
+                header: Container(
+                  alignment: Alignment.centerLeft,
+                  color: Colors.white,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Next 7 Days',
+                        style: TextStyle(
+                          fontSize: 25.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                sliver: SliverList(
+                  delegate: SliverChildListDelegate(
+                      items[3].length > 0 ? items[3] : [Text("Good, Nothing is going off!")]
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Align(
+            alignment: Alignment.topRight,
+            child: Text(
+              "Quantity",
+              style: TextStyle(
+                fontSize: 20.0,
               ),
             ),
-          ],
-        ),
+          ),
+        ]
       ),
     );
   }
@@ -98,18 +138,33 @@ class CalculateItems {
     List<ExpiryItem> expiryItems = [
       ExpiryItem(expiryDate: 0, product: "Whole Chicken", quantity: 10),
       ExpiryItem(expiryDate: 0, product: "Cheese", quantity: 13),
-      ExpiryItem(expiryDate: 0, product: "Venison", quantity: 5),
-      ExpiryItem(expiryDate: 0, product: "Pork", quantity: 7),
+      ExpiryItem(expiryDate: 1, product: "Cake", quantity: 10),
+      ExpiryItem(expiryDate: 1, product: "Rice", quantity: 13),
       ExpiryItem(expiryDate: 4, product: "Corn", quantity: 15),
       ExpiryItem(expiryDate: 4, product: "McNuggets", quantity: 1500),
-      ExpiryItem(expiryDate: 4, product: "Whole Chicken", quantity: 10),
-      ExpiryItem(expiryDate: 4, product: "Cheese", quantity: 13),
       ExpiryItem(expiryDate: 7, product: "Venison", quantity: 5),
       ExpiryItem(expiryDate: 7, product: "Pork", quantity: 7),
-      ExpiryItem(expiryDate: 7, product: "Corn", quantity: 15),
-      ExpiryItem(expiryDate: 7, product: "McNuggets", quantity: 1500),
+      //
+      ExpiryItem(expiryDate: 0, product: "Whole Chicken", quantity: 10),
+      ExpiryItem(expiryDate: 0, product: "Cheese", quantity: 13),
+      ExpiryItem(expiryDate: 1, product: "Cake", quantity: 10),
+      ExpiryItem(expiryDate: 1, product: "Rice", quantity: 13),
+      ExpiryItem(expiryDate: 4, product: "Corn", quantity: 15),
+      ExpiryItem(expiryDate: 4, product: "McNuggets", quantity: 1500),
+      ExpiryItem(expiryDate: 7, product: "Venison", quantity: 5),
+      ExpiryItem(expiryDate: 7, product: "Pork", quantity: 7),
+      //
+      ExpiryItem(expiryDate: 0, product: "Whole Chicken", quantity: 10),
+      ExpiryItem(expiryDate: 0, product: "Cheese", quantity: 13),
+      ExpiryItem(expiryDate: 1, product: "Cake", quantity: 10),
+      ExpiryItem(expiryDate: 1, product: "Rice", quantity: 13),
+      ExpiryItem(expiryDate: 4, product: "Corn", quantity: 15),
+      ExpiryItem(expiryDate: 4, product: "McNuggets", quantity: 1500),
+      ExpiryItem(expiryDate: 7, product: "Venison", quantity: 5),
+      ExpiryItem(expiryDate: 7, product: "Pork", quantity: 7),
     ];
     List<ExpiryItem> today = [];
+    List<ExpiryItem> tomorrow = [];
     List<ExpiryItem> days5 = [];
     List<ExpiryItem> days7 = [];
 
@@ -117,6 +172,8 @@ class CalculateItems {
       if(itemName == null || item.product.toLowerCase().contains(itemName)) {
         if(item.expiryDate == 0) {
           today.add(item);
+        }else if(item.expiryDate == 1) {
+          tomorrow.add(item);
         }else if(item.expiryDate <= 5) {
           days5.add(item);
         }else if(item.expiryDate <= 7) {
@@ -124,6 +181,6 @@ class CalculateItems {
         }
       }
     }
-    return [today, days5, days7];
+    return [today, tomorrow, days5, days7];
   }
 }
