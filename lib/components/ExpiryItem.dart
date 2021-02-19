@@ -1,17 +1,49 @@
 import 'package:flutter/material.dart';
 
 class ExpiryItem extends StatelessWidget {
-  int expiryDate;
-  String product;
-  int quantity;
+  final int expiryDate;
+  final String product;
+  final int quantity;
+  MaterialColor expiryStatus = Colors.green;
 
   ExpiryItem({ this.expiryDate, this.product, this.quantity });
 
   @override
   Widget build(BuildContext context) {
+
+    if(expiryDate < 2) {
+      expiryStatus = Colors.red;
+    }else if(expiryDate <= 5) {
+      expiryStatus = Colors.orange;
+    }
+
     return Card(
       elevation:0,
-      child: Padding(
+      child: ListTile(
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Text(product),
+            Container(
+              width:60.0,
+              child: Text(
+                quantity.toString(),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ],
+        ),
+        contentPadding: EdgeInsets.all(0.0),
+        leading: CircleAvatar(
+          radius: 22,
+          backgroundColor: expiryStatus,
+          child: CircleAvatar(
+            backgroundColor: Colors.white,
+            radius: 15,
+          ),
+        ),
+      ),
+      /*child: Padding(
         padding: EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 15.0),
         child: Row(
           children: <Widget>[
@@ -40,7 +72,7 @@ class ExpiryItem extends StatelessWidget {
             ),
           ],
         ),
-      ),
+      ),*/
     );
   }
 }
