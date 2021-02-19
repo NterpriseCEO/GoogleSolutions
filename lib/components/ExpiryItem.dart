@@ -23,12 +23,21 @@ class ExpiryItem extends StatelessWidget {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            Text(product),
+            Text(
+              product,
+              style: TextStyle(
+                fontSize:20.0,
+              ),
+            ),
             Container(
               width:60.0,
               child: Text(
                 quantity.toString(),
                 textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize:20.0,
+                ),
               ),
             ),
           ],
