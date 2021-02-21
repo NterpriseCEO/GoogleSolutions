@@ -19,49 +19,43 @@ class _ExpiryListState extends State<ExpiryList> {
     List items = CalculateItems().getItems(widget.search);
     //Scrollable page
     return Padding(
-      padding: const EdgeInsets.all(10.0),
+      padding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 0.0),
       child: Stack(
         children: <Widget>[
+          //This is required for the SliverStickyHeader
           CustomScrollView(
+            //The StickyHeaders
             slivers: <Widget>[
+              //StickyHeader / content combo
               SliverStickyHeader(
-                header: Container(
-                  alignment: Alignment.centerLeft,
+                //ColoredBox is more efficient then container with color property
+                header: ColoredBox(
                   color: Colors.white,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Today',
-                        style: TextStyle(
-                          fontSize: 25.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
+                  child: Text(
+                    'Today',
+                    style: TextStyle(
+                      fontSize: 25.0,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 sliver: SliverList(
+                  //The content associated with a StickyHeader
                   delegate: SliverChildListDelegate(
+                    //Checks if there are items going of today, prints message if not
                     items[0].length > 0 ? items[0] : [Text("Good, Nothing is going off!")]
                   ),
                 ),
               ),
               SliverStickyHeader(
-                header: Container(
-                  alignment: Alignment.centerLeft,
+                header: ColoredBox(
                   color: Colors.white,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Tomorrow',
-                        style: TextStyle(
-                          fontSize: 25.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
+                  child: Text(
+                    'Tomorrow',
+                    style: TextStyle(
+                      fontSize: 25.0,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 sliver: SliverList(
@@ -71,20 +65,14 @@ class _ExpiryListState extends State<ExpiryList> {
                 ),
               ),
               SliverStickyHeader(
-                header: Container(
-                  alignment: Alignment.centerLeft,
+                header: ColoredBox(
                   color: Colors.white,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Next 5 Days',
-                        style: TextStyle(
-                          fontSize: 25.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
+                  child: Text(
+                    'Next 5 Days',
+                    style: TextStyle(
+                      fontSize: 25.0,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 sliver: SliverList(
@@ -94,20 +82,14 @@ class _ExpiryListState extends State<ExpiryList> {
                 ),
               ),
               SliverStickyHeader(
-                header: Container(
-                  alignment: Alignment.centerLeft,
+                header: ColoredBox(
                   color: Colors.white,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Next 7 Days',
-                        style: TextStyle(
-                          fontSize: 25.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
+                  child: Text(
+                    'Next 7 Days',
+                    style: TextStyle(
+                      fontSize: 25.0,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 sliver: SliverList(
@@ -118,6 +100,8 @@ class _ExpiryListState extends State<ExpiryList> {
               ),
             ],
           ),
+          //Positions the Quantity text to the right
+          //of the page so that it is constantly visible
           Align(
             alignment: Alignment.topRight,
             child: Text(

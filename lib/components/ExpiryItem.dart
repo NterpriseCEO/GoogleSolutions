@@ -11,6 +11,7 @@ class ExpiryItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
+    //Sets the circle colour based on expiry dates
     if(expiryDate < 2) {
       expiryStatus = Colors.red;
     }else if(expiryDate <= 5) {
@@ -20,6 +21,7 @@ class ExpiryItem extends StatelessWidget {
     return Card(
       elevation:0,
       child: ListTile(
+        //Product name and quantity
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
@@ -42,7 +44,9 @@ class ExpiryItem extends StatelessWidget {
             ),
           ],
         ),
+        //Removes the padding from the ListTitle
         contentPadding: EdgeInsets.all(0.0),
+        //The colour ring icon
         leading: CircleAvatar(
           radius: 22,
           backgroundColor: expiryStatus,
@@ -52,36 +56,6 @@ class ExpiryItem extends StatelessWidget {
           ),
         ),
       ),
-      /*child: Padding(
-        padding: EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 15.0),
-        child: Row(
-          children: <Widget>[
-            Expanded(
-              flex: 3,
-              child:Text(
-                expiryDate.toString(),
-              ),
-            ),
-            Expanded(
-              flex: 4,
-              child:Text(
-                product,
-                textAlign: TextAlign.center,
-              ),
-            ),
-            Expanded(
-              flex: 2,
-              child:Text(
-                quantity.toString(),
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),*/
     );
   }
 }

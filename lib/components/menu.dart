@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import "package:best_before_app/pages/CameraPage.dart";
 import "package:best_before_app/pages/ExpirationPage.dart";
+import "package:best_before_app/pages/InventoryOverview.dart";
 
 class Menu extends StatefulWidget {
   @override
@@ -57,7 +58,7 @@ class _MenuState extends State<Menu> {
                 Container(
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Text("page 3"),
+                    child: InventoryOverview(),
                   ),
                 ),
               ],
