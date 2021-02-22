@@ -1,51 +1,6 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
-
-class InventoryCard extends StatelessWidget {
-  String category;
-  InventoryCard({ this.category });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        print("test");
-      },
-      child: Card(
-        elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15.0),
-          side: BorderSide(
-            color: Colors.orange,
-            width:2.0,
-          ),
-        ),
-        child: Padding(
-          padding: EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              Expanded(
-                  flex: 4,
-                  child: Image.asset("assets/vegetables.png"),
-              ),
-              Expanded(
-                flex: 1,
-                child: Text(
-                  category,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize:20.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
+import "package:best_before_app/components/InventoryCard.dart";
 
 class InventoryOverview extends StatefulWidget {
   @override
@@ -55,16 +10,42 @@ class InventoryOverview extends StatefulWidget {
 class _InventoryOverviewState extends State<InventoryOverview> {
   String search;
   TextEditingController _controller;
+  ScrollController _scrollController;
+
+  List<Widget> inventoryCards = [
+    InventoryCard(category: "Vegetables"),
+    InventoryCard(category: "Fruits"),
+    InventoryCard(category: "Dairy"),
+    InventoryCard(category: "Sauces"),
+    InventoryCard(category: "Breads"),
+    InventoryCard(category: "Meat"),
+    InventoryCard(category: "Home Cooked Meals"),
+  ];
 
   @override
   void initState() {
-    _controller = TextEditingController();
     super.initState();
+    _controller = TextEditingController();
+
+    _scrollController = new ScrollController(
+      initialScrollOffset: 0.0,
+      keepScrollOffset: true,
+    );
   }
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+
+  void toEnd() {
+    Timer(Duration(milliseconds: 100), () {
+      _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: Duration(milliseconds: 500),
+          curve: Curves.ease
+      );
+    });
   }
 
   @override
@@ -142,7 +123,13 @@ class _InventoryOverviewState extends State<InventoryOverview> {
                   Expanded(
                     flex: 1,
                     child: TextButton.icon(
-                      onPressed: (){},
+                      onPressed: () {
+                        setState(() {
+                          search = "";
+                          inventoryCards.add(InventoryCard(category: "U Wot M8?"));
+                          toEnd();
+                        });
+                      },
                       icon: Icon(
                         Icons.add,
                         size: 45.0,
@@ -159,20 +146,28 @@ class _InventoryOverviewState extends State<InventoryOverview> {
             flex: 7,
             child: GridView.count(
               crossAxisCount: 2,
-              children: <Widget>[
-                InventoryCard(category: "Vegetables"),
-                InventoryCard(category: "Fruits"),
-                InventoryCard(category: "Dairy"),
-                InventoryCard(category: "Sauces"),
-                InventoryCard(category: "Breads"),
-                InventoryCard(category: "Meat"),
-                InventoryCard(category: "Home Cooked Meals"),
-              ],
+              children: filterCards(search?.toLowerCase(), inventoryCards),
+              controller: _scrollController,
             ),
           ),
         ],
       ),
     );
+  }
+}
+
+List<Widget> filterCards(String query, List<Widget> inventoryCards) {
+  List<Widget> items = [];
+  print(inventoryCards);
+  if(query != null) {
+    for(InventoryCard item in inventoryCards) {
+      if(item.category.toLowerCase().contains(query)) {
+        items.add(item);
+      }
+    }
+    return items;
+  }else {
+    return inventoryCards;
   }
 }
 
