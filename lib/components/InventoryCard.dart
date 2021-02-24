@@ -8,7 +8,9 @@ class InventoryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        print("test");
+        Navigator.pushNamed(context, "/inventory", arguments: {
+          "category": category
+        });
       },
       child: Card(
         elevation: 0,
