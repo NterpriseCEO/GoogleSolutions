@@ -16,23 +16,27 @@ class _InventoryState extends State<Inventory> {
     title = ModalRoute.of(context).settings.arguments;
     Color indicator = Colors.red[200];
 
-
+    //Creates the list of expiry items
     Widget list() {
       return ListView.builder(
         itemCount: items.length,
         itemBuilder: (context, index) {
           final item = items[index];
-
+          //Testing indicator colours
           indicator = indicator == Colors.red[200] ? Colors.green[200] : Colors.red[200];
 
+          //A removable list item
           return Dismissible(
             key: Key(item),
+            //The direction: swipe left to remove
             direction: DismissDirection.endToStart,
+            //Removes item when dismissed
             onDismissed: (direction) {
               setState(() {
                 items.removeAt(index);
               });
             },
+            //The list item's content
             child: ColoredBox(
               color: indicator,
               child: ListTile(
@@ -56,6 +60,7 @@ class _InventoryState extends State<Inventory> {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
+                            //Item quantity
                             Text(
                               "Quantity X",
                               style: TextStyle(
@@ -92,15 +97,15 @@ class _InventoryState extends State<Inventory> {
             background: Container(
               color: Colors.orange,
               child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.only(right: 15.0),
-                      child: Icon(
-                        Icons.delete,
-                      ),
-                    )
-                  ]
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.only(right: 15.0),
+                    child: Icon(
+                      Icons.delete,
+                    ),
+                  )
+                ]
               ),
             ),
           );
@@ -111,10 +116,11 @@ class _InventoryState extends State<Inventory> {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 0.0),
+          padding: EdgeInsets.only(top: 8.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
+              //Page title and back button
               Expanded(
                 flex: 1,
                 child: Padding(
@@ -210,11 +216,7 @@ class _InventoryState extends State<Inventory> {
                         flex: 1,
                         child: TextButton.icon(
                           onPressed: () {
-                            setState(() {
-                              //search = "";
-                              //inventoryCards.add(InventoryCard(category: "U Wot M8?"));
-                              //toEnd();
-                            });
+                            Navigator.pop(context, 1);
                           },
                           icon: Icon(
                             Icons.add,
@@ -228,10 +230,21 @@ class _InventoryState extends State<Inventory> {
                   ),
                 ),
               ),
+              //Adds the list of removable items from the list
               Expanded(
                 flex: 7,
-                child: items.isNotEmpty ? list() : Text("This List is Empty"),
-              )
+                child: items.isNotEmpty ? list() :
+                Center(
+                  child: Text(
+                    "There are no ${title["category"]} in your inventory",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20.0,
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
         ),

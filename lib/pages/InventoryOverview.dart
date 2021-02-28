@@ -2,7 +2,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import "package:best_before_app/components/InventoryCard.dart";
 
+typedef Callback(int pageNumber);
+
 class InventoryOverview extends StatefulWidget {
+  final Callback goToPage;
+
+  InventoryOverview({ Key key, @required this.goToPage }): super(key: key);
   @override
   _InventoryOverviewState createState() => _InventoryOverviewState();
 }
@@ -12,15 +17,7 @@ class _InventoryOverviewState extends State<InventoryOverview> {
   TextEditingController _controller;
   ScrollController _scrollController;
 
-  List<Widget> inventoryCards = [
-    InventoryCard(category: "Vegetables"),
-    InventoryCard(category: "Fruits"),
-    InventoryCard(category: "Dairy"),
-    InventoryCard(category: "Sauces"),
-    InventoryCard(category: "Breads"),
-    InventoryCard(category: "Meat"),
-    InventoryCard(category: "Home Cooked Meals"),
-  ];
+  List<Widget> inventoryCards;
 
   @override
   void initState() {
@@ -50,6 +47,53 @@ class _InventoryOverviewState extends State<InventoryOverview> {
 
   @override
   Widget build(BuildContext context) {
+    if(inventoryCards == null) {
+      inventoryCards = [
+        InventoryCard(
+          category: "Vegetables",
+          goToPage: (int page) {
+            widget.goToPage(page);
+          },
+        ),
+        InventoryCard(
+          category: "Fruit",
+          goToPage: (int page) {
+            widget.goToPage(page);
+          },
+        ),
+        InventoryCard(
+          category: "Dairy",
+          goToPage: (int page) {
+            widget.goToPage(page);
+          },
+        ),
+        InventoryCard(
+          category: "Sauces",
+          goToPage: (int page) {
+            widget.goToPage(page);
+          },
+        ),
+        InventoryCard(
+          category: "Bread",
+          goToPage: (int page) {
+            widget.goToPage(page);
+          },
+        ),
+        InventoryCard(
+          category: "Meat",
+          goToPage: (int page) {
+            widget.goToPage(page);
+          },
+        ),
+        InventoryCard(
+          category: "Home Cooked Meals",
+          goToPage: (int page) {
+            widget.goToPage(page);
+          },
+        ),
+      ];
+    }
+
     return Padding(
       padding: EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0.0),
       child: Column(
@@ -126,10 +170,14 @@ class _InventoryOverviewState extends State<InventoryOverview> {
                       onPressed: () {
                         setState(() {
                           search = "";
-                          inventoryCards.add(InventoryCard(category: "U Wot M8?"));
+                          //TODO: code for properly adding a new category
+                          inventoryCards.add(InventoryCard(
+                            category: "U Wot M8?"
+                          ));
                           toEnd();
                         });
                       },
+                      //The the "+" icon
                       icon: Icon(
                         Icons.add,
                         size: 45.0,
@@ -142,6 +190,7 @@ class _InventoryOverviewState extends State<InventoryOverview> {
               ),
             ),
           ),
+          //The scrollable list of cards
           Expanded(
             flex: 7,
             child: GridView.count(
@@ -159,8 +208,11 @@ class _InventoryOverviewState extends State<InventoryOverview> {
 List<Widget> filterCards(String query, List<Widget> inventoryCards) {
   List<Widget> items = [];
   print(inventoryCards);
+  //If search result is not null, filter cards,
+  //otherwise return all cards
   if(query != null) {
     for(InventoryCard item in inventoryCards) {
+      //Checks if the search query matches any title cards
       if(item.category.toLowerCase().contains(query)) {
         items.add(item);
       }

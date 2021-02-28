@@ -152,6 +152,7 @@ class CalculateItems {
     List<ExpiryItem> days5 = [];
     List<ExpiryItem> days7 = [];
 
+    //Checks the date for a specific list item and decides what expiry list to ad it to
     for(ExpiryItem item in expiryItems) {
       if(itemName == null || item.product.toLowerCase().contains(itemName)) {
         if(item.expiryDate == 0) {
@@ -165,6 +166,7 @@ class CalculateItems {
         }
       }
     }
+    //Returns the lists of data so that it can be rendered
     return [today, tomorrow, days5, days7];
   }
 }

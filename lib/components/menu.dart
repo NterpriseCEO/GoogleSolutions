@@ -58,7 +58,23 @@ class _MenuState extends State<Menu> {
                 Container(
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: InventoryOverview(),
+                    child: InventoryOverview(
+                      goToPage: (int page) {
+                        setState(() {
+                          currentPage = page;
+                        });
+                        //pageController.jumpToPage(page);
+                        pageController.animateToPage(
+                          page,
+                          //The animation speed
+                          duration: Duration(
+                            milliseconds: 500,
+                          ),
+                          //The animation tweening effect
+                          curve: Curves.easeInOut,
+                        );
+                      },
+                    ),
                   ),
                 ),
               ],
