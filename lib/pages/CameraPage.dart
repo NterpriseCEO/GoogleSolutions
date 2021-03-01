@@ -1,3 +1,4 @@
+import 'package:best_before_app/components/BarcodeResult.dart';
 import 'package:dropdown_banner/dropdown_banner.dart';
 import "package:flutter/material.dart";
 import "package:camera/camera.dart";
@@ -38,7 +39,6 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
   Future<void> scanBarcode() async{
     try {
 
-      print("HEyaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" + barcode);
       barcode = await FlutterBarcodeScanner.scanBarcode(
         "#ff6666", // This is the line color for scanning part
         "Cancel", //cancel option
@@ -59,7 +59,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
         textStyle: TextStyle(color: Colors.white),
       );
     }
-    print("The BARCODE IS AAAAAAAAAAAAAAAAAAAAAA" + barcode);
+    barcodeResult(barcode);
   }
 
 
