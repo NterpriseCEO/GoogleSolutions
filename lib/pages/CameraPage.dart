@@ -1,5 +1,8 @@
+import 'package:dropdown_banner/dropdown_banner.dart';
 import "package:flutter/material.dart";
 import "package:camera/camera.dart";
+import 'package:flutter/services.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 
 class ScanPicture extends StatefulWidget {
   @override
@@ -13,6 +16,8 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
   CameraController controller;
   //The int value that will hold value of the current camera
   int selected = 0;
+
+  String barcode = 'Unknown'; //This will hold the returned value from a barcode
 
   //The camera setup function
   Future<void> setupCamera() async {
@@ -29,6 +34,29 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
     await controller.initialize();
     return controller;
   }
+  Future<void> scanBarcode() async{
+    try {
+      final barcode = await FlutterBarcodeScanner.scanBarcode(
+        "#ff6666", // This is the line color for scanning part
+        "Cancel", //cancel option
+        false, //disabling flash as an option
+        ScanMode.BARCODE,
+      );
+      if (!mounted) return;
+
+      setState(() {
+        this.barcode = barcode;
+      });
+    } on PlatformException{
+      barcode = 'Failed to get platform version.';
+      DropdownBanner.showBanner(
+        text: 'Failed to complete scan request',
+        color: Colors.red[600],
+        textStyle: TextStyle(color: Colors.white),
+      );
+    }
+  }
+
 
   @override
   void dispose() {
@@ -89,7 +117,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
                   ),
                   //The button with a spherical border
                   child: TextButton(
-                    onPressed: () {},
+                    onPressed: scanBarcode,
                     style: ElevatedButton.styleFrom(
                       primary: Colors.black.withOpacity(0.2),
                       shape: CircleBorder(
