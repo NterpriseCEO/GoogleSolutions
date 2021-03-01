@@ -34,14 +34,18 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
     await controller.initialize();
     return controller;
   }
+
   Future<void> scanBarcode() async{
     try {
-      final barcode = await FlutterBarcodeScanner.scanBarcode(
+
+      print("HEyaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" + barcode);
+      barcode = await FlutterBarcodeScanner.scanBarcode(
         "#ff6666", // This is the line color for scanning part
         "Cancel", //cancel option
         false, //disabling flash as an option
         ScanMode.BARCODE,
       );
+
       if (!mounted) return;
 
       setState(() {
@@ -55,6 +59,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
         textStyle: TextStyle(color: Colors.white),
       );
     }
+    print("The BARCODE IS AAAAAAAAAAAAAAAAAAAAAA" + barcode);
   }
 
 
