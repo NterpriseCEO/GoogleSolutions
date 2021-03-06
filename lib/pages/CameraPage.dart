@@ -1,14 +1,17 @@
 import 'package:best_before_app/components/BarcodeResult.dart';
 import 'package:dropdown_banner/dropdown_banner.dart';
+import 'package:flutter/cupertino.dart';
 import "package:flutter/material.dart";
 import "package:camera/camera.dart";
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'package:flutter_mobile_vision/flutter_mobile_vision.dart';
 
 class ScanPicture extends StatefulWidget {
   @override
   _ScanPictureState createState() => _ScanPictureState();
 }
+
 
 class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
   //The cameras
@@ -17,6 +20,9 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
   CameraController controller;
   //The int value that will hold value of the current camera
   int selected = 0;
+  bool barCodeScanned = true;
+  String expiryDate;
+  int _ocrCamera = FlutterMobileVision.CAMERA_BACK;
 
   String barcode = 'Unknown'; //This will hold the returned value from a barcode
 
@@ -59,7 +65,59 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
         textStyle: TextStyle(color: Colors.white),
       );
     }
-    barcodeResult(barcode);
+    String itemName = await barcodeResult("20262969");
+    _showMyDialog(itemName);
+
+  }
+
+  Future<Null> readExpiry() async {
+    List<OcrText> texts = [];
+    try {
+      texts = await FlutterMobileVision.read(
+        camera: _ocrCamera,
+        waitTap: true,
+      );
+      setState(() {
+        expiryDate = texts[0].value;
+      });
+    } on Exception {
+      texts.add( OcrText('Failed to recognize text'));
+    }
+  }
+
+  Future<void> _showMyDialog(String itemName) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Product name is $itemName'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Did we get it right?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Approve'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                //call expiry scan function
+                readExpiry();
+              },
+            ),
+            TextButton(
+              child: Text("Disapprove"),
+              onPressed: () {
+                // todo: ask the user for input to determine product name
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
 
