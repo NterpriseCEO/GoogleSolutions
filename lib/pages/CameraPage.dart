@@ -21,7 +21,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
   //The int value that will hold value of the current camera
   int selected = 0;
   bool barCodeScanned = true;
-  String expiryDate;
+  String expiryDate = "EMPTY";
   int _ocrCamera = FlutterMobileVision.CAMERA_BACK;
 
   String barcode = 'Unknown'; //This will hold the returned value from a barcode
@@ -65,24 +65,9 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
         textStyle: TextStyle(color: Colors.white),
       );
     }
-    String itemName = await barcodeResult("20262969");
+    String itemName = await barcodeResult(this.barcode);
     _showMyDialog(itemName);
 
-  }
-
-  Future<Null> readExpiry() async {
-    List<OcrText> texts = [];
-    try {
-      texts = await FlutterMobileVision.read(
-        camera: _ocrCamera,
-        waitTap: true,
-      );
-      setState(() {
-        expiryDate = texts[0].value;
-      });
-    } on Exception {
-      texts.add( OcrText('Failed to recognize text'));
-    }
   }
 
   Future<void> _showMyDialog(String itemName) async {
@@ -199,6 +184,24 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
       );
     }else {
       return Text("loading...");
+    }
+  }
+
+  Future<Null> readExpiry() async {
+    List<OcrText> texts = [];
+    try {
+      texts = await FlutterMobileVision.read(
+        camera: _ocrCamera,
+        waitTap: true,
+      );
+      setState(() {
+        expiryDate = texts[0].value;
+        for(OcrText text in texts) {
+          print('valueis ${text.value}');
+        }
+      });
+    } on Exception {
+      texts.add( OcrText('Failed to recognize text'));
     }
   }
 }

@@ -17,6 +17,20 @@ class _ExpiryListState extends State<ExpiryList> {
   Widget build(BuildContext context) {
     //List of dummy data items
     List items = CalculateItems().getItems(widget.search);
+
+    Widget emptyList() {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 20.0),
+        child: Text(
+          "Good, Nothing is going off!",
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize:20.0,
+          )
+        ),
+      );
+    }
+
     //Scrollable page
     return Padding(
       padding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 0.0),
@@ -27,6 +41,26 @@ class _ExpiryListState extends State<ExpiryList> {
             //The StickyHeaders
             slivers: <Widget>[
               //StickyHeader / content combo
+              SliverStickyHeader(
+                //ColoredBox is more efficient then container with color property
+                header: ColoredBox(
+                  color: Colors.white,
+                  child: Text(
+                    'Expired items',
+                    style: TextStyle(
+                      fontSize: 25.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                sliver: SliverList(
+                  //The content associated with a StickyHeader
+                  delegate: SliverChildListDelegate(
+                    //Checks if there are items going of today, prints message if not
+                      items[0].length > 0 ? items[0] : [emptyList()]
+                  ),
+                ),
+              ),
               SliverStickyHeader(
                 //ColoredBox is more efficient then container with color property
                 header: ColoredBox(
@@ -43,7 +77,7 @@ class _ExpiryListState extends State<ExpiryList> {
                   //The content associated with a StickyHeader
                   delegate: SliverChildListDelegate(
                     //Checks if there are items going of today, prints message if not
-                    items[0].length > 0 ? items[0] : [Text("Good, Nothing is going off!")]
+                    items[1].length > 0 ? items[1] : [emptyList()]
                   ),
                 ),
               ),
@@ -60,7 +94,7 @@ class _ExpiryListState extends State<ExpiryList> {
                 ),
                 sliver: SliverList(
                   delegate: SliverChildListDelegate(
-                      items[1].length > 0 ? items[1] : [Text("Good, Nothing is going off!")]
+                      items[2].length > 0 ? items[2] : [emptyList()]
                   ),
                 ),
               ),
@@ -77,7 +111,7 @@ class _ExpiryListState extends State<ExpiryList> {
                 ),
                 sliver: SliverList(
                   delegate: SliverChildListDelegate(
-                      items[2].length > 0 ? items[2] : [Text("Good, Nothing is going off!")]
+                      items[3].length > 0 ? items[3] : [emptyList()]
                   ),
                 ),
               ),
@@ -94,7 +128,7 @@ class _ExpiryListState extends State<ExpiryList> {
                 ),
                 sliver: SliverList(
                   delegate: SliverChildListDelegate(
-                      items[3].length > 0 ? items[3] : [Text("Good, Nothing is going off!")]
+                      items[4].length > 0 ? items[4] : [emptyList()]
                   ),
                 ),
               ),
@@ -120,33 +154,34 @@ class _ExpiryListState extends State<ExpiryList> {
 class CalculateItems {
   List<List> getItems(String itemName) {
     List<ExpiryItem> expiryItems = [
-      ExpiryItem(expiryDate: 0, product: "Whole Chicken", quantity: 10),
-      ExpiryItem(expiryDate: 0, product: "Cheese", quantity: 13),
-      ExpiryItem(expiryDate: 1, product: "Cake", quantity: 10),
-      ExpiryItem(expiryDate: 1, product: "Rice", quantity: 13),
-      ExpiryItem(expiryDate: 4, product: "Corn", quantity: 15),
-      ExpiryItem(expiryDate: 4, product: "McNuggets", quantity: 1500),
-      ExpiryItem(expiryDate: 7, product: "Venison", quantity: 5),
-      ExpiryItem(expiryDate: 7, product: "Pork", quantity: 7),
+      //ExpiryItem(expiryDate: -3, product: "Carrots", quantity: 10),
+      //ExpiryItem(expiryDate: 0, product: "Cheese", quantity: 13),
+      //ExpiryItem(expiryDate: 1, product: "Cake", quantity: 10),
+      //ExpiryItem(expiryDate: 1, product: "Rice", quantity: 13),
+      //ExpiryItem(expiryDate: 4, product: "Corn", quantity: 15),
+      //ExpiryItem(expiryDate: 4, product: "McNuggets", quantity: 1500),
+      //ExpiryItem(expiryDate: 7, product: "Venison", quantity: 5),
+      //ExpiryItem(expiryDate: 7, product: "Pork", quantity: 7),
       //
-      ExpiryItem(expiryDate: 0, product: "Whole Chicken", quantity: 10),
-      ExpiryItem(expiryDate: 0, product: "Cheese", quantity: 13),
-      ExpiryItem(expiryDate: 1, product: "Cake", quantity: 10),
-      ExpiryItem(expiryDate: 1, product: "Rice", quantity: 13),
-      ExpiryItem(expiryDate: 4, product: "Corn", quantity: 15),
-      ExpiryItem(expiryDate: 4, product: "McNuggets", quantity: 1500),
-      ExpiryItem(expiryDate: 7, product: "Venison", quantity: 5),
-      ExpiryItem(expiryDate: 7, product: "Pork", quantity: 7),
+      //ExpiryItem(expiryDate: -2, product: "Peas", quantity: 10),
+      //ExpiryItem(expiryDate: 0, product: "Cheese", quantity: 13),
+      //ExpiryItem(expiryDate: 1, product: "Cake", quantity: 10),
+      //ExpiryItem(expiryDate: 1, product: "Rice", quantity: 13),
+      //ExpiryItem(expiryDate: 4, product: "Corn", quantity: 15),
+      //ExpiryItem(expiryDate: 4, product: "McNuggets", quantity: 1500),
+      //ExpiryItem(expiryDate: 7, product: "Venison", quantity: 5),
+      //ExpiryItem(expiryDate: 7, product: "Pork", quantity: 7),
       //
-      ExpiryItem(expiryDate: 0, product: "Whole Chicken", quantity: 10),
-      ExpiryItem(expiryDate: 0, product: "Cheese", quantity: 13),
-      ExpiryItem(expiryDate: 1, product: "Cake", quantity: 10),
-      ExpiryItem(expiryDate: 1, product: "Rice", quantity: 13),
-      ExpiryItem(expiryDate: 4, product: "Corn", quantity: 15),
-      ExpiryItem(expiryDate: 4, product: "McNuggets", quantity: 1500),
-      ExpiryItem(expiryDate: 7, product: "Venison", quantity: 5),
-      ExpiryItem(expiryDate: 7, product: "Pork", quantity: 7),
+      //ExpiryItem(expiryDate: -1, product: "Celery", quantity: 10),
+      //ExpiryItem(expiryDate: 0, product: "Cheese", quantity: 13),
+      //ExpiryItem(expiryDate: 1, product: "Cake", quantity: 10),
+      //ExpiryItem(expiryDate: 1, product: "Rice", quantity: 13),
+      //ExpiryItem(expiryDate: 4, product: "Corn", quantity: 15),
+      //ExpiryItem(expiryDate: 4, product: "McNuggets", quantity: 1500),
+      //ExpiryItem(expiryDate: 7, product: "Venison", quantity: 5),
+      //ExpiryItem(expiryDate: 7, product: "Pork", quantity: 7),
     ];
+    List<ExpiryItem> goneoff = [];
     List<ExpiryItem> today = [];
     List<ExpiryItem> tomorrow = [];
     List<ExpiryItem> days5 = [];
@@ -155,7 +190,9 @@ class CalculateItems {
     //Checks the date for a specific list item and decides what expiry list to ad it to
     for(ExpiryItem item in expiryItems) {
       if(itemName == null || item.product.toLowerCase().contains(itemName)) {
-        if(item.expiryDate == 0) {
+        if(item.expiryDate < 0) {
+          goneoff.add(item);
+        }else if(item.expiryDate == 0) {
           today.add(item);
         }else if(item.expiryDate == 1) {
           tomorrow.add(item);
@@ -167,6 +204,6 @@ class CalculateItems {
       }
     }
     //Returns the lists of data so that it can be rendered
-    return [today, tomorrow, days5, days7];
+    return [goneoff, today, tomorrow, days5, days7];
   }
 }

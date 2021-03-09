@@ -100,93 +100,84 @@ class _InventoryOverviewState extends State<InventoryOverview> {
         children: <Widget>[
           Expanded(
             flex: 1,
-            child: Text(
-              "My Inventory",
-              style: TextStyle(
-                fontSize: 40.0,
-                fontWeight: FontWeight.bold,
-              ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text(
+                  "My Inventory",
+                  style: TextStyle(
+                    fontSize: 40.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                TextButton.icon(
+                  onPressed: () {
+                    setState(() {
+                      search = "";
+                      //TODO: code for properly adding a new category
+                      inventoryCards.add(InventoryCard(
+                        category: "U Wot M8?"
+                      ));
+                      toEnd();
+                    });
+                  },
+                  //The the "+" icon
+                  icon: Icon(
+                    Icons.add,
+                    size: 45.0,
+                    color: Colors.amber[800],
+                  ),
+                  label: Text(""),
+                ),
+              ],
             ),
           ),
           Expanded(
             flex: 1,
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.0),
-              //The search field
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 3,
-                    child: TextField(
-                      //Change the search variable when typing
-                      onChanged: (String val) async {
-                        setState(() {
-                          search = val;
-                        });
-                      },
-                      //The input styling
-                      decoration: InputDecoration(
-                        //Placeholder text
-                        hintText: "Search",
-                        //The magnifying glass icon
-                        prefixIcon: Icon(
-                          Icons.search,
-                          color: Colors.black,
-                        ),
-                        //The clear search icon
-                        suffixIcon: IconButton(
-                          icon: Icon(Icons.clear),
-                          onPressed: () {
-                            _controller.clear();
-                            //Clear search on click
-                            setState(() {
-                              search = "";
-                            });
-                          },
-                        ),
-                        //Background colour = true
-                        filled: true,
-                        //Background colour
-                        fillColor: Colors.grey[300],
-                        contentPadding: EdgeInsets.all(0.0),
-                        //Border when not focused
-                        enabledBorder: OutlineInputBorder(
-                          //Border colour
-                          borderSide: BorderSide(color: Colors.transparent),
-                          borderRadius: BorderRadius.circular(15.0),
-                        ),
-                        //Border when focused
-                        focusedBorder: OutlineInputBorder(
-                          //Border colour
-                          borderSide: BorderSide(color: Colors.transparent),
-                          borderRadius: BorderRadius.circular(15.0),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: TextButton.icon(
-                      onPressed: () {
-                        setState(() {
-                          search = "";
-                          //TODO: code for properly adding a new category
-                          inventoryCards.add(InventoryCard(
-                            category: "U Wot M8?"
-                          ));
-                          toEnd();
-                        });
-                      },
-                      //The the "+" icon
-                      icon: Icon(
-                        Icons.add,
-                        size: 45.0,
-                        color: Colors.amber[800],
-                      ),
-                      label: Text(""),
-                    ),
-                  ),
-                ],
+            child: TextField(
+              //Change the search variable when typing
+              onChanged: (String val) async {
+                setState(() {
+                  search = val;
+                });
+              },
+              //The input styling
+              decoration: InputDecoration(
+                //Placeholder text
+                hintText: "Search",
+                //The magnifying glass icon
+                prefixIcon: Icon(
+                  Icons.search,
+                  color: Colors.black,
+                ),
+                //The clear search icon
+                suffixIcon: IconButton(
+                  icon: Icon(Icons.clear),
+                  onPressed: () {
+                    _controller.clear();
+                    //Clear search on click
+                    setState(() {
+                      search = "";
+                    });
+                  },
+                ),
+                //Background colour = true
+                filled: true,
+                //Background colour
+                fillColor: Colors.grey[300],
+                contentPadding: EdgeInsets.all(0.0),
+                //Border when not focused
+                enabledBorder: OutlineInputBorder(
+                  //Border colour
+                  borderSide: BorderSide(color: Colors.transparent),
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                //Border when focused
+                focusedBorder: OutlineInputBorder(
+                  //Border colour
+                  borderSide: BorderSide(color: Colors.transparent),
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
               ),
             ),
           ),
