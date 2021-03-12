@@ -6,7 +6,7 @@ import 'notifications/LocalNotifications.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  initNotifications();
+  await initNotifications();
 
   runApp(MaterialApp(
     initialRoute: "/",

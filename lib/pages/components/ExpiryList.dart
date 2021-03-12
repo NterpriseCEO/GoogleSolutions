@@ -1,5 +1,6 @@
+import 'package:best_before_app/components/ExpiryItem.dart';
 import 'package:flutter/material.dart';
-import "package:best_before_app/components/ExpiryItem.dart";
+import "package:best_before_app/globals.dart";
 import "package:flutter_sticky_header/flutter_sticky_header.dart";
 
 class ExpiryList extends StatefulWidget {
@@ -10,13 +11,15 @@ class ExpiryList extends StatefulWidget {
   _ExpiryListState createState() => _ExpiryListState();
 }
 
-
 class _ExpiryListState extends State<ExpiryList> {
+
+  bool visible = true;
+  List<String> expired = [""];
 
   @override
   Widget build(BuildContext context) {
     //List of dummy data items
-    List items = CalculateItems().getItems(widget.search);
+    List items = getItems(widget.search);
 
     Widget emptyList() {
       return Padding(
@@ -45,20 +48,56 @@ class _ExpiryListState extends State<ExpiryList> {
                 //ColoredBox is more efficient then container with color property
                 header: ColoredBox(
                   color: Colors.white,
-                  child: Text(
+                  child: visible ? Text(
                     'Expired items',
                     style: TextStyle(
                       fontSize: 25.0,
                       fontWeight: FontWeight.bold,
                     ),
-                  ),
+                  ) : null,
                 ),
                 sliver: SliverList(
                   //The content associated with a StickyHeader
-                  delegate: SliverChildListDelegate(
-                    //Checks if there are items going of today, prints message if not
-                      items[0].length > 0 ? items[0] : [emptyList()]
-                  ),
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    final item = expired[index];
+                    return Dismissible(
+                      key: Key(item),
+                      //Removes item when dismissed
+                      onDismissed: (direction) {
+                        setState(() {
+                          visible = false;
+                          removeExpired();
+                          expired.remove(expired.removeAt(index));
+                        });
+                      },
+
+                      //List of items going off today
+                      child: items[0].length > 0 ? Column(
+                        children: [
+                          for(int i = 0; i < items[0].length; i++) ExpiryItem(
+                            expiryDate: items[0][i].expiryDate,
+                            product: items[0][i].product,
+                            quantity: items[0][i].quantity,
+                            callback: () => setState((){removeItem(items[0][i]);})
+                          ),
+                        ],
+                      ) : emptyList(),
+                      background: Container(
+                        color: Colors.red,
+                        child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: <Widget>[
+                              Padding(
+                                padding: EdgeInsets.only(right: 15.0),
+                                child: Icon(
+                                  Icons.delete,
+                                ),
+                              )
+                            ]
+                        ),
+                      ),
+                    );
+                  },childCount: expired.length),
                 ),
               ),
               SliverStickyHeader(
@@ -76,8 +115,15 @@ class _ExpiryListState extends State<ExpiryList> {
                 sliver: SliverList(
                   //The content associated with a StickyHeader
                   delegate: SliverChildListDelegate(
-                    //Checks if there are items going of today, prints message if not
-                    items[1].length > 0 ? items[1] : [emptyList()]
+                    //Checks if there are items going off today, prints message if not
+                    items[1].length > 0 ? [
+                      for(int i = 0; i < items[1].length; i++) ExpiryItem(
+                        expiryDate: items[1][i].expiryDate,
+                        product: items[1][i].product,
+                        quantity: items[1][i].quantity,
+                        callback: () => setState((){removeItem(items[1][i]);})
+                      ),
+                    ] : [emptyList()],
                   ),
                 ),
               ),
@@ -94,7 +140,15 @@ class _ExpiryListState extends State<ExpiryList> {
                 ),
                 sliver: SliverList(
                   delegate: SliverChildListDelegate(
-                      items[2].length > 0 ? items[2] : [emptyList()]
+                    //Checks if there are items going off tomorrow, prints message if not
+                    items[2].length > 0 ? [
+                      for(int i = 0; i < items[2].length; i++) ExpiryItem(
+                        expiryDate: items[2][i].expiryDate,
+                        product: items[2][i].product,
+                        quantity: items[2][i].quantity,
+                        callback: () => setState((){removeItem(items[2][i]);})
+                      ),
+                    ] : [emptyList()],
                   ),
                 ),
               ),
@@ -111,7 +165,15 @@ class _ExpiryListState extends State<ExpiryList> {
                 ),
                 sliver: SliverList(
                   delegate: SliverChildListDelegate(
-                      items[3].length > 0 ? items[3] : [emptyList()]
+                    //Checks if there are items going off in 5 days, prints message if not
+                    items[3].length > 0 ? [
+                      for( int i = 0; i < items[3].length; i++) ExpiryItem(
+                        expiryDate: items[3][i].expiryDate,
+                        product: items[3][i].product,
+                        quantity: items[3][i].quantity,
+                        callback: () => setState((){removeItem(items[3][i]);})
+                      ),
+                    ] : [emptyList()],
                   ),
                 ),
               ),
@@ -127,8 +189,16 @@ class _ExpiryListState extends State<ExpiryList> {
                   ),
                 ),
                 sliver: SliverList(
+                //Checks if there are items going off in 7 days, prints message if not
                   delegate: SliverChildListDelegate(
-                      items[4].length > 0 ? items[4] : [emptyList()]
+                    items[4].length > 0 ? [
+                      for ( int i = 0; i < items[4].length; i++) ExpiryItem(
+                        expiryDate: items[4][i].expiryDate,
+                        product: items[4][i].product,
+                        quantity: items[4][i].quantity,
+                        callback: () => setState((){removeItem(items[4][i]);})
+                      ),
+                    ] : [emptyList()],
                   ),
                 ),
               ),
@@ -148,62 +218,5 @@ class _ExpiryListState extends State<ExpiryList> {
         ]
       ),
     );
-  }
-}
-
-class CalculateItems {
-  List<List> getItems(String itemName) {
-    List<ExpiryItem> expiryItems = [
-      //ExpiryItem(expiryDate: -3, product: "Carrots", quantity: 10),
-      //ExpiryItem(expiryDate: 0, product: "Cheese", quantity: 13),
-      //ExpiryItem(expiryDate: 1, product: "Cake", quantity: 10),
-      //ExpiryItem(expiryDate: 1, product: "Rice", quantity: 13),
-      //ExpiryItem(expiryDate: 4, product: "Corn", quantity: 15),
-      //ExpiryItem(expiryDate: 4, product: "McNuggets", quantity: 1500),
-      //ExpiryItem(expiryDate: 7, product: "Venison", quantity: 5),
-      //ExpiryItem(expiryDate: 7, product: "Pork", quantity: 7),
-      //
-      //ExpiryItem(expiryDate: -2, product: "Peas", quantity: 10),
-      //ExpiryItem(expiryDate: 0, product: "Cheese", quantity: 13),
-      //ExpiryItem(expiryDate: 1, product: "Cake", quantity: 10),
-      //ExpiryItem(expiryDate: 1, product: "Rice", quantity: 13),
-      //ExpiryItem(expiryDate: 4, product: "Corn", quantity: 15),
-      //ExpiryItem(expiryDate: 4, product: "McNuggets", quantity: 1500),
-      //ExpiryItem(expiryDate: 7, product: "Venison", quantity: 5),
-      //ExpiryItem(expiryDate: 7, product: "Pork", quantity: 7),
-      //
-      //ExpiryItem(expiryDate: -1, product: "Celery", quantity: 10),
-      //ExpiryItem(expiryDate: 0, product: "Cheese", quantity: 13),
-      //ExpiryItem(expiryDate: 1, product: "Cake", quantity: 10),
-      //ExpiryItem(expiryDate: 1, product: "Rice", quantity: 13),
-      //ExpiryItem(expiryDate: 4, product: "Corn", quantity: 15),
-      //ExpiryItem(expiryDate: 4, product: "McNuggets", quantity: 1500),
-      //ExpiryItem(expiryDate: 7, product: "Venison", quantity: 5),
-      //ExpiryItem(expiryDate: 7, product: "Pork", quantity: 7),
-    ];
-    List<ExpiryItem> goneoff = [];
-    List<ExpiryItem> today = [];
-    List<ExpiryItem> tomorrow = [];
-    List<ExpiryItem> days5 = [];
-    List<ExpiryItem> days7 = [];
-
-    //Checks the date for a specific list item and decides what expiry list to ad it to
-    for(ExpiryItem item in expiryItems) {
-      if(itemName == null || item.product.toLowerCase().contains(itemName)) {
-        if(item.expiryDate < 0) {
-          goneoff.add(item);
-        }else if(item.expiryDate == 0) {
-          today.add(item);
-        }else if(item.expiryDate == 1) {
-          tomorrow.add(item);
-        }else if(item.expiryDate <= 5) {
-          days5.add(item);
-        }else if(item.expiryDate <= 7) {
-          days7.add(item);
-        }
-      }
-    }
-    //Returns the lists of data so that it can be rendered
-    return [goneoff, today, tomorrow, days5, days7];
   }
 }

@@ -1,7 +1,5 @@
 import "package:flutter/material.dart";
 import "package:best_before_app/pages/components/ExpiryList.dart";
-import "package:best_before_app/notifications/LocalNotifications.dart";
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class ExpirationPage extends StatefulWidget {
   @override
@@ -24,29 +22,8 @@ class _ExpirationPageState extends State<ExpirationPage> {
     super.dispose();
   }
 
-  Future<void> silentNotification() async {
-    const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
-      "silent channel id",
-      "silent channel name",
-      "silent channel description",
-      playSound: false,
-      styleInformation: DefaultStyleInformation(true, true),
-    );
-    const IOSNotificationDetails iOSPlatformChannelSpecifics = IOSNotificationDetails(presentSound: false);
-    const MacOSNotificationDetails macOSPlatformChannelSpecifics = MacOSNotificationDetails(presentSound: false);
-    const NotificationDetails platformChannelSpecifics = NotificationDetails(
-      android: androidPlatformChannelSpecifics,
-      iOS: iOSPlatformChannelSpecifics,
-      macOS: macOSPlatformChannelSpecifics,
-    );
-    await flutterLocalNotificationsPlugin.show(0, "I iz internet cat", "Can i haz cookie?", platformChannelSpecifics);
-  }
-
   @override
   Widget build(BuildContext context) {
-
-    silentNotification();
-
     return Padding(
       padding: EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0.0),
       child: Column(
