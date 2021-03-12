@@ -1,4 +1,5 @@
 import 'package:best_before_app/components/BarcodeResult.dart';
+import 'package:best_before_app/components/ExpiryItem.dart';
 import 'package:dropdown_banner/dropdown_banner.dart';
 import 'package:flutter/cupertino.dart';
 import "package:flutter/material.dart";
@@ -6,6 +7,7 @@ import "package:camera/camera.dart";
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:flutter_mobile_vision/flutter_mobile_vision.dart';
+import "package:best_before_app/globals.dart";
 
 class ScanPicture extends StatefulWidget {
   @override
@@ -90,7 +92,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
               onPressed: () {
                 Navigator.of(context).pop();
                 //call expiry scan function
-                readExpiry();
+                readExpiry(itemName);
               },
             ),
             TextButton(
@@ -187,18 +189,23 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
     }
   }
 
-  Future<Null> readExpiry() async {
+  Future<Null> readExpiry(String productName) async {
     List<OcrText> texts = [];
     try {
       texts = await FlutterMobileVision.read(
+        flash: false,
+        autoFocus: true,
+        multiple: true,
         camera: _ocrCamera,
         waitTap: true,
       );
       setState(() {
         expiryDate = texts[0].value;
+        print('valueis ${texts}');
         for(OcrText text in texts) {
           print('valueis ${text.value}');
         }
+        expiryItems.add(ExpiryItemData(expiryDate: 3, product: productName, quantity: 1));
       });
     } on Exception {
       texts.add( OcrText('Failed to recognize text'));
