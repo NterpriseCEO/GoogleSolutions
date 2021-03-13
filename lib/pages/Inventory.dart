@@ -95,7 +95,7 @@ class _InventoryState extends State<Inventory> {
               ),
             ),
             background: Container(
-              color: Colors.orange,
+              color: Colors.red,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
@@ -103,6 +103,8 @@ class _InventoryState extends State<Inventory> {
                     padding: EdgeInsets.only(right: 15.0),
                     child: Icon(
                       Icons.delete,
+                      color: Colors.white,
+                      size: 30.0
                     ),
                   )
                 ]

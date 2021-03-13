@@ -34,6 +34,15 @@ class _ExpiryListState extends State<ExpiryList> {
       );
     }
 
+    void decrement(ExpiryItemData item, bool remove) {
+      setState((){
+        item.quantity--;
+        if(item.quantity == 0 || remove) {
+          removeItem(item);
+        }
+      });
+    }
+
     //Scrollable page
     return Padding(
       padding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 0.0),
@@ -62,6 +71,7 @@ class _ExpiryListState extends State<ExpiryList> {
                     final item = expired[index];
                     return Dismissible(
                       key: Key(item),
+                      direction: DismissDirection.startToEnd,
                       //Removes item when dismissed
                       onDismissed: (direction) {
                         setState(() {
@@ -78,7 +88,7 @@ class _ExpiryListState extends State<ExpiryList> {
                             expiryDate: items[0][i].expiryDate,
                             product: items[0][i].product,
                             quantity: items[0][i].quantity,
-                            callback: () => setState((){removeItem(items[0][i]);})
+                            callback: (remove) => decrement(items[0][i], remove),
                           ),
                         ],
                       ) : emptyList(),
@@ -121,7 +131,7 @@ class _ExpiryListState extends State<ExpiryList> {
                         expiryDate: items[1][i].expiryDate,
                         product: items[1][i].product,
                         quantity: items[1][i].quantity,
-                        callback: () => setState((){removeItem(items[1][i]);})
+                        callback: (remove) => decrement(items[1][i], remove),
                       ),
                     ] : [emptyList()],
                   ),
@@ -146,7 +156,7 @@ class _ExpiryListState extends State<ExpiryList> {
                         expiryDate: items[2][i].expiryDate,
                         product: items[2][i].product,
                         quantity: items[2][i].quantity,
-                        callback: () => setState((){removeItem(items[2][i]);})
+                        callback: (remove) => decrement(items[2][i], remove),
                       ),
                     ] : [emptyList()],
                   ),
@@ -171,7 +181,7 @@ class _ExpiryListState extends State<ExpiryList> {
                         expiryDate: items[3][i].expiryDate,
                         product: items[3][i].product,
                         quantity: items[3][i].quantity,
-                        callback: () => setState((){removeItem(items[3][i]);})
+                        callback: (remove) => decrement(items[3][i], remove),
                       ),
                     ] : [emptyList()],
                   ),
@@ -196,7 +206,7 @@ class _ExpiryListState extends State<ExpiryList> {
                         expiryDate: items[4][i].expiryDate,
                         product: items[4][i].product,
                         quantity: items[4][i].quantity,
-                        callback: () => setState((){removeItem(items[4][i]);})
+                        callback: (remove) => decrement(items[4][i], remove),
                       ),
                     ] : [emptyList()],
                   ),
