@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-typedef void Callback();
+typedef void Callback(bool remove);
 
 //Data for the expiry items
 class ExpiryItemData {
   final int expiryDate;
   final String product;
-  final int quantity;
+  int quantity;
 
   ExpiryItemData({this.expiryDate, this.product, this.quantity });
 }
@@ -26,14 +26,17 @@ class ExpiryItem extends StatelessWidget {
   Widget build(BuildContext context) {
 
     //Sets the circle colour based on expiry dates
-    if(this.expiryDate < 2) {
+    if(this.expiryDate < 0) {
       expiryStatus = Colors.red;
-    }else if(this.expiryDate <= 5) {
+    }else if(this.expiryDate <= 2) {
       expiryStatus = Colors.orange;
     }
 
-    return Card(
-      elevation:0,
+    return Dismissible(
+      key: UniqueKey(),
+      onDismissed: (direction) {
+        this.callback(true);
+      },
       child: ListTile(
         //Product name and quantity
         title: Row(
@@ -68,18 +71,36 @@ class ExpiryItem extends StatelessWidget {
         //Removes the padding from the ListTitle
         contentPadding: EdgeInsets.all(0.0),
         //The colour ring icon
-        leading: TextButton(
-          onPressed: () {
-            this.callback();
-          },
-          child: CircleAvatar(
-            radius: 22,
-            backgroundColor: expiryStatus,
-            child: CircleAvatar(
-              backgroundColor: Colors.white,
-              radius: 15,
-            ),
+        leading: ElevatedButton(
+          child: Text(
+            "-",
+            style: TextStyle(
+              fontSize:40,
+            )
           ),
+          style: ElevatedButton.styleFrom(
+            elevation: 0,
+            primary: expiryStatus,
+            shape: CircleBorder(),
+          ),
+          onPressed: () {
+            this.callback(false);
+          },
+        ),
+      ),
+      background: Container(
+        color: Colors.red,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.only(right: 15.0),
+              child: Icon(
+                Icons.delete,
+                color: Colors.white,
+              ),
+            )
+          ]
         ),
       ),
     );

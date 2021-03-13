@@ -104,7 +104,7 @@ class _InventoryOverviewState extends State<InventoryOverview> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Text(
-                  "My Inventory",
+                  "My Fridge",
                   style: TextStyle(
                     fontSize: 40.0,
                     fontWeight: FontWeight.bold,

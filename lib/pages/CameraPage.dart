@@ -10,6 +10,8 @@ import 'package:flutter_mobile_vision/flutter_mobile_vision.dart';
 import "package:best_before_app/globals.dart";
 
 class ScanPicture extends StatefulWidget {
+  bool disabled = true;
+
   @override
   _ScanPictureState createState() => _ScanPictureState();
 }
@@ -68,27 +70,21 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
       );
     }
     String itemName = await barcodeResult(this.barcode);
-    _showMyDialog(itemName);
+    confirmBarcode(itemName);
 
   }
 
-  Future<void> _showMyDialog(String itemName) async {
+  Future<void> confirmBarcode(String itemName) async {
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Product name is $itemName'),
-          content: SingleChildScrollView(
-            child: ListBody(
-              children: <Widget>[
-                Text('Did we get it right?'),
-              ],
-            ),
-          ),
+          content: Text('Did we get it right?'),
           actions: <Widget>[
             TextButton(
-              child: Text('Approve'),
+              child: Text('Yes'),
               onPressed: () {
                 Navigator.of(context).pop();
                 //call expiry scan function
@@ -96,9 +92,42 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
               },
             ),
             TextButton(
-              child: Text("Disapprove"),
+              child: Text("No"),
               onPressed: () {
-                // todo: ask the user for input to determine product name
+                Navigator.of(context).pop();
+                inputProductName();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> inputProductName() async {
+    String product;
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Add Product"),
+          content: TextField(
+            onChanged: (String name) async {
+              product = name;
+            },
+            decoration: InputDecoration(
+              hintText: "Enter product name",
+            ),
+          ),
+          actions: <Widget>[
+            ElevatedButton(
+              child: Text("Add"),
+              onPressed: () {
+                if(product != null && product != "") {
+                  Navigator.of(context).pop();
+                  readExpiry(product);
+                }
               },
             ),
           ],
