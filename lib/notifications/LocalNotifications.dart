@@ -4,6 +4,8 @@
 //import 'dart:ui';
 
 //import 'package:device_info/device_info.dart';
+import 'dart:math';
+
 import 'package:flutter/cupertino.dart';
 //import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -84,18 +86,17 @@ void initNotifications() async {
   );
 }
 
-int i = 0;
+var rand = Random();
 
 Future<void> notification(String product, int quantity, int expiry) async {
   //print("hello: ${tz.getLocation(currentTimeZone)}");
-  print(i);
   now = await tz.TZDateTime.now(zone);
   if(expiry > 0) {
     flutterLocalNotificationsPlugin.zonedSchedule(
-        i,
+        rand.nextInt(pow(2, 31) - 1),
         "$product has gone off!!!",
         "You let $quantity $product go off dipshit!!!",
-        now.add(Duration(seconds  : expiry)),
+        now.add(Duration(days  : expiry)),
         const NotificationDetails(
           android: AndroidNotificationDetails("0", "fuck you", "bitch"),
         ),
@@ -103,5 +104,4 @@ Future<void> notification(String product, int quantity, int expiry) async {
         uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime
     );
   }
-  i++;
 }
