@@ -17,7 +17,7 @@ class _MenuState extends State<Menu> {
   void initState() {
     super.initState();
     //Initialises the pageController
-    pageController = PageController();
+    pageController = PageController(initialPage: 1);
   }
 
   @override
@@ -102,7 +102,7 @@ class _MenuState extends State<Menu> {
               });
               //Animates to the page at this specific index
               pageController.animateToPage(
-                index,
+                currentPage,
                 //The animation speed
                 duration: Duration(
                   milliseconds: 500,
