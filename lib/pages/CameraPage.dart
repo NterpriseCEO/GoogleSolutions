@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:best_before_app/components/BarcodeResult.dart';
 import 'package:best_before_app/components/ExpiryItem.dart';
 import 'package:dropdown_banner/dropdown_banner.dart';
@@ -8,6 +10,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:flutter_mobile_vision/flutter_mobile_vision.dart';
 import "package:best_before_app/globals.dart";
+import 'package:flutter_picker/flutter_picker.dart';
+
+typedef void Callback(String category);
 
 class ScanPicture extends StatefulWidget {
   bool disabled = true;
@@ -71,71 +76,159 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
     }
     String itemName = await barcodeResult(this.barcode);
     confirmBarcode(itemName);
-
   }
 
-  Future<void> confirmBarcode(String itemName) async {
+  Future<void> confirmBarcode(String itemName) {
+    int amount = 1;
+    TextEditingController textController = new TextEditingController();
+    textController.text = "1";
+    String category = "Vegetables";
+
     return showDialog<void>(
       context: context,
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Product name is $itemName'),
-          content: Text('Did we get it right?'),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Yes'),
-              onPressed: () {
-                Navigator.of(context).pop();
-                //call expiry scan function
-                readExpiry(itemName);
-              },
-            ),
-            TextButton(
-              child: Text("No"),
-              onPressed: () {
-                Navigator.of(context).pop();
-                inputProductName();
-              },
-            ),
-          ],
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text(
+                'Product Details',
+                textAlign: TextAlign.center,
+              ),
+              content: SingleChildScrollView(
+                child: ListBody(
+                  children: <Widget>[
+                    Text(
+                      "Product Name",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    TextFormField(
+                      initialValue: itemName,
+                      onChanged: (String name) async {
+                        itemName = name;
+                      },
+                      decoration: InputDecoration(
+                        hintText: "Enter product name",
+                      ),
+                    ),
+                    SizedBox(height:10.0),
+                    Text(
+                      "Quantity",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                          flex: 3,
+                          child: IconButton(
+                            onPressed: () {
+                              if(amount > 1) {
+                                setState(() {
+                                  amount--;
+                                  textController.text = amount.toString();
+                                });
+                              }
+                            },
+                            icon: Icon(Icons.exposure_minus_1),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: TextFormField(
+                            controller: textController,
+                            keyboardType: TextInputType.number,
+                            onChanged: (String name) async {
+                              int value = int.tryParse(name);
+                              if(value != null) {
+                                amount = value;
+                              }
+                            },
+                            decoration: InputDecoration(
+                              hintText: "Enter product name",
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 3,
+                          child: IconButton(
+                            onPressed: () {
+                              setState(() {
+                                amount++;
+                                textController.text = amount.toString();
+                              });
+                            },
+                            icon: Icon(Icons.exposure_plus_1),
+                          ),
+                        )
+                      ],
+                    ),
+                    SizedBox(height:10.0),
+                    Text(
+                      "Category",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      "$category",
+                      textAlign: TextAlign.center,
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        showPicker(context, (String cat) {
+                          setState(() {
+                            category = cat;
+                          });
+                        });
+                      },
+                      child: Text("Choose a Category"),
+                    ),
+                  ],
+                ),
+              ),
+              actions: <Widget>[
+                Row(
+                  children: <Widget>[
+                    TextButton.icon(
+                      icon: Icon(
+                        Icons.check_circle_outline,
+                        color: Colors.green[400],
+                        size: 50,
+                      ),
+                      label: Text(""),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        //call expiry scan function
+                        readExpiry(itemName, category, amount);
+                      },
+                    ),
+                    TextButton.icon(
+                      icon: Icon(
+                        Icons.cancel_outlined,
+                        color: Colors.red,
+                        size: 50,
+                      ),
+                      label: Text(""),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                )
+              ],
+            );
+          }
         );
       },
     );
   }
-
-  Future<void> inputProductName() async {
-    String product;
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Add Product"),
-          content: TextField(
-            onChanged: (String name) async {
-              product = name;
-            },
-            decoration: InputDecoration(
-              hintText: "Enter product name",
-            ),
-          ),
-          actions: <Widget>[
-            ElevatedButton(
-              child: Text("Add"),
-              onPressed: () {
-                if(product != null && product != "") {
-                  Navigator.of(context).pop();
-                  readExpiry(product);
-                }
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
 
   @override
   void dispose() {
@@ -218,7 +311,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
     }
   }
 
-  Future<Null> readExpiry(String productName) async {
+  Future<Null> readExpiry(String productName, String category, int quantity) async {
     List<OcrText> texts = [];
     try {
       texts = await FlutterMobileVision.read(
@@ -234,10 +327,41 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
         for(OcrText text in texts) {
           print('valueis ${text.value}');
         }
-        expiryItems.add(ExpiryItemData(expiryDate: 3, product: productName, quantity: 1));
+        expiryItems.add(ExpiryItemData(expiryDate: 3, product: productName, quantity: quantity));
       });
     } on Exception {
       texts.add( OcrText('Failed to recognize text'));
     }
+  }
+
+  showPicker(BuildContext context, Callback callback) {
+    const PickerData2 = '''
+[
+    [
+        "Vegetables",
+        "Fruit",
+        "Dairy",
+        "Sauces",
+        "Bread",
+        "Meat",
+        "Home Cooked meals"
+    ]
+]
+    ''';
+    Picker(
+        adapter: PickerDataAdapter<String>(
+          pickerdata: JsonDecoder().convert(PickerData2),
+          isArray: true,
+        ),
+        hideHeader: true,
+        title: Text("Please Select"),
+        selectedTextStyle: TextStyle(color: Colors.blue),
+        cancel: TextButton(onPressed: () {
+          Navigator.pop(context);
+        }, child: Text("Cancel")),
+        onConfirm: (Picker picker, List value) {
+          callback(picker.getSelectedValues()[0]);
+        }
+    ).showDialog(context);
   }
 }

@@ -37,6 +37,7 @@ dependencies:
   rxdart: ^0.26.0
   flutter_mobile_vision: ^0.1.4+1
   flutter_native_timezone: ^1.0.10
+  flutter_picker: ^2.0.0
 
 dev_dependencies:
   flutter_test:
