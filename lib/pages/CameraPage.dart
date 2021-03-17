@@ -174,7 +174,8 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
         expiryDate = texts[0].value;
         print('valueis ${texts}');
         for(OcrText text in texts) {
-          print('valueis ${text.value}');
+          print("DATA: ${text.value}");
+          checkIfExpiry(text.value);
         }
         expiryItems.add(ExpiryItemData(expiryDate: 3, product: productName, quantity: quantity));
       });
