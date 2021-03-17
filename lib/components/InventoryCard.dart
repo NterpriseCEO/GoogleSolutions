@@ -11,10 +11,12 @@ class InventoryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () async {
+        //This code navigates to the correct inventory page
         final result = await Navigator.pushNamed(context, "/inventory", arguments: {
           "category": category
         });
         print(result);
+        //This checks if trying to add a new item to the inventory
         if(result == 1) {
           goToPage(result);
         }

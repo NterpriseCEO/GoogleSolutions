@@ -17,7 +17,7 @@ class ExpiryItem extends StatelessWidget {
   final int expiryDate;
   final String product;
   final int quantity;
-
+  //The callback for removing the item from the inventory
   final Callback callback;
 
   ExpiryItem({this.expiryDate, this.product, this.quantity, @required this.callback });
@@ -88,6 +88,7 @@ class ExpiryItem extends StatelessWidget {
           },
         ),
       ),
+      //The delete icon that appears behind the dismissible widget
       background: Container(
         color: Colors.red,
         child: Row(
