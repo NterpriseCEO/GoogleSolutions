@@ -63,7 +63,6 @@ class _MenuState extends State<Menu> {
                         setState(() {
                           currentPage = page;
                         });
-                        //pageController.jumpToPage(page);
                         pageController.animateToPage(
                           page,
                           //The animation speed
