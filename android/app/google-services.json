@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "935634309491",
+    "project_id": "foodify-4c53b",
+    "storage_bucket": "foodify-4c53b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:935634309491:android:be43c9d4a5a9b353eab506",
+        "android_client_info": {
+          "package_name": "group.googlesolutions.best_before_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "935634309491-gqjssnfhcaeurktrsm8bm4sedjtls82l.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCqMBZfoHTtvFgSLAtgglyvNOSMNV8Ge1o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "935634309491-gqjssnfhcaeurktrsm8bm4sedjtls82l.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "935634309491-1ifv2d0ovfbi34hipp7idjau52aod26e.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "group.googlesolutions.bestBeforeApp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
