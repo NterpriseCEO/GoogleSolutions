@@ -8,8 +8,9 @@ class ExpiryItemData {
   int daysTillExpiry = 0;
   final String product;
   int quantity;
+  String category;
 
-  ExpiryItemData({this.expiryDate, this.product, this.quantity, this.daysTillExpiry });
+  ExpiryItemData({this.expiryDate, this.product, this.quantity, this.daysTillExpiry, this.category });
 }
 
 class ExpiryItem extends StatelessWidget {

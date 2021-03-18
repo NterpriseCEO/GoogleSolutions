@@ -135,6 +135,7 @@ class _InventoryOverviewState extends State<InventoryOverview> {
           Expanded(
             flex: 1,
             child: TextField(
+              controller: _controller,
               //Change the search variable when typing
               onChanged: (String val) async {
                 setState(() {
