@@ -186,7 +186,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
         print(expiry);
 
         int daysTillExpiry = expiry.difference(DateTime.now()).inDays;
-        expiryItems.add(ExpiryItemData(expiryDate: expiry, product: productName, quantity: quantity, daysTillExpiry: daysTillExpiry));
+        expiryItems.add(ExpiryItemData(expiryDate: expiry, product: productName, quantity: quantity, daysTillExpiry: daysTillExpiry, category: category));
       });
     } on Exception {
       texts.add( OcrText('Failed to recognize text'));

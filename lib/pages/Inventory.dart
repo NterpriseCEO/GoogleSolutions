@@ -1,5 +1,10 @@
+import 'dart:math';
+
+import 'package:best_before_app/components/ExpiryItem.dart';
+import 'package:best_before_app/components/InventoryItem.dart';
 import 'package:flutter/material.dart';
 import 'package:marquee/marquee.dart';
+import "package:best_before_app/globals.dart";
 
 class Inventory extends StatefulWidget {
   @override
@@ -7,107 +12,76 @@ class Inventory extends StatefulWidget {
 }
 
 class _InventoryState extends State<Inventory> {
-  final items = List<String>.generate(20, (i) => "Item ${i + 1}");
   Map title = {};
+
+  TextEditingController _controller;
+
+  String search = "";
+
+  @override
+  void initState() {
+    _controller = TextEditingController();
+    super.initState();
+  }
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
 
     title = ModalRoute.of(context).settings.arguments;
-    Color indicator = Colors.red[200];
+
+    List<ExpiryItemData> inCategory = [];
+
+    for(ExpiryItemData exp in expiryItems) {
+      if(exp.category == title["category"]) {
+        if(exp.product.toLowerCase().contains(search) || search == "") {
+          inCategory.add(exp);
+        }
+      }
+    }
+    inCategory.sort((a, b) => a.daysTillExpiry.compareTo(b.daysTillExpiry));
 
     //Creates the list of expiry items
     Widget list() {
       return ListView.builder(
-        itemCount: items.length,
-        itemBuilder: (context, index) {
-          final item = items[index];
-          //Testing indicator colours
-          indicator = indicator == Colors.red[200] ? Colors.green[200] : Colors.red[200];
-
-          //A removable list item
+        itemCount: inCategory.length,
+        itemBuilder: (BuildContext context, int index) {
+          final expiryItem = inCategory[index];
           return Dismissible(
-            key: Key(item),
-            //The direction: swipe left to remove
-            direction: DismissDirection.endToStart,
-            //Removes item when dismissed
-            onDismissed: (direction) {
-              setState(() {
-                items.removeAt(index);
-              });
-            },
-            //The list item's content
-            child: ColoredBox(
-              color: indicator,
-              child: ListTile(
-                title: Padding(
-                  padding: EdgeInsets.all(10.0),
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        flex: 1,
-                        child: Icon(Icons.fastfood),
-                      ),
-                      Expanded(
-                        flex: 4,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Text(
-                              "Food",
-                              style: TextStyle(
-                                fontSize:20.0,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            //Item quantity
-                            Text(
-                              "Quantity X",
-                              style: TextStyle(
-                                fontSize:20.0,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Expanded(
-                        flex: 1,
-                        child: Icon(Icons.face),
-                      ),
-                      Expanded(
-                        flex: 2,
-                        child: Column(
-                          children: <Widget>[
-                            Text(
-                              "0",
-                              style: TextStyle(
-                                fontSize:30.0,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text("Days Left"),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+            key: UniqueKey(),
+            child: InventoryItem(
+              expiryDate: expiryItem.daysTillExpiry,
+              product: expiryItem.product,
+              quantity: expiryItem.quantity,
+              callback: (int direction) {
+                setState(() {
+                  expiryItem.quantity+=direction;
+                  if(expiryItem.quantity == 0) {
+                    expiryItems.removeWhere((expiry) => expiry == expiryItem);
+                  }
+                });
+              },
             ),
+            onDismissed: (direction) {
+              expiryItems.removeWhere((expiry) => expiry == expiryItem);
+            },
             background: Container(
               color: Colors.red,
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.only(right: 15.0),
-                    child: Icon(
-                      Icons.delete,
-                      color: Colors.white,
-                      size: 30.0
-                    ),
-                  )
-                ]
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.only(right: 15.0),
+                      child: Icon(
+                        Icons.delete,
+                        color: Colors.white,
+                      ),
+                    )
+                  ]
               ),
             ),
           );
@@ -131,27 +105,12 @@ class _InventoryState extends State<Inventory> {
                     children: <Widget>[
                       Expanded(
                         flex: 4,
-                        child: Marquee(
-                          text: title["category"],
-                          blankSpace: 80.0,
+                        child: Text(
+                          title["category"],
                           style: TextStyle(
                             fontSize: 40.0,
                             fontWeight: FontWeight.bold,
                           ),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 1,
-                        child: TextButton.icon(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          icon: Icon(
-                            Icons.close,
-                            size: 40.0,
-                            color: Colors.black,
-                          ),
-                          label: Text(""),
                         ),
                       ),
                     ],
@@ -168,10 +127,11 @@ class _InventoryState extends State<Inventory> {
                       Expanded(
                         flex: 3,
                         child: TextField(
+                          controller: _controller,
                           //Change the search variable when typing
                           onChanged: (String val) async {
                             setState(() {
-                              //search = val;
+                              search = val;
                             });
                           },
                           //The input styling
@@ -187,10 +147,10 @@ class _InventoryState extends State<Inventory> {
                             suffixIcon: IconButton(
                               icon: Icon(Icons.clear),
                               onPressed: () {
-                                //_controller.clear();
+                                _controller.clear();
                                 //Clear search on click
                                 setState(() {
-                                  //search = "";
+                                  search = "";
                                 });
                               },
                             ),
@@ -235,7 +195,7 @@ class _InventoryState extends State<Inventory> {
               //Adds the list of removable items from the list
               Expanded(
                 flex: 7,
-                child: items.isNotEmpty ? list() :
+                child: inCategory.isNotEmpty ? list() :
                 Center(
                   child: Text(
                     "There are no ${title["category"]} in your inventory",
