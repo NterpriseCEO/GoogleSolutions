@@ -85,7 +85,7 @@ class _ExpiryListState extends State<ExpiryList> {
                       child: items[0].length > 0 ? Column(
                         children: [
                           for(int i = 0; i < items[0].length; i++) ExpiryItem(
-                            expiryDate: items[0][i].expiryDate,
+                            expiryDate: items[0][i].daysTillExpiry,
                             product: items[0][i].product,
                             quantity: items[0][i].quantity,
                             callback: (remove) => decrement(items[0][i], remove),
@@ -128,7 +128,7 @@ class _ExpiryListState extends State<ExpiryList> {
                     //Checks if there are items going off today, prints message if not
                     items[1].length > 0 ? [
                       for(int i = 0; i < items[1].length; i++) ExpiryItem(
-                        expiryDate: items[1][i].expiryDate,
+                        expiryDate: items[1][i].daysTillExpiry,
                         product: items[1][i].product,
                         quantity: items[1][i].quantity,
                         callback: (remove) => decrement(items[1][i], remove),
@@ -153,7 +153,7 @@ class _ExpiryListState extends State<ExpiryList> {
                     //Checks if there are items going off tomorrow, prints message if not
                     items[2].length > 0 ? [
                       for(int i = 0; i < items[2].length; i++) ExpiryItem(
-                        expiryDate: items[2][i].expiryDate,
+                        expiryDate: items[2][i].daysTillExpiry,
                         product: items[2][i].product,
                         quantity: items[2][i].quantity,
                         callback: (remove) => decrement(items[2][i], remove),
@@ -178,7 +178,7 @@ class _ExpiryListState extends State<ExpiryList> {
                     //Checks if there are items going off in 5 days, prints message if not
                     items[3].length > 0 ? [
                       for( int i = 0; i < items[3].length; i++) ExpiryItem(
-                        expiryDate: items[3][i].expiryDate,
+                        expiryDate: items[3][i].daysTillExpiry,
                         product: items[3][i].product,
                         quantity: items[3][i].quantity,
                         callback: (remove) => decrement(items[3][i], remove),
@@ -203,7 +203,7 @@ class _ExpiryListState extends State<ExpiryList> {
                   delegate: SliverChildListDelegate(
                     items[4].length > 0 ? [
                       for ( int i = 0; i < items[4].length; i++) ExpiryItem(
-                        expiryDate: items[4][i].expiryDate,
+                        expiryDate: items[4][i].daysTillExpiry,
                         product: items[4][i].product,
                         quantity: items[4][i].quantity,
                         callback: (remove) => decrement(items[4][i], remove),

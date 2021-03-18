@@ -34,6 +34,7 @@ class _LoginState extends State<Login> {
     isLoggedIn = await googleSignIn.isSignedIn();
 
     if (isLoggedIn) {
+      print("test");
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (context) => Menu()));
     }

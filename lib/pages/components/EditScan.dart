@@ -244,24 +244,31 @@ void showPicker(BuildContext context, Callback2 callback) {
   ).showDialog(context);
 }
 
-void checkIfExpiry(String data) {
+DateTime checkIfExpiry(String data) {
   List<String> strings = data.split(" ");
-  String date = "20-";
-
+  String date = "";
   for(int i = 0; i < strings.length; i++) {
     if(strings[i].length <= 4 && strings[i].length >= 2) {
-      if(double.parse(strings[i]) != null) {
-        date = strings[i]+"-"+date;
-        print("Word length: ${strings[i].length}, the string: ${strings[i]}");
+      try {
+        if(double.parse(strings[i]) != null) {
+          date = strings[i]+"-"+date;
+          print("Word length: ${strings[i].length}, the string: ${strings[i]}");
+        }
+      }catch(e) {
+        print("error: $e");
       }
     }
   }
-  //print(date.substring(0,date.length-1));
-  /*try {
-    DateTime parseDt = DateTime.parse("2021-07-20");
-    print(parseDt);
+  //date+=01
+  if(date != "") {
+    date = date.substring(0,date.length-1)+"-01";
+  }
+  try {
+    DateTime dte = DateTime.parse(date);
+    print("the date ${DateTime.parse(date)}");
+    return dte;
   }catch(e) {
     print(e);
-  }*/
-  print("tesssst");
+  }
+  return null;
 }

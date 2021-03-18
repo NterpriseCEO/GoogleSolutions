@@ -4,32 +4,32 @@ import "package:best_before_app/notifications/LocalNotifications.dart";
 bool hasNotified = false;
 
 List<ExpiryItemData> expiryItems = [
-  ExpiryItemData(expiryDate: -3, product: "Carrots", quantity: 10),
-  ExpiryItemData(expiryDate: 0, product: "Cheese", quantity: 13),
-  ExpiryItemData(expiryDate: 1, product: "Cake", quantity: 10),
-  ExpiryItemData(expiryDate: 1, product: "Rice", quantity: 13),
-  ExpiryItemData(expiryDate: 4, product: "Corn", quantity: 15),
-  ExpiryItemData(expiryDate: 4, product: "McNuggets", quantity: 1500),
-  ExpiryItemData(expiryDate: 7, product: "Venison", quantity: 5),
-  ExpiryItemData(expiryDate: 7, product: "Pork", quantity: 7),
+  ExpiryItemData(expiryDate: DateTime.now().subtract(const Duration(days: 3)), daysTillExpiry: -3, product: "Carrots", quantity: 10),
+  ExpiryItemData(expiryDate: DateTime.now(), daysTillExpiry: 0, product: "Cheese", quantity: 13),
+  ExpiryItemData(expiryDate: DateTime.now().add(const Duration(days: 1)), daysTillExpiry: 1, product: "Cake", quantity: 10),
+  ExpiryItemData(expiryDate: DateTime.now().add(const Duration(days: 1)), daysTillExpiry: 1, product: "Rice", quantity: 13),
+  ExpiryItemData(expiryDate: DateTime.now().add(const Duration(days: 4)), daysTillExpiry: 4, product: "Corn", quantity: 15),
+  ExpiryItemData(expiryDate: DateTime.now().add(const Duration(days: 4)), daysTillExpiry: 4,product: "McNuggets", quantity: 1500),
+  ExpiryItemData(expiryDate: DateTime.now().add(const Duration(days: 7)), daysTillExpiry: 7, product: "Venison", quantity: 5),
+  ExpiryItemData(expiryDate: DateTime.now().add(const Duration(days: 7)), daysTillExpiry: 7, product: "Pork", quantity: 7),
   //
-  ExpiryItemData(expiryDate: -2, product: "Peas", quantity: 10),
-  ExpiryItemData(expiryDate: 0, product: "Cheese", quantity: 13),
-  ExpiryItemData(expiryDate: 1, product: "Cake", quantity: 10),
-  ExpiryItemData(expiryDate: 1, product: "Rice", quantity: 13),
-  ExpiryItemData(expiryDate: 4, product: "Corn", quantity: 15),
-  ExpiryItemData(expiryDate: 4, product: "McNuggets", quantity: 1500),
-  ExpiryItemData(expiryDate: 7, product: "Venison", quantity: 5),
-  ExpiryItemData(expiryDate: 7, product: "Pork", quantity: 7),
+  ExpiryItemData(expiryDate: DateTime.now().subtract(const Duration(days: 2)), daysTillExpiry: -2, product: "Peas", quantity: 10),
+  ExpiryItemData(expiryDate: DateTime.now().subtract(const Duration(days: 3)), daysTillExpiry: -3, product: "Cheese", quantity: 13),
+  ExpiryItemData(expiryDate: DateTime.now(), daysTillExpiry: 0, product: "Cake", quantity: 10),
+  ExpiryItemData(expiryDate: DateTime.now().add(const Duration(days: 1)), daysTillExpiry: 1, product: "Rice", quantity: 13),
+  ExpiryItemData(expiryDate: DateTime.now().add(const Duration(days: 4)), daysTillExpiry: 4, product: "Corn", quantity: 15),
+  ExpiryItemData(expiryDate: DateTime.now().add(const Duration(days: 4)), daysTillExpiry: 4, product: "McNuggets", quantity: 1500),
+  ExpiryItemData(expiryDate: DateTime.now().add(const Duration(days: 7)), daysTillExpiry: 7, product: "Venison", quantity: 5),
+  ExpiryItemData(expiryDate: DateTime.now().add(const Duration(days: 7)), daysTillExpiry: 7, product: "Pork", quantity: 7),
   //
-  ExpiryItemData(expiryDate: -1, product: "Celery", quantity: 10),
-  ExpiryItemData(expiryDate: 0, product: "Cheese", quantity: 13),
-  ExpiryItemData(expiryDate: 1, product: "Cake", quantity: 10),
-  ExpiryItemData(expiryDate: 1, product: "Rice", quantity: 13),
-  ExpiryItemData(expiryDate: 4, product: "Corn", quantity: 15),
-  ExpiryItemData(expiryDate: 4, product: "McNuggets", quantity: 1500),
-  ExpiryItemData(expiryDate: 7, product: "Venison", quantity: 5),
-  ExpiryItemData(expiryDate: 7, product: "Pork", quantity: 7),
+  ExpiryItemData(expiryDate: DateTime.now().subtract(const Duration(days: 1)), daysTillExpiry: -1, product: "Celery", quantity: 10),
+  ExpiryItemData(expiryDate: DateTime.now(), daysTillExpiry: 0, product: "Cheese", quantity: 13),
+  ExpiryItemData(expiryDate: DateTime.now().add(const Duration(days: 1)), daysTillExpiry: 1, product: "Cake", quantity: 10),
+  ExpiryItemData(expiryDate: DateTime.now().add(const Duration(days: 1)), daysTillExpiry: 1, product: "Rice", quantity: 13),
+  ExpiryItemData(expiryDate: DateTime.now().add(const Duration(days: 4)), daysTillExpiry: 4, product: "Corn", quantity: 15),
+  ExpiryItemData(expiryDate: DateTime.now().add(const Duration(days: 4)), daysTillExpiry: 4, product: "McNuggets", quantity: 1500),
+  ExpiryItemData(expiryDate: DateTime.now().add(const Duration(days: 7)), daysTillExpiry: 7, product: "Venison", quantity: 5),
+  ExpiryItemData(expiryDate: DateTime.now().add(const Duration(days: 7)), daysTillExpiry: 7, product: "Pork", quantity: 7),
 ];
 
 List<List> getItems(String itemName) {
@@ -42,20 +42,22 @@ List<List> getItems(String itemName) {
   //Checks the date for a specific  list item and decides what expiry list to add it to
   for(ExpiryItemData item in expiryItems) {
     if(!hasNotified) {
-      notification(item.product, item.quantity, item.expiryDate);
+      notification(item.product, item.quantity, item.daysTillExpiry);
     }
     if(itemName == null || item.product.toLowerCase().contains(itemName)) {
-      if(item.expiryDate < 0) {
+      if(item.daysTillExpiry < 0) {
         goneoff.add(item);
-      }else if(item.expiryDate == 0) {
+      }else if(item.daysTillExpiry == 0) {
         today.add(item);
-      }else if(item.expiryDate == 1) {
+      }else if(item.daysTillExpiry == 1) {
         tomorrow.add(item);
-      }else if(item.expiryDate <= 5) {
+      }else if(item.daysTillExpiry <= 5) {
         days5.add(item);
-      }else if(item.expiryDate <= 7) {
+      }else if(item.daysTillExpiry <= 7) {
         days7.add(item);
-      }
+      }/*else if(item.daysTillExpiry > 5) {
+        days7.add(item);
+      }*/
     }
   }
   hasNotified = true;
@@ -64,7 +66,7 @@ List<List> getItems(String itemName) {
 }
 
 void removeExpired() {
-  expiryItems.removeWhere((item) => item.expiryDate < 0);
+  expiryItems.removeWhere((item) => item.daysTillExpiry < 0);
 }
 
 void removeItem(ExpiryItemData toRemove) {
