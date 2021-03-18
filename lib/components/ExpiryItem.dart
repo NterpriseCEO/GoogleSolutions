@@ -4,11 +4,12 @@ typedef void Callback(bool remove);
 
 //Data for the expiry items
 class ExpiryItemData {
-  final int expiryDate;
+  final DateTime expiryDate;
+  int daysTillExpiry = 0;
   final String product;
   int quantity;
 
-  ExpiryItemData({this.expiryDate, this.product, this.quantity });
+  ExpiryItemData({this.expiryDate, this.product, this.quantity, this.daysTillExpiry });
 }
 
 class ExpiryItem extends StatelessWidget {
