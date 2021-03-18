@@ -162,6 +162,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
 
   Future<Null> readExpiry(String productName, String category, int quantity) async {
     List<OcrText> texts = [];
+    DateTime expiry;
     try {
       texts = await FlutterMobileVision.read(
         flash: false,
@@ -174,9 +175,18 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
         expiryDate = texts[0].value;
         print('valueis ${texts}');
         for(OcrText text in texts) {
-          print('valueis ${text.value}');
+          if(expiry == null) {
+            print("DATA: ${text.value}");
+            expiry = checkIfExpiry(text.value);
+          }else {
+            break;
+          }
         }
-        expiryItems.add(ExpiryItemData(expiryDate: 3, product: productName, quantity: quantity));
+
+        print(expiry);
+
+        int daysTillExpiry = expiry.difference(DateTime.now()).inDays;
+        expiryItems.add(ExpiryItemData(expiryDate: expiry, product: productName, quantity: quantity, daysTillExpiry: daysTillExpiry));
       });
     } on Exception {
       texts.add( OcrText('Failed to recognize text'));

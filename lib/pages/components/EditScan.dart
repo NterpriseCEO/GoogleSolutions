@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_picker/flutter_picker.dart';
 import 'dart:convert';
+import 'package:intl/intl.dart';
 
 typedef void Callback(String itemName, String category, int amount);
 typedef void Callback2(String category);
@@ -241,4 +242,33 @@ void showPicker(BuildContext context, Callback2 callback) {
         callback(picker.getSelectedValues()[0]);
       }
   ).showDialog(context);
+}
+
+DateTime checkIfExpiry(String data) {
+  List<String> strings = data.split(" ");
+  String date = "";
+  for(int i = 0; i < strings.length; i++) {
+    if(strings[i].length <= 4 && strings[i].length >= 2) {
+      try {
+        if(double.parse(strings[i]) != null) {
+          date = strings[i]+"-"+date;
+          print("Word length: ${strings[i].length}, the string: ${strings[i]}");
+        }
+      }catch(e) {
+        print("error: $e");
+      }
+    }
+  }
+  //date+=01
+  if(date != "") {
+    date = date.substring(0,date.length-1)+"-01";
+  }
+  try {
+    DateTime dte = DateTime.parse(date);
+    print("the date ${DateTime.parse(date)}");
+    return dte;
+  }catch(e) {
+    print(e);
+  }
+  return null;
 }
