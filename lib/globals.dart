@@ -1,5 +1,4 @@
 import "package:best_before_app/components/ExpiryItem.dart";
-import "package:best_before_app/notifications/LocalNotifications.dart";
 
 bool hasNotified = false;
 
@@ -41,9 +40,6 @@ List<List> getItems(String itemName) {
 
   //Checks the date for a specific  list item and decides what expiry list to add it to
   for(ExpiryItemData item in expiryItems) {
-    if(!hasNotified) {
-      notification(item.product, item.quantity, item.daysTillExpiry);
-    }
     if(itemName == null || item.product.toLowerCase().contains(itemName)) {
       if(item.daysTillExpiry < 0) {
         goneoff.add(item);

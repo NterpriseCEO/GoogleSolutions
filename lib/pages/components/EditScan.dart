@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_picker/flutter_picker.dart';
 import 'dart:convert';
-import 'package:intl/intl.dart';
 
 typedef void Callback(String itemName, String category, int amount);
 typedef void Callback2(String category);
@@ -148,7 +147,7 @@ Future<void> confirmBarcode(String itemName, BuildContext context, Callback call
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          SizedBox(width: 5.0,),
+                          SizedBox(width: 5.0),
                           Text(
                             "$category",
                             textAlign: TextAlign.center,
@@ -176,24 +175,22 @@ Future<void> confirmBarcode(String itemName, BuildContext context, Callback call
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: <Widget>[
-                          TextButton.icon(
+                          IconButton(
                             icon: Icon(
                               Icons.cancel_outlined,
                               color: Colors.red,
                               size: 50,
                             ),
-                            label: Text(""),
                             onPressed: () {
                               Navigator.of(context).pop();
                             },
                           ),
-                          TextButton.icon(
+                          IconButton(
                             icon: Icon(
                               Icons.check_circle_outline,
                               color: Colors.green[400],
                               size: 50,
                             ),
-                            label: Text(""),
                             onPressed: () {
                               Navigator.of(context).pop();
                               //call expiry scan function

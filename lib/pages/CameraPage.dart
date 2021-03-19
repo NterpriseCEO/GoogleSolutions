@@ -8,7 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:flutter_mobile_vision/flutter_mobile_vision.dart';
 import "package:best_before_app/globals.dart";
-
+import "package:best_before_app/notifications/LocalNotifications.dart";
 import 'components/EditScan.dart';
 
 typedef void Callback(String category);
@@ -28,7 +28,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
   CameraController controller;
   //The int value that will hold value of the current camera
   int selected = 0;
-  bool barCodeScanned = true;
+  bool barCodeScanned = false;
   String expiryDate = "EMPTY";
   int _ocrCamera = FlutterMobileVision.CAMERA_BACK;
 
@@ -72,9 +72,15 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
         color: Colors.red[600],
         textStyle: TextStyle(color: Colors.white),
       );
+      setState(() {
+        barCodeScanned = false;
+      });
     }
     String itemName = await barcodeResult(this.barcode);
     confirmBarcode(itemName, context, (String itemName, String category, int amount) {
+      setState(() {
+        barCodeScanned = true;
+      });
       readExpiry(itemName, category, amount);
     });
   }
@@ -128,9 +134,23 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
             width: MediaQuery.of(context).size.width,
             //A column to vertical align the button
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 //A constrained box to set the button to 1/4 the width of the app
+                Text(
+                  "Scan Barcode Then Scan Expiry Date",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 30.0,
+                    shadows: [
+                      Shadow(
+                        blurRadius: 10.0,
+                        color: Colors.red,
+                        offset: Offset(0.0, 0.0),
+                      ),
+                    ],
+                  ),
+                ),
                 ConstrainedBox(
                   constraints: BoxConstraints.tightFor(
                     width:  MediaQuery.of(context).size.width/4,
@@ -156,7 +176,12 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
         ],
       );
     }else {
-      return Text("loading...");
+      return Align(
+        child: Icon(
+          Icons.camera_alt,
+          size: 60.0,
+        ),
+      );
     }
   }
 
@@ -166,6 +191,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
     try {
       texts = await FlutterMobileVision.read(
         flash: false,
+        showText: false,
         autoFocus: true,
         multiple: true,
         camera: _ocrCamera,
@@ -173,20 +199,30 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
       );
       setState(() {
         expiryDate = texts[0].value;
-        print('valueis ${texts}');
         for(OcrText text in texts) {
           if(expiry == null) {
-            print("DATA: ${text.value}");
             expiry = checkIfExpiry(text.value);
           }else {
             break;
           }
         }
 
-        print(expiry);
-
         int daysTillExpiry = expiry.difference(DateTime.now()).inDays;
         expiryItems.add(ExpiryItemData(expiryDate: expiry, product: productName, quantity: quantity, daysTillExpiry: daysTillExpiry, category: category));
+        notification(productName, quantity, daysTillExpiry);
+
+        setState(() {
+          barCodeScanned = false;
+        });
+
+        final snackBar = SnackBar(
+          content: Text('$quantity $productName have been added to your inventory'),
+          action: SnackBarAction(
+            label: 'Ok',
+            onPressed: () {},
+          ),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
       });
     } on Exception {
       texts.add( OcrText('Failed to recognize text'));

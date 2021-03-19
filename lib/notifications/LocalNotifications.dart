@@ -7,11 +7,7 @@
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
-//import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-//import 'package:http/http.dart' as http;
-//import 'package:path_provider/path_provider.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:timezone/data/latest.dart' as tz;
@@ -89,16 +85,15 @@ void initNotifications() async {
 var rand = Random();
 
 Future<void> notification(String product, int quantity, int expiry) async {
-  //print("hello: ${tz.getLocation(currentTimeZone)}");
   now = await tz.TZDateTime.now(zone);
   if(expiry > 0) {
     flutterLocalNotificationsPlugin.zonedSchedule(
         rand.nextInt(pow(2, 31) - 1),
-        "$product has gone off!!!",
-        "You let $quantity $product go off dipshit!!!",
-        now.add(Duration(days  : expiry)),
+        "$product going off!",
+        "$quantity $product goes off today!",
+        now.add(Duration(days : expiry)),
         const NotificationDetails(
-          android: AndroidNotificationDetails("0", "fuck you", "bitch"),
+          android: AndroidNotificationDetails("0", "What does", "this do"),
         ),
         androidAllowWhileIdle: true,
         uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime
