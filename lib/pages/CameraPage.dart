@@ -145,7 +145,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
                     shadows: [
                       Shadow(
                         blurRadius: 10.0,
-                        color: Colors.red,
+                        color: Colors.white,
                         offset: Offset(0.0, 0.0),
                       ),
                     ],
