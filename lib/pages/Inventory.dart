@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:best_before_app/components/ExpiryItem.dart';
 import 'package:best_before_app/components/InventoryItem.dart';
 import 'package:flutter/material.dart';
-import 'package:marquee/marquee.dart';
 import "package:best_before_app/globals.dart";
 
 class Inventory extends StatefulWidget {
@@ -90,6 +89,7 @@ class _InventoryState extends State<Inventory> {
     }
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.only(top: 8.0),
@@ -104,12 +104,26 @@ class _InventoryState extends State<Inventory> {
                   child: Row(
                     children: <Widget>[
                       Expanded(
-                        flex: 4,
+                        flex: 3,
                         child: Text(
                           title["category"],
                           style: TextStyle(
                             fontSize: 40.0,
                             fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: TextButton.icon(
+                          onPressed: () {
+                            Navigator.pop(context, 1);
+                          },
+                          label: Text(""),
+                          icon: Icon(
+                            Icons.add,
+                            size: 45.0,
+                            color: Colors.amber[800],
                           ),
                         ),
                       ),
@@ -120,7 +134,7 @@ class _InventoryState extends State<Inventory> {
               Expanded(
                 flex: 1,
                 child: Padding(
-                  padding: EdgeInsets.only(left: 40.0),
+                  padding: EdgeInsets.symmetric(horizontal: 15.0),
                   //The search field
                   child: Row(
                     children: [
@@ -172,20 +186,6 @@ class _InventoryState extends State<Inventory> {
                               borderRadius: BorderRadius.circular(15.0),
                             ),
                           ),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 1,
-                        child: TextButton.icon(
-                          onPressed: () {
-                            Navigator.pop(context, 1);
-                          },
-                          icon: Icon(
-                            Icons.add,
-                            size: 45.0,
-                            color: Colors.amber[800],
-                          ),
-                          label: Text(""),
                         ),
                       ),
                     ],

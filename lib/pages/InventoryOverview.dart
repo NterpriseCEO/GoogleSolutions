@@ -121,13 +121,13 @@ class _InventoryOverviewState extends State<InventoryOverview> {
                       toEnd();
                     });
                   },
+                  label: Text(""),
                   //The the "+" icon
                   icon: Icon(
                     Icons.add,
                     size: 45.0,
                     color: Colors.amber[800],
                   ),
-                  label: Text(""),
                 ),
               ],
             ),

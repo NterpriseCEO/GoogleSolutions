@@ -28,24 +28,24 @@ class InventoryItem extends StatelessWidget {
           child: Row(
             children: <Widget>[
               Expanded(
-                  flex: 2,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: <Widget>[
-                      IconButton(
-                          icon: Icon(Icons.exposure_minus_1),
-                          onPressed: () {
-                            this.callback(-1);
-                          }
-                      ),
-                      IconButton(
-                          icon: Icon(Icons.add_sharp),
-                          onPressed: () {
-                            this.callback(1);
-                          }
-                      ),
-                    ],
-                  )
+                flex: 2,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: <Widget>[
+                    IconButton(
+                      icon: Icon(Icons.exposure_minus_1),
+                      onPressed: () {
+                        this.callback(-1);
+                      }
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.add_sharp),
+                      onPressed: () {
+                        this.callback(1);
+                      }
+                    ),
+                  ],
+                ),
               ),
               Expanded(
                 flex: 3,
@@ -70,7 +70,7 @@ class InventoryItem extends StatelessWidget {
                 ),
               ),
               Expanded(
-                flex: 2,
+                flex: 1,
                 child: Column(
                   children: <Widget>[
                     Text(
@@ -80,7 +80,10 @@ class InventoryItem extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    Text("Days Left"),
+                    Text(
+                      "Days Left",
+                      textAlign: TextAlign.center,
+                    ),
                   ],
                 ),
               ),
