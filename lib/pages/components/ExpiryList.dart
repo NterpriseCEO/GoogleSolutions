@@ -3,6 +3,23 @@ import 'package:flutter/material.dart';
 import "package:best_before_app/globals.dart";
 import "package:flutter_sticky_header/flutter_sticky_header.dart";
 
+class EmptyList extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 20.0),
+      child: Text(
+        "Good, Nothing is going off!",
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize:20.0,
+        )
+      ),
+    );
+  }
+}
+
+
 class ExpiryList extends StatefulWidget {
   String search;
   ExpiryList({ Key key, this.search }): super(key: key);
@@ -20,19 +37,6 @@ class _ExpiryListState extends State<ExpiryList> {
   Widget build(BuildContext context) {
     //List of dummy data items
     List items = getItems(widget.search);
-
-    Widget emptyList() {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 20.0),
-        child: Text(
-          "Good, Nothing is going off!",
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize:20.0,
-          )
-        ),
-      );
-    }
 
     void decrement(ExpiryItemData item, bool remove) {
       setState((){
@@ -91,7 +95,7 @@ class _ExpiryListState extends State<ExpiryList> {
                             callback: (remove) => decrement(items[0][i], remove),
                           ),
                         ],
-                      ) : emptyList(),
+                      ) : EmptyList(),
                       background: Container(
                         color: Colors.red,
                         child: Row(
@@ -133,7 +137,7 @@ class _ExpiryListState extends State<ExpiryList> {
                         quantity: items[1][i].quantity,
                         callback: (remove) => decrement(items[1][i], remove),
                       ),
-                    ] : [emptyList()],
+                    ] : [EmptyList()],
                   ),
                 ),
               ),
@@ -158,7 +162,7 @@ class _ExpiryListState extends State<ExpiryList> {
                         quantity: items[2][i].quantity,
                         callback: (remove) => decrement(items[2][i], remove),
                       ),
-                    ] : [emptyList()],
+                    ] : [EmptyList()],
                   ),
                 ),
               ),
@@ -183,7 +187,7 @@ class _ExpiryListState extends State<ExpiryList> {
                         quantity: items[3][i].quantity,
                         callback: (remove) => decrement(items[3][i], remove),
                       ),
-                    ] : [emptyList()],
+                    ] : [EmptyList()],
                   ),
                 ),
               ),
@@ -208,7 +212,7 @@ class _ExpiryListState extends State<ExpiryList> {
                         quantity: items[4][i].quantity,
                         callback: (remove) => decrement(items[4][i], remove),
                       ),
-                    ] : [emptyList()],
+                    ] : [EmptyList()],
                   ),
                 ),
               ),
