@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_picker/flutter_picker.dart';
 import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 typedef void Callback(String itemName, String category, int amount);
 typedef void Callback2(String category);
+
+//fireabase init
+FirebaseFirestore firestore = FirebaseFirestore.instance;
 
 Future<void> confirmBarcode(String itemName, BuildContext context, Callback callback) {
   int amount = 1;
@@ -192,6 +196,12 @@ Future<void> confirmBarcode(String itemName, BuildContext context, Callback call
                               size: 50,
                             ),
                             onPressed: () {
+                              //send data to firebase
+                              firestore.collection('Users').add({
+                                'Category':  category,
+                                'Product Name': itemName,
+                                'Quantity': amount
+                              });
                               Navigator.of(context).pop();
                               //call expiry scan function
                               callback(itemName, category, amount);

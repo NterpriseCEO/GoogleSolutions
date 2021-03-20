@@ -1,7 +1,14 @@
+// import 'dart:html';
+// import 'dart:js';
+// import 'dart:js';
+
 import 'package:best_before_app/components/ExpiryItem.dart';
 import 'package:flutter/material.dart';
 import "package:best_before_app/globals.dart";
 import "package:flutter_sticky_header/flutter_sticky_header.dart";
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+FirebaseFirestore firestore = FirebaseFirestore.instance;
 
 class EmptyList extends StatelessWidget {
   @override
@@ -19,6 +26,57 @@ class EmptyList extends StatelessWidget {
   }
 }
 
+// void getProducts() async {
+//   print('test');
+//   var product = firestore.collection('products');
+//   var item = await product.get();
+//   for(int x = 0; x < item.docs.length; x++)
+//     {
+//       Map<String, dynamic> data = item.docs[x].data();
+//       print('${data['ProductName']} \n ${data['Category']} \n ${data['ExpiryDate']} \n ${data['Quantity']} ');
+//     }
+// }
+
+// void productStream() async {
+//   await for (var snapshot in firestore.collection('products').snapshots()){
+//     for (var item in snapshot.docs){
+//       var itemData = item.data();
+//       var itemCategory = itemData['Category'];
+//       var itemName = itemData['ProductName'];
+//       var itemQuantity = itemData['Quantity'];
+//       var itemExpiry = itemData['ExpiryDate'];
+//       print('this is message sender $itemName , $itemCategory, $itemQuantity, $itemExpiry');
+//     }
+//   }
+// }
+
+Widget dataList()  {
+   return StreamBuilder<QuerySnapshot>(
+      stream: firestore.collection('products').snapshots(),
+      builder: (context, snapshot){
+        List<Widget> itemWidgets = [];
+        if(snapshot.hasData){
+          final items = snapshot.data.docs;
+
+          for(var item in items){
+            final itemData = item.data();
+            final itemCategory = itemData['Category'];
+            final itemName = itemData['ProductName'];
+            final itemQuantity = int.tryParse(itemData['Quantity']);
+            final itemExpiry = itemData['ExpiryDate'];
+            DateTime expiry = DateTime.parse(itemExpiry);
+            int daysTillExpiry = expiry.difference(DateTime.now()).inDays;
+            print('this is message sender $itemName , $itemCategory, $itemQuantity, $daysTillExpiry');
+            final itemWidget = ExpiryItem(product: itemName,quantity: itemQuantity,expiryDate: daysTillExpiry,);
+            itemWidgets.add(itemWidget);
+          }
+        }
+        return Column(
+          children: itemWidgets,
+        );
+      }
+  );
+}
 
 class ExpiryList extends StatefulWidget {
   String search;
@@ -48,6 +106,7 @@ class _ExpiryListState extends State<ExpiryList> {
     }
 
     //Scrollable page
+    // productStream();
     return Padding(
       padding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 0.0),
       child: Stack(
@@ -85,17 +144,18 @@ class _ExpiryListState extends State<ExpiryList> {
                         });
                       },
 
-                      //List of items going off today
-                      child: items[0].length > 0 ? Column(
-                        children: [
-                          for(int i = 0; i < items[0].length; i++) ExpiryItem(
-                            expiryDate: items[0][i].daysTillExpiry,
-                            product: items[0][i].product,
-                            quantity: items[0][i].quantity,
-                            callback: (remove) => decrement(items[0][i], remove),
-                          ),
-                        ],
-                      ) : EmptyList(),
+                      //List of items that are expired
+                      child: dataList(),
+                      // child: items[0].length > 0 ? Column(
+                      //   children: [
+                      //     for(int i = 0; i < items[0].length; i++) ExpiryItem(
+                      //       expiryDate: items[0][i].daysTillExpiry,
+                      //       product: items[0][i].product,
+                      //       quantity: items[0][i].quantity,
+                      //       callback: (remove) => decrement(items[0][i], remove),
+                      //     ),
+                      //   ],
+                      // ) : EmptyList(),
                       background: Container(
                         color: Colors.red,
                         child: Row(

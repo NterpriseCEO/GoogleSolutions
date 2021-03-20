@@ -11,6 +11,7 @@ import "package:best_before_app/globals.dart";
 import "package:best_before_app/notifications/LocalNotifications.dart";
 import 'components/EditScan.dart';
 
+
 typedef void Callback(String category);
 
 class ScanPicture extends StatefulWidget {
@@ -20,17 +21,20 @@ class ScanPicture extends StatefulWidget {
   _ScanPictureState createState() => _ScanPictureState();
 }
 
-
 class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
   //The cameras
   List<CameraDescription> cameras;
+
   //The camera controller
   CameraController controller;
+
   //The int value that will hold value of the current camera
   int selected = 0;
   bool barCodeScanned = false;
   String expiryDate = "EMPTY";
   int _ocrCamera = FlutterMobileVision.CAMERA_BACK;
+
+
 
   String barcode = 'Unknown'; //This will hold the returned value from a barcode
 
@@ -42,6 +46,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
     var _controller = await selectCamera();
     setState(() => controller = _controller);
   }
+
   selectCamera() async {
     //Assign camera to a controller and set the Resolution preset to high
     var controller = CameraController(cameras[selected], ResolutionPreset.high);
@@ -50,9 +55,8 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
     return controller;
   }
 
-  Future<void> scanBarcode() async{
+  Future<void> scanBarcode() async {
     try {
-
       barcode = await FlutterBarcodeScanner.scanBarcode(
         "#ff6666", // This is the line color for scanning part
         "Cancel", //cancel option
@@ -65,7 +69,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
       setState(() {
         this.barcode = barcode;
       });
-    } on PlatformException{
+    } on PlatformException {
       barcode = 'Failed to get platform version.';
       DropdownBanner.showBanner(
         text: 'Failed to complete scan request',
@@ -77,7 +81,8 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
       });
     }
     String itemName = await barcodeResult(this.barcode);
-    confirmBarcode(itemName, context, (String itemName, String category, int amount) {
+    confirmBarcode(itemName, context,
+        (String itemName, String category, int amount) {
       setState(() {
         barCodeScanned = true;
       });
@@ -96,14 +101,14 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if(controller == null || !controller.value.isInitialized) {
+    if (controller == null || !controller.value.isInitialized) {
       return;
     }
 
-    if(state == AppLifecycleState.inactive) {
+    if (state == AppLifecycleState.inactive) {
       //Dispose of controller when necessary
       controller?.dispose();
-    }else if(state == AppLifecycleState.resumed) {
+    } else if (state == AppLifecycleState.resumed) {
       //Set up camera when App lifecycle state resumed
       setupCamera();
     }
@@ -120,7 +125,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    if(controller != null) {
+    if (controller != null) {
       //A Widget for absolute positioning other widgets
       return Stack(
         fit: StackFit.expand,
@@ -151,31 +156,45 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
                     ],
                   ),
                 ),
-                ConstrainedBox(
-                  constraints: BoxConstraints.tightFor(
-                    width:  MediaQuery.of(context).size.width/4,
-                    height:  MediaQuery.of(context).size.width/4,
-                  ),
-                  //The button with a spherical border
-                  child: TextButton(
-                    onPressed: scanBarcode,
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.black.withOpacity(0.2),
-                      shape: CircleBorder(
-                        side: BorderSide(
-                          color: Colors.amber,
-                          width:5.0,
+                Row( mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                  ConstrainedBox(
+                    constraints: BoxConstraints.tightFor(
+                      width: MediaQuery.of(context).size.width / 4,
+                      height: MediaQuery.of(context).size.width / 4,
+                    ),
+                    //The button with a spherical border
+                    child: TextButton(
+                      onPressed: scanBarcode,
+                      style: ElevatedButton.styleFrom(
+                        primary: Colors.black.withOpacity(0.2),
+                        shape: CircleBorder(
+                          side: BorderSide(
+                            color: Colors.amber,
+                            width: 5.0,
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
+                  IconButton(
+                      icon: Icon(Icons.keyboard),
+                      onPressed: () {
+                        confirmBarcode("", context,
+                            (String itemName, String category, int amount) {
+                          setState(() {
+                            barCodeScanned = true;
+                          });
+                          readExpiry(itemName, category, amount);
+                        });
+                      })
+                ]),
               ],
             ),
           ),
         ],
       );
-    }else {
+    } else {
       return Align(
         child: Icon(
           Icons.camera_alt,
@@ -185,7 +204,8 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
     }
   }
 
-  Future<Null> readExpiry(String productName, String category, int quantity) async {
+  Future<Null> readExpiry(
+      String productName, String category, int quantity) async {
     List<OcrText> texts = [];
     DateTime expiry;
     try {
@@ -199,16 +219,21 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
       );
       setState(() {
         expiryDate = texts[0].value;
-        for(OcrText text in texts) {
-          if(expiry == null) {
+        for (OcrText text in texts) {
+          if (expiry == null) {
             expiry = checkIfExpiry(text.value);
-          }else {
+          } else {
             break;
           }
         }
 
         int daysTillExpiry = expiry.difference(DateTime.now()).inDays;
-        expiryItems.add(ExpiryItemData(expiryDate: expiry, product: productName, quantity: quantity, daysTillExpiry: daysTillExpiry, category: category));
+        expiryItems.add(ExpiryItemData(
+            expiryDate: expiry,
+            product: productName,
+            quantity: quantity,
+            daysTillExpiry: daysTillExpiry,
+            category: category));
         notification(productName, quantity, daysTillExpiry);
 
         setState(() {
@@ -216,7 +241,8 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
         });
 
         final snackBar = SnackBar(
-          content: Text('$quantity $productName have been added to your inventory'),
+          content:
+              Text('$quantity $productName have been added to your inventory'),
           action: SnackBarAction(
             label: 'Ok',
             onPressed: () {},
@@ -225,7 +251,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
       });
     } on Exception {
-      texts.add( OcrText('Failed to recognize text'));
+      texts.add(OcrText('Failed to recognize text'));
     }
   }
 }
