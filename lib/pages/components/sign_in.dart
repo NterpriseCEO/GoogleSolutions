@@ -1,8 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 final GoogleSignIn googleSignIn = GoogleSignIn();
@@ -11,6 +9,14 @@ Future<String> signInWithGoogle() async {
   await Firebase.initializeApp();
 
   final GoogleSignInAccount googleSignInAccount = await googleSignIn.signIn();
+
+  if (googleSignInAccount == null) {
+    // cancelled login
+    print('Continue with Google: Error!');
+    print('Return to Default Settings');
+    return null;
+  }
+
   final GoogleSignInAuthentication googleSignInAuthentication =
       await googleSignInAccount.authentication;
 
@@ -30,7 +36,8 @@ Future<String> signInWithGoogle() async {
     final User currentUser = _auth.currentUser;
     assert(user.uid == currentUser.uid);
 
-    print('signInWithGoogle succeeded: $user');
+    print('Continue with Google: Success');
+    print('$user');
 
     return '$user';
   }
@@ -40,6 +47,5 @@ Future<String> signInWithGoogle() async {
 
 Future<void> signOutGoogle() async {
   await googleSignIn.signOut();
-
-  print("User Signed Out");
+  print('Continue with Google: Signed Out');
 }
