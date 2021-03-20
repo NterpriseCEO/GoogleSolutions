@@ -10,8 +10,6 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  // start comment here
-
   bool loading = false;
   bool isLoggedIn = false;
   bool showSpinner = false;
@@ -45,8 +43,6 @@ class _LoginState extends State<Login> {
       loading = false;
     });
   }
-
-  // end comment here
 
   @override
   Widget build(BuildContext context) {
