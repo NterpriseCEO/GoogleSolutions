@@ -2,8 +2,11 @@ import 'dart:math';
 
 import 'package:best_before_app/components/ExpiryItem.dart';
 import 'package:best_before_app/components/InventoryItem.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import "package:best_before_app/globals.dart";
+
+FirebaseFirestore firestore = FirebaseFirestore.instance;
 
 class Inventory extends StatefulWidget {
   @override
@@ -45,6 +48,76 @@ class _InventoryState extends State<Inventory> {
     inCategory.sort((a, b) => a.daysTillExpiry.compareTo(b.daysTillExpiry));
 
     //Creates the list of expiry items
+    Widget dataList()  {
+      return StreamBuilder<QuerySnapshot>(
+          stream: firestore.collection('products').snapshots(),
+          builder: (context, snapshot){
+            List<Widget> itemWidgets = [];
+            if(snapshot.hasData){
+              final items = snapshot.data.docs;
+
+              int increment = 0;
+
+              for(var item in items){
+                final itemData = item.data();
+                final itemCategory = itemData['Category'];
+                if(itemCategory == title["category"]) {
+                  increment++;
+                  final itemExpiry = itemData['ExpiryDate'];
+                  DateTime expiry = DateTime.parse(itemExpiry);
+                  int daysTillExpiry = expiry.difference(DateTime.now()).inDays;
+                  final itemName = itemData['ProductName'];
+                  print("$itemName $daysTillExpiry");
+                  var itemQuantity = int.parse(itemData['Quantity'].toString());
+                  print('this is message sender $itemName , $itemCategory, ${itemQuantity+50}, $daysTillExpiry');
+                  final itemWidget = Dismissible(
+                    key: UniqueKey(),
+                    child: InventoryItem(
+                      expiryDate: daysTillExpiry,
+                      product: itemName,
+                      quantity: itemQuantity,
+                      callback: (int direction) {
+                        setState(() {
+                          //expiryItem.quantity+=direction;
+                          //if(expiryItem.quantity == 0) {
+                            //expiryItems.removeWhere((expiry) => expiry == expiryItem);
+                          //}
+                        });
+                      },
+                    ),
+                    onDismissed: (direction) {
+                      //expiryItems.removeWhere((expiry) => expiry == expiryItem);
+                    },
+                    background: Container(
+                      color: Colors.red,
+                      child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: <Widget>[
+                            Padding(
+                              padding: EdgeInsets.only(right: 15.0),
+                              child: Icon(
+                                Icons.delete,
+                                color: Colors.white,
+                              ),
+                            )
+                          ]
+                      ),
+                    ),
+                  );
+                  itemWidgets.add(itemWidget);
+                }
+              }
+              if(increment == 0) {
+                //itemWidgets.add(EmptyList());
+              }
+            }
+            return Column(
+              children: itemWidgets,
+            );
+          }
+      );
+    }
+
     Widget list() {
       return ListView.builder(
         itemCount: inCategory.length,
@@ -195,7 +268,7 @@ class _InventoryState extends State<Inventory> {
               //Adds the list of removable items from the list
               Expanded(
                 flex: 7,
-                child: inCategory.isNotEmpty ? list() :
+                child: inCategory.isNotEmpty ? dataList() :
                 Center(
                   child: Text(
                     "There are no ${title["category"]} in your inventory",
