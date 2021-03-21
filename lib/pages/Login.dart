@@ -82,8 +82,8 @@ class _LoginState extends State<Login> {
                     });
                   },
                 ),
-                SizedBox(height: 15),
-                SignInButton(
+                SizedBox(height: 30),
+                /*SignInButton(
                   Buttons.Email,
                   text: "Continue with Mail",
                   onPressed: () {
@@ -95,7 +95,7 @@ class _LoginState extends State<Login> {
                       ),
                     );
                   },
-                )
+                )*/
               ],
             ),
           ),

@@ -36,6 +36,7 @@ class ExpiryItem extends StatelessWidget {
 
     return Dismissible(
       key: UniqueKey(),
+      direction: DismissDirection.startToEnd,
       onDismissed: (direction) {
         this.callback(true);
       },

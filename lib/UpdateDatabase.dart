@@ -31,3 +31,7 @@ void addItemToDB(String itemName, String category, int amount, String expiryDate
     "ExpiryDate": expiryDate
   });
 }
+
+void removeExpired() {
+  //firestore.instance.collection(userCol).getDocuments().
+}

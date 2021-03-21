@@ -14,12 +14,14 @@ class EmptyList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 20.0),
-      child: Text(
-        "Good, Nothing is going off!",
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          fontSize:20.0,
-        )
+      child: Center(
+        child: Text(
+          "Good, Nothing is going off!",
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize:20.0,
+          )
+        ),
       ),
     );
   }
@@ -34,13 +36,15 @@ Widget dataList(int days1, int days2, String search)  {
         final items = snapshot.data.docs;
 
         int increment = 0;
+        DateTime now = DateTime.now();
         for(var item in items){
           final itemData = item.data();
           final itemExpiry = itemData['ExpiryDate'];
           DateTime expiry = DateTime.parse(itemExpiry);
-          int daysTillExpiry = expiry.difference(DateTime.now()).inDays;
+          int daysTillExpiry = expiry.difference(DateTime(now.year, now.month, now.day)).inDays;
           if(daysTillExpiry <= days1 && daysTillExpiry >= days2) {
             final itemName = itemData['ProductName'].toString();
+            print("product name: $itemName, expiry: $daysTillExpiry");
             if(search != null) {
               if(itemName.toLowerCase().contains(search.toLowerCase()) || search == "") {
                 increment++;
@@ -127,9 +131,9 @@ class _ExpiryListState extends State<ExpiryList> {
                       //Removes item when dismissed
                       onDismissed: (direction) {
                         setState(() {
-                          //visible = false;
-                          //removeExpired();
-                          //expired.remove(expired.removeAt(index));
+                          visible = false;
+
+                          expired.remove(expired.removeAt(index));
                         });
                       },
 
