@@ -86,7 +86,7 @@ class _InventoryOverviewState extends State<InventoryOverview> {
           },
         ),
         InventoryCard(
-          category: "Home Cooked Meals",
+          category: "Misc",
           goToPage: (int page) {
             widget.goToPage(page);
           },
@@ -100,36 +100,12 @@ class _InventoryOverviewState extends State<InventoryOverview> {
         children: <Widget>[
           Expanded(
             flex: 1,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Text(
-                  "My Fridge",
-                  style: TextStyle(
-                    fontSize: 40.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                TextButton.icon(
-                  onPressed: () {
-                    setState(() {
-                      search = "";
-                      //TODO: code for properly adding a new category
-                      inventoryCards.add(InventoryCard(
-                        category: "U Wot M8?"
-                      ));
-                      toEnd();
-                    });
-                  },
-                  label: Text(""),
-                  //The the "+" icon
-                  icon: Icon(
-                    Icons.add,
-                    size: 45.0,
-                    color: Colors.amber[800],
-                  ),
-                ),
-              ],
+            child: Text(
+              "My Fridge",
+              style: TextStyle(
+                fontSize: 40.0,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
           Expanded(

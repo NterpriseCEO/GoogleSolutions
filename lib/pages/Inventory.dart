@@ -1,10 +1,10 @@
 import 'dart:math';
 
+import 'package:best_before_app/UpdateDatabase.dart';
 import 'package:best_before_app/components/ExpiryItem.dart';
 import 'package:best_before_app/components/InventoryItem.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import "package:best_before_app/globals.dart";
 
 FirebaseFirestore firestore = FirebaseFirestore.instance;
 
@@ -36,40 +36,29 @@ class _InventoryState extends State<Inventory> {
 
     title = ModalRoute.of(context).settings.arguments;
 
-    List<ExpiryItemData> inCategory = [];
-
-    for(ExpiryItemData exp in expiryItems) {
-      if(exp.category == title["category"]) {
-        if(exp.product.toLowerCase().contains(search) || search == "") {
-          inCategory.add(exp);
-        }
-      }
-    }
-    inCategory.sort((a, b) => a.daysTillExpiry.compareTo(b.daysTillExpiry));
-
     //Creates the list of expiry items
     Widget dataList()  {
       return StreamBuilder<QuerySnapshot>(
-          stream: firestore.collection('products').snapshots(),
-          builder: (context, snapshot){
-            List<Widget> itemWidgets = [];
-            if(snapshot.hasData){
-              final items = snapshot.data.docs;
+        stream: firestore.collection(userCol).snapshots(),
+        builder: (context, snapshot){
+          List<Widget> itemWidgets = [];
+          if(snapshot.hasData){
+            final items = snapshot.data.docs;
 
-              int increment = 0;
+            int increment = 0;
 
-              for(var item in items){
-                final itemData = item.data();
-                final itemCategory = itemData['Category'];
-                if(itemCategory == title["category"]) {
+            for(var item in items){
+              final itemData = item.data();
+              final itemCategory = itemData['Category'];
+              if(itemCategory == title["category"]) {
+                final itemExpiry = itemData['ExpiryDate'];
+                DateTime expiry = DateTime.parse(itemExpiry);
+                int daysTillExpiry = expiry.difference(DateTime.now()).inDays;
+                String itemName = itemData['ProductName'].toString();
+                int itemQuantity = int.parse(itemData['Quantity'].toString());
+
+                if(itemName.toLowerCase().contains(search.toLowerCase()) || search == "") {
                   increment++;
-                  final itemExpiry = itemData['ExpiryDate'];
-                  DateTime expiry = DateTime.parse(itemExpiry);
-                  int daysTillExpiry = expiry.difference(DateTime.now()).inDays;
-                  final itemName = itemData['ProductName'];
-                  print("$itemName $daysTillExpiry");
-                  var itemQuantity = int.parse(itemData['Quantity'].toString());
-                  print('this is message sender $itemName , $itemCategory, ${itemQuantity+50}, $daysTillExpiry');
                   final itemWidget = Dismissible(
                     key: UniqueKey(),
                     child: InventoryItem(
@@ -77,87 +66,49 @@ class _InventoryState extends State<Inventory> {
                       product: itemName,
                       quantity: itemQuantity,
                       callback: (int direction) {
-                        setState(() {
-                          //expiryItem.quantity+=direction;
-                          //if(expiryItem.quantity == 0) {
-                            //expiryItems.removeWhere((expiry) => expiry == expiryItem);
-                          //}
-                        });
+                        updateItemAmount(item.id, false, itemQuantity, direction);
                       },
                     ),
                     onDismissed: (direction) {
-                      //expiryItems.removeWhere((expiry) => expiry == expiryItem);
+                      updateItemAmount(item.id, true, itemQuantity, 0);
                     },
                     background: Container(
                       color: Colors.red,
                       child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: <Widget>[
-                            Padding(
-                              padding: EdgeInsets.only(right: 15.0),
-                              child: Icon(
-                                Icons.delete,
-                                color: Colors.white,
-                              ),
-                            )
-                          ]
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.only(right: 15.0),
+                            child: Icon(
+                              Icons.delete,
+                              color: Colors.white,
+                            ),
+                          )
+                        ]
                       ),
                     ),
                   );
                   itemWidgets.add(itemWidget);
                 }
               }
-              if(increment == 0) {
-                //itemWidgets.add(EmptyList());
-              }
             }
-            return Column(
-              children: itemWidgets,
-            );
+            if(increment == 0) {
+              itemWidgets.add(Center(
+                child: Text(
+                  "There's no ${title["category"]} in your inventory",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20.0,
+                  ),
+                ),
+              ));
+            }
           }
-      );
-    }
-
-    Widget list() {
-      return ListView.builder(
-        itemCount: inCategory.length,
-        itemBuilder: (BuildContext context, int index) {
-          final expiryItem = inCategory[index];
-          return Dismissible(
-            key: UniqueKey(),
-            child: InventoryItem(
-              expiryDate: expiryItem.daysTillExpiry,
-              product: expiryItem.product,
-              quantity: expiryItem.quantity,
-              callback: (int direction) {
-                setState(() {
-                  expiryItem.quantity+=direction;
-                  if(expiryItem.quantity == 0) {
-                    expiryItems.removeWhere((expiry) => expiry == expiryItem);
-                  }
-                });
-              },
-            ),
-            onDismissed: (direction) {
-              expiryItems.removeWhere((expiry) => expiry == expiryItem);
-            },
-            background: Container(
-              color: Colors.red,
-              child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.only(right: 15.0),
-                      child: Icon(
-                        Icons.delete,
-                        color: Colors.white,
-                      ),
-                    )
-                  ]
-              ),
-            ),
+          return Column(
+            children: itemWidgets,
           );
-        },
+        }
       );
     }
 
@@ -268,17 +219,7 @@ class _InventoryState extends State<Inventory> {
               //Adds the list of removable items from the list
               Expanded(
                 flex: 7,
-                child: inCategory.isNotEmpty ? dataList() :
-                Center(
-                  child: Text(
-                    "There are no ${title["category"]} in your inventory",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20.0,
-                    ),
-                  ),
-                ),
+                child: dataList(),
               ),
             ],
           ),

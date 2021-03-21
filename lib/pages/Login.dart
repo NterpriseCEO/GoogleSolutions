@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../components/menu.dart';
 import 'components/sign_in.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
+import "package:best_before_app/UpdateDatabase.dart";
 
 class Login extends StatefulWidget {
   @override
@@ -34,7 +35,7 @@ class _LoginState extends State<Login> {
     isLoggedIn = await googleSignIn.isSignedIn();
 
     if (isLoggedIn) {
-      print("test");
+      userCol = googleSignIn.currentUser.id;
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (context) => Menu()));
     }

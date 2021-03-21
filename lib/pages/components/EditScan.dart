@@ -197,11 +197,6 @@ Future<void> confirmBarcode(String itemName, BuildContext context, Callback call
                             ),
                             onPressed: () {
                               //send data to firebase
-                              firestore.collection('Users').add({
-                                'Category':  category,
-                                'Product Name': itemName,
-                                'Quantity': amount
-                              });
                               Navigator.of(context).pop();
                               //call expiry scan function
                               callback(itemName, category, amount);
@@ -230,7 +225,7 @@ void showPicker(BuildContext context, Callback2 callback) {
         "Sauces",
         "Bread",
         "Meat",
-        "Home Cooked meals"
+        "Misc"
     ]
 ]
     ''';

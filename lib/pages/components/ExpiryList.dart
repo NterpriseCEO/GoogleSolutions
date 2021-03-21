@@ -3,12 +3,11 @@
 // import 'dart:js';
 
 import 'package:best_before_app/components/ExpiryItem.dart';
-import 'package:flutter/material.dart';
-import "package:best_before_app/globals.dart";
-import "package:flutter_sticky_header/flutter_sticky_header.dart";
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import "package:flutter_sticky_header/flutter_sticky_header.dart";
 
-FirebaseFirestore firestore = FirebaseFirestore.instance;
+import 'package:best_before_app/UpdateDatabase.dart';
 
 class EmptyList extends StatelessWidget {
   @override
@@ -26,69 +25,59 @@ class EmptyList extends StatelessWidget {
   }
 }
 
-// void getProducts() async {
-//   print('test');
-//   var product = firestore.collection('products');
-//   var item = await product.get();
-//   for(int x = 0; x < item.docs.length; x++)
-//     {
-//       Map<String, dynamic> data = item.docs[x].data();
-//       print('${data['ProductName']} \n ${data['Category']} \n ${data['ExpiryDate']} \n ${data['Quantity']} ');
-//     }
-// }
+Widget dataList(int days1, int days2, String search)  {
+  return StreamBuilder<QuerySnapshot>(
+    stream: firestore.collection(userCol).snapshots(),
+    builder: (context, snapshot) {
+      List<Widget> itemWidgets = [];
+      if(snapshot.hasData){
+        final items = snapshot.data.docs;
 
-// void productStream() async {
-//   await for (var snapshot in firestore.collection('products').snapshots()){
-//     for (var item in snapshot.docs){
-//       var itemData = item.data();
-//       var itemCategory = itemData['Category'];
-//       var itemName = itemData['ProductName'];
-//       var itemQuantity = itemData['Quantity'];
-//       var itemExpiry = itemData['ExpiryDate'];
-//       print('this is message sender $itemName , $itemCategory, $itemQuantity, $itemExpiry');
-//     }
-//   }
-// }
-
-Widget dataList(int days1, int days2)  {
-   return StreamBuilder<QuerySnapshot>(
-      stream: firestore.collection('products').snapshots(),
-      builder: (context, snapshot){
-        List<Widget> itemWidgets = [];
-        if(snapshot.hasData){
-          final items = snapshot.data.docs;
-
-          int increment = 0;
-
-          for(var item in items){
-            final itemData = item.data();
-            final itemExpiry = itemData['ExpiryDate'];
-            DateTime expiry = DateTime.parse(itemExpiry);
-            int daysTillExpiry = expiry.difference(DateTime.now()).inDays;
-            if(daysTillExpiry <= days1 && daysTillExpiry >= days2) {
+        int increment = 0;
+        for(var item in items){
+          final itemData = item.data();
+          final itemExpiry = itemData['ExpiryDate'];
+          DateTime expiry = DateTime.parse(itemExpiry);
+          int daysTillExpiry = expiry.difference(DateTime.now()).inDays;
+          if(daysTillExpiry <= days1 && daysTillExpiry >= days2) {
+            final itemName = itemData['ProductName'].toString();
+            if(search != null) {
+              if(itemName.toLowerCase().contains(search.toLowerCase()) || search == "") {
+                increment++;
+                var itemQuantity = int.parse(itemData['Quantity'].toString());
+                final itemWidget = ExpiryItem(product: itemName,quantity: itemQuantity,expiryDate: daysTillExpiry,
+                  callback: (remove) {
+                    updateItemAmount(item.id, remove, itemQuantity, -1);
+                  }
+                );
+                itemWidgets.add(itemWidget);
+              }
+            }else {
               increment++;
-              final itemCategory = itemData['Category'];
-              final itemName = itemData['ProductName'];
-              print("$itemName $daysTillExpiry");
               var itemQuantity = int.parse(itemData['Quantity'].toString());
-              print('this is message sender $itemName , $itemCategory, ${itemQuantity+50}, $daysTillExpiry');
-              final itemWidget = ExpiryItem(product: itemName,quantity: itemQuantity,expiryDate: daysTillExpiry, callback: (remove) => print("does nothing yet!!!"));
+              final itemWidget = ExpiryItem(product: itemName,quantity: itemQuantity,expiryDate: daysTillExpiry,
+                callback: (remove) {
+                  updateItemAmount(item.id, remove, itemQuantity, -1);
+                }
+              );
               itemWidgets.add(itemWidget);
             }
           }
-          if(increment == 0) {
-            itemWidgets.add(EmptyList());
-          }
         }
-        return Column(
-          children: itemWidgets,
-        );
+        if(increment == 0) {
+          itemWidgets.add(EmptyList());
+        }
       }
+      return Column(
+      children: itemWidgets,
+      );
+    }
   );
 }
 
 class ExpiryList extends StatefulWidget {
   String search;
+
   ExpiryList({ Key key, this.search }): super(key: key);
 
   @override
@@ -102,17 +91,8 @@ class _ExpiryListState extends State<ExpiryList> {
 
   @override
   Widget build(BuildContext context) {
-    //List of dummy data items
-    List items = getItems(widget.search);
 
-    void decrement(ExpiryItemData item, bool remove) {
-      setState((){
-        item.quantity--;
-        if(item.quantity == 0 || remove) {
-          removeItem(item);
-        }
-      });
-    }
+    print(widget.search);
 
     //Scrollable page
     // productStream();
@@ -147,26 +127,26 @@ class _ExpiryListState extends State<ExpiryList> {
                       //Removes item when dismissed
                       onDismissed: (direction) {
                         setState(() {
-                          visible = false;
-                          removeExpired();
-                          expired.remove(expired.removeAt(index));
+                          //visible = false;
+                          //removeExpired();
+                          //expired.remove(expired.removeAt(index));
                         });
                       },
 
                       //List of items that are expired
-                      child: dataList(-1, -1000000),
+                      child: dataList(-1, -1000000, widget.search),
                       background: Container(
                         color: Colors.red,
                         child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: <Widget>[
-                              Padding(
-                                padding: EdgeInsets.only(right: 15.0),
-                                child: Icon(
-                                  Icons.delete,
-                                ),
-                              )
-                            ]
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: <Widget>[
+                            Padding(
+                              padding: EdgeInsets.only(right: 15.0),
+                              child: Icon(
+                                Icons.delete,
+                              ),
+                            )
+                          ]
                         ),
                       ),
                     );
@@ -189,7 +169,7 @@ class _ExpiryListState extends State<ExpiryList> {
                   //The content associated with a StickyHeader
                   delegate: SliverChildListDelegate(
                     //Checks if there are items going off today, prints message if not
-                    [dataList(0, 0)]
+                    [dataList(0, 0, widget.search)]
                   ),
                 ),
               ),
@@ -207,7 +187,7 @@ class _ExpiryListState extends State<ExpiryList> {
                 sliver: SliverList(
                   delegate: SliverChildListDelegate(
                     //Checks if there are items going off tomorrow, prints message if not
-                    [dataList(1, 1)]
+                    [dataList(1, 1, widget.search)]
                   ),
                 ),
               ),
@@ -225,7 +205,7 @@ class _ExpiryListState extends State<ExpiryList> {
                 sliver: SliverList(
                   delegate: SliverChildListDelegate(
                     //Checks if there are items going off in 5 days, prints message if not
-                    [dataList(5, 2)]
+                    [dataList(5, 2, widget.search)]
                   ),
                 ),
               ),
@@ -243,7 +223,7 @@ class _ExpiryListState extends State<ExpiryList> {
                 sliver: SliverList(
                 //Checks if there are items going off in 7 days, prints message if not
                   delegate: SliverChildListDelegate(
-                    [dataList(7, 6)]
+                    [dataList(7, 6, widget.search)]
                   ),
                 ),
               ),

@@ -7,15 +7,18 @@ import "package:camera/camera.dart";
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:flutter_mobile_vision/flutter_mobile_vision.dart';
-import "package:best_before_app/globals.dart";
 import "package:best_before_app/notifications/LocalNotifications.dart";
 import 'components/EditScan.dart';
-
+import "package:best_before_app/UpdateDatabase.dart";
 
 typedef void Callback(String category);
 
 class ScanPicture extends StatefulWidget {
   bool disabled = true;
+
+  String itemName;
+  String category;
+  int quantity;
 
   @override
   _ScanPictureState createState() => _ScanPictureState();
@@ -31,10 +34,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
   //The int value that will hold value of the current camera
   int selected = 0;
   bool barCodeScanned = false;
-  String expiryDate = "EMPTY";
   int _ocrCamera = FlutterMobileVision.CAMERA_BACK;
-
-
 
   String barcode = 'Unknown'; //This will hold the returned value from a barcode
 
@@ -56,6 +56,10 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
   }
 
   Future<void> scanBarcode() async {
+    widget.itemName = "";
+    widget.category = "";
+    widget.quantity = 0;
+
     try {
       barcode = await FlutterBarcodeScanner.scanBarcode(
         "#ff6666", // This is the line color for scanning part
@@ -81,12 +85,13 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
       });
     }
     String itemName = await barcodeResult(this.barcode);
-    confirmBarcode(itemName, context,
-        (String itemName, String category, int amount) {
+    confirmBarcode(itemName, context, (String itemName, String category, int amount) {
       setState(() {
         barCodeScanned = true;
       });
-      readExpiry(itemName, category, amount);
+      widget.itemName = itemName;
+      widget.category = category;
+      widget.quantity = amount;
     });
   }
 
@@ -143,7 +148,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
               children: [
                 //A constrained box to set the button to 1/4 the width of the app
                 Text(
-                  "Scan Barcode Then Scan Expiry Date",
+                  barCodeScanned ? "Scan Expiry Date" : "Scan Barcode",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 30.0,
@@ -156,45 +161,68 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
                     ],
                   ),
                 ),
-                Row( mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                  ConstrainedBox(
-                    constraints: BoxConstraints.tightFor(
-                      width: MediaQuery.of(context).size.width / 4,
-                      height: MediaQuery.of(context).size.width / 4,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: SizedBox(width:20.0)
                     ),
-                    //The button with a spherical border
-                    child: TextButton(
-                      onPressed: scanBarcode,
-                      style: ElevatedButton.styleFrom(
-                        primary: Colors.black.withOpacity(0.2),
-                        shape: CircleBorder(
-                          side: BorderSide(
-                            color: Colors.amber,
-                            width: 5.0,
+                    Expanded(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints.tightFor(
+                          width: MediaQuery.of(context).size.width / 4,
+                          height: MediaQuery.of(context).size.width / 4,
+                        ),
+                        //The button with a spherical border
+                        child: TextButton(
+                          onPressed: () {
+                            if(!barCodeScanned) {
+                              scanBarcode();
+                            }else {
+                              readExpiry(widget.itemName, widget.category, widget.quantity);
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            primary: Colors.black.withOpacity(0.2),
+                            shape: CircleBorder(
+                              side: BorderSide(
+                                color: Colors.amber,
+                                width: 5.0,
+                              ),
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                  IconButton(
-                      icon: Icon(Icons.keyboard),
-                      onPressed: () {
-                        confirmBarcode("", context,
-                            (String itemName, String category, int amount) {
-                          setState(() {
-                            barCodeScanned = true;
-                          });
-                          readExpiry(itemName, category, amount);
-                        });
-                      })
-                ]),
+                    Expanded(
+                      child: IconButton(
+                        icon: Icon(Icons.keyboard),
+                        iconSize: 40.0,
+                        color: Colors.white,
+                        onPressed: () {
+                          if(!barCodeScanned) {
+                            confirmBarcode("", context, (String itemName, String category, int amount) {
+                              setState(() {
+                                barCodeScanned = true;
+                              });
+                              widget.itemName = itemName;
+                              widget.category = category;
+                              widget.quantity = amount;
+                            });
+                          }else {
+                            enterExpiry(context, widget.itemName, widget.category, widget.quantity);
+                          }
+                        }
+                      ),
+                    )
+                  ],
+                ),
               ],
             ),
           ),
         ],
       );
-    } else {
+    }else {
       return Align(
         child: Icon(
           Icons.camera_alt,
@@ -218,7 +246,6 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
         waitTap: true,
       );
       setState(() {
-        expiryDate = texts[0].value;
         for (OcrText text in texts) {
           if (expiry == null) {
             expiry = checkIfExpiry(text.value);
@@ -228,12 +255,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
         }
 
         int daysTillExpiry = expiry.difference(DateTime.now()).inDays;
-        expiryItems.add(ExpiryItemData(
-            expiryDate: expiry,
-            product: productName,
-            quantity: quantity,
-            daysTillExpiry: daysTillExpiry,
-            category: category));
+        addItemToDB(productName, category, quantity, expiry.toString());
         notification(productName, quantity, daysTillExpiry);
 
         setState(() {
@@ -241,8 +263,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
         });
 
         final snackBar = SnackBar(
-          content:
-              Text('$quantity $productName have been added to your inventory'),
+          content: Text('$quantity $productName have been added to your inventory'),
           action: SnackBarAction(
             label: 'Ok',
             onPressed: () {},
@@ -253,5 +274,31 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
     } on Exception {
       texts.add(OcrText('Failed to recognize text'));
     }
+  }
+
+  void enterExpiry(BuildContext context, String productName, String category, int quantity) async {
+    DateTime expiry = await showDatePicker(
+      context: context,
+      initialDate:DateTime.now(),
+      firstDate:DateTime.now(),
+      lastDate: DateTime(2100)
+    );
+    print(productName);
+    addItemToDB(productName, category, quantity, expiry.toString());
+    int daysTillExpiry = expiry.difference(DateTime.now()).inDays;
+    notification(productName, quantity, daysTillExpiry);
+
+    final snackBar = SnackBar(
+      content: Text('$quantity $productName have been added to your inventory'),
+      action: SnackBarAction(
+        label: 'Ok',
+        onPressed: () {},
+      ),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+    setState(() {
+      barCodeScanned = false;
+    });
   }
 }
