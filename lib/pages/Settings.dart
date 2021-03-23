@@ -26,13 +26,7 @@ class _SettingsState extends State<Settings> {
                 child: Text("Sign Out"),
                 onPressed: () {
                   signOutGoogle();
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) {
-                        return Menu();
-                      },
-                    ),
-                  );
+                  Navigator.pushNamed(context, "/Login");
                 },
               ),
               SizedBox(height: 30),
