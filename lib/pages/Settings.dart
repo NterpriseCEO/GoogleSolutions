@@ -1,13 +1,15 @@
 import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:flutter/material.dart';
 
+import 'components/sign_in.dart';
+import '../components/menu.dart';
+
 class Settings extends StatefulWidget {
   @override
   _SettingsState createState() => _SettingsState();
 }
 
 class _SettingsState extends State<Settings> {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,8 +23,16 @@ class _SettingsState extends State<Settings> {
               Image(image: AssetImage('assets/icon.png'), height: 225),
               SizedBox(height: 50),
               ElevatedButton(
-                child: Text("logout"),
+                child: Text("Sign Out"),
                 onPressed: () {
+                  signOutGoogle();
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return Menu();
+                      },
+                    ),
+                  );
                 },
               ),
               SizedBox(height: 30),
