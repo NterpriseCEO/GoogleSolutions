@@ -84,15 +84,21 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
         barCodeScanned = false;
       });
     }
-    String itemName = await barcodeResult(this.barcode);
-    confirmBarcode(itemName, context, (String itemName, String category, int amount) {
-      setState(() {
-        barCodeScanned = true;
+    if(barcode != "-1") {
+      String itemName = await barcodeResult(this.barcode);
+      itemName = itemName != "noData" ? itemName : "";
+      confirmBarcode(itemName, context, (String itemName, String category, int amount, bool canceled) {
+        if(!canceled) {
+          setState(() {
+            barCodeScanned = true;
+          });
+          widget.itemName = itemName;
+          widget.category = category;
+          widget.quantity = amount;
+        }
+        setupCamera();
       });
-      widget.itemName = itemName;
-      widget.category = category;
-      widget.quantity = amount;
-    });
+    }
   }
 
   @override
@@ -201,13 +207,15 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
                         color: Colors.white,
                         onPressed: () {
                           if(!barCodeScanned) {
-                            confirmBarcode("", context, (String itemName, String category, int amount) {
-                              setState(() {
-                                barCodeScanned = true;
-                              });
-                              widget.itemName = itemName;
-                              widget.category = category;
-                              widget.quantity = amount;
+                            confirmBarcode("", context, (String itemName, String category, int amount, bool canceled) {
+                              if(!canceled) {
+                                setState(() {
+                                  barCodeScanned = true;
+                                });
+                                widget.itemName = itemName;
+                                widget.category = category;
+                                widget.quantity = amount;
+                              }
                             });
                           }else {
                             enterExpiry(context, widget.itemName, widget.category, widget.quantity);
@@ -233,7 +241,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
   }
 
   Future<Null> readExpiry(
-      String productName, String category, int quantity) async {
+    String productName, String category, int quantity) async {
     List<OcrText> texts = [];
     DateTime expiry;
     try {
@@ -254,26 +262,29 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
           }
         }
 
-        int daysTillExpiry = expiry.difference(DateTime.now()).inDays;
-        addItemToDB(productName, category, quantity, expiry.toString());
-        notification(productName, quantity, daysTillExpiry);
+        if(expiry != null) {
+          int daysTillExpiry = expiry.difference(DateTime.now()).inDays;
+          addItemToDB(productName, category, quantity, expiry.toString());
+          notification(productName, quantity, daysTillExpiry);
 
-        setState(() {
           barCodeScanned = false;
-        });
 
-        final snackBar = SnackBar(
-          content: Text('$quantity $productName have been added to your inventory'),
-          action: SnackBarAction(
-            label: 'Ok',
-            onPressed: () {},
-          ),
-        );
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          final snackBar = SnackBar(
+            content: Text('$quantity $productName have been added to your inventory'),
+            action: SnackBarAction(
+              label: 'Ok',
+              onPressed: () {},
+            ),
+          );
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        }else {
+          enterExpiry(context, productName, category, quantity);
+        }
       });
     } on Exception {
       texts.add(OcrText('Failed to recognize text'));
     }
+    setupCamera();
   }
 
   void enterExpiry(BuildContext context, String productName, String category, int quantity) async {
@@ -283,19 +294,20 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
       firstDate:DateTime.now(),
       lastDate: DateTime(2100)
     );
-    print(productName);
-    addItemToDB(productName, category, quantity, expiry.toString());
-    int daysTillExpiry = expiry.difference(DateTime.now()).inDays;
-    notification(productName, quantity, daysTillExpiry);
+    if(expiry != null) {
+      addItemToDB(productName, category, quantity, expiry.toString());
+      int daysTillExpiry = expiry.difference(DateTime.now()).inDays;
+      notification(productName, quantity, daysTillExpiry);
 
-    final snackBar = SnackBar(
-      content: Text('$quantity $productName have been added to your inventory'),
-      action: SnackBarAction(
-        label: 'Ok',
-        onPressed: () {},
-      ),
-    );
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      final snackBar = SnackBar(
+        content: Text('$quantity $productName have been added to your inventory'),
+        action: SnackBarAction(
+          label: 'Ok',
+          onPressed: () {},
+        ),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
 
     setState(() {
       barCodeScanned = false;

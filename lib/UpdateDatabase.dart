@@ -32,6 +32,16 @@ void addItemToDB(String itemName, String category, int amount, String expiryDate
   });
 }
 
-void removeExpired() {
-  //firestore.instance.collection(userCol).getDocuments().
+void removeExpired() async {
+  await firestore.collection(userCol).get().then((snapshot) {
+    List<DocumentSnapshot> allDocs = snapshot.docs;
+    allDocs.forEach((DocumentSnapshot document) {
+      DateTime date = DateTime.parse(document.data()["ExpiryDate"]);
+      if(date.isBefore(DateTime.now())) {
+        document.reference.delete();
+      }
+    });
+  });
+
+
 }

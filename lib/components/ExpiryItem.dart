@@ -94,17 +94,15 @@ class ExpiryItem extends StatelessWidget {
       //The delete icon that appears behind the dismissible widget
       background: Container(
         color: Colors.red,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: <Widget>[
-            Padding(
-              padding: EdgeInsets.only(right: 15.0),
-              child: Icon(
-                Icons.delete,
-                color: Colors.white,
-              ),
-            )
-          ]
+        child: Padding(
+          padding: EdgeInsets.only(left: 15.0),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Icon(
+              Icons.delete,
+              color: Colors.white,
+            ),
+          ),
         ),
       ),
     );

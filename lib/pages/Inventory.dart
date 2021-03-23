@@ -46,14 +46,14 @@ class _InventoryState extends State<Inventory> {
             final items = snapshot.data.docs;
 
             int increment = 0;
-
+            DateTime now = DateTime.now();
             for(var item in items){
               final itemData = item.data();
               final itemCategory = itemData['Category'];
               if(itemCategory == title["category"]) {
                 final itemExpiry = itemData['ExpiryDate'];
                 DateTime expiry = DateTime.parse(itemExpiry);
-                int daysTillExpiry = expiry.difference(DateTime.now()).inDays;
+                int daysTillExpiry = expiry.difference(DateTime(now.year, now.month, now.day)).inDays;
                 String itemName = itemData['ProductName'].toString();
                 int itemQuantity = int.parse(itemData['Quantity'].toString());
 
@@ -61,6 +61,7 @@ class _InventoryState extends State<Inventory> {
                   increment++;
                   final itemWidget = Dismissible(
                     key: UniqueKey(),
+                    direction: DismissDirection.endToStart,
                     child: InventoryItem(
                       expiryDate: daysTillExpiry,
                       product: itemName,

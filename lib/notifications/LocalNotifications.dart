@@ -33,7 +33,7 @@ var now;
 var zone;
 
 void initNotifications() async {
-  //START OF IMPORTANT MESSAGE: Don't modify this code unless you want to give yourself an aneurysm //////////////////////////////////////////////////////
+  //START OF IMPORTANT MESSAGE: This code initialises the notifications//////////////////////////////////////////////////////
   flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
   //init plugin. app_icon needs to be added as drawable resource to android head project
 
