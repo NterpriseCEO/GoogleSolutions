@@ -8,6 +8,7 @@ Future<String> barcodeResult(String barcode) async {
     String data = jsonDecode(response.body)["product"]["product_name"];
     return data;
   }catch(e) {
+    //Return "noData" if no barcode found in the database
     return "noData";
   }
 }

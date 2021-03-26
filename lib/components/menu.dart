@@ -61,7 +61,7 @@ class _MenuState extends State<Menu> {
                     ),
                     Container(
                       //The ScanPicture() page
-                        child: ScanPicture()
+                      child: ScanPicture(),
                     ),
                     Container(
                       child: Padding(

@@ -1,7 +1,3 @@
-// import 'dart:html';
-// import 'dart:js';
-// import 'dart:js';
-
 import 'package:best_before_app/components/ExpiryItem.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -10,28 +6,6 @@ import "package:flutter_sticky_header/flutter_sticky_header.dart";
 import 'package:best_before_app/UpdateDatabase.dart';
 
 typedef Callback(bool hide);
-
-class EmptyList extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 20.0),
-      child: Center(
-        child: Text(
-          "Good, Nothing is going off!",
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize:20.0,
-          )
-        ),
-      ),
-    );
-  }
-}
-
-/*Widget dataList(int days1, int days2, String search, Callback isVisible)  {
-  return
-}*/
 
 class ExpiryList extends StatefulWidget {
   String search;
@@ -44,19 +18,8 @@ class ExpiryList extends StatefulWidget {
 
 class _ExpiryListState extends State<ExpiryList> {
 
-  bool goneOff = true;
-  bool today = true;
-  bool tomorrow = true;
-  bool fiveDays = true;
-  bool sevenDays = true;
-
-  List<String> expired = [""];
-
   @override
   Widget build(BuildContext context) {
-
-    print(widget.search);
-
     //Scrollable page
     // productStream();
     return Padding(
@@ -82,6 +45,7 @@ class _ExpiryListState extends State<ExpiryList> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
+                      //Button to remove all expired items
                       TextButton(
                         onPressed: () {
                           removeExpired();
@@ -95,19 +59,14 @@ class _ExpiryListState extends State<ExpiryList> {
                   //The content associated with a StickyHeader
                   delegate: SliverChildListDelegate(
                     <Widget>[
-                      DataList(upper: -1, lower: -1000000, search: widget.search, isVisible: (bool visible) {
-                        if(!visible) {
-                          today = false;
-                        }else {
-                          today = true;
-                        }
-                      })
+                      DataList(upper: -1, lower: -1000000, search: widget.search)
                     ]
                   )
                 ),
               ),
               SliverStickyHeader(
                 //ColoredBox is more efficient then container with color property
+                //Sets the title background colour
                 header: ColoredBox(
                   color: Colors.white,
                   child: Text(
@@ -123,13 +82,7 @@ class _ExpiryListState extends State<ExpiryList> {
                   delegate: SliverChildListDelegate.fixed(
                     //Checks if there are items going off today, prints message if not
                     <Widget>[
-                      DataList(upper: 0, lower: 0, search: widget.search, isVisible: (bool visible) {
-                        if(!visible) {
-                          today = false;
-                        }else {
-                          today = true;
-                        }
-                      })
+                      DataList(upper: 0, lower: 0, search: widget.search)
                     ]
                   ),
                 ),
@@ -149,13 +102,7 @@ class _ExpiryListState extends State<ExpiryList> {
                   delegate: SliverChildListDelegate.fixed(
                     //Checks if there are items going off tomorrow, prints message if not
                     <Widget>[
-                      DataList(upper: 1, lower: 1, search: widget.search, isVisible: (bool visible) {
-                        if(!visible) {
-                          tomorrow = false;
-                        }else {
-                          tomorrow = true;
-                        }
-                      })
+                      DataList(upper: 1, lower: 1, search: widget.search)
                     ]
                   ),
                 ),
@@ -174,13 +121,9 @@ class _ExpiryListState extends State<ExpiryList> {
                 sliver: SliverList(
                   delegate: SliverChildListDelegate.fixed(
                     //Checks if there are items going off in 5 days, prints message if not
-                    <Widget>[DataList(upper: 5, lower: 2, search: widget.search, isVisible: (bool visible) {
-                      if(!visible) {
-                        fiveDays = false;
-                      }else {
-                        fiveDays = true;
-                      }
-                    })]
+                    <Widget>[
+                      DataList(upper: 5, lower: 2, search: widget.search)
+                    ]
                   ),
                 ),
               ),
@@ -199,13 +142,7 @@ class _ExpiryListState extends State<ExpiryList> {
                   //Checks if there are items going off in 7 days, prints message if not
                   delegate: SliverChildListDelegate.fixed(
                     <Widget>[
-                      DataList(upper: 7, lower: 6, search: widget.search, isVisible: (bool visible) {
-                        if(!visible) {
-                          sevenDays = false;
-                        }else {
-                          sevenDays = true;
-                        }
-                      })
+                      DataList(upper: 7, lower: 6, search: widget.search)
                     ]
                   ),
                 ),
@@ -233,32 +170,44 @@ class DataList extends StatelessWidget {
   final int upper;
   final int lower;
   final String search;
-  final Callback isVisible;
 
-  DataList({ this.upper, this.lower, this.search, this.isVisible });
+  //The upper and lower date range and the search value
+  DataList({ this.upper, this.lower, this.search });
 
   @override
   Widget build(BuildContext context) {
+    //Listens for changes from the users databse of items
+    //(items added / removed etc)
     return StreamBuilder<QuerySnapshot>(
       stream: firestore.collection(userCol).snapshots(),
       builder: (context, snapshot) {
+        //WHen data is gotten creates a list of expiry item widgets
         List<Widget> itemWidgets = [];
+        //Checks if data returned
         if(snapshot.hasData) {
+          //Gets a list of the documents
           final items = snapshot.data.docs;
 
-          int increment = 0;
           DateTime now = DateTime.now();
-          for(var item in items){
+          //Loops through the documents
+          for(var item in items) {
+            //Gets the document data
             final itemData = item.data();
+            //Gets the fields (ExpiryDate, ProductName, Category and quantity)
             final itemExpiry = itemData['ExpiryDate'];
             DateTime expiry = DateTime.parse(itemExpiry);
+            //Calculates the days till expiry
             int daysTillExpiry = expiry.difference(DateTime(now.year, now.month, now.day)).inDays;
+            //Checks if the expiry date is in the range
             if(daysTillExpiry <= upper && daysTillExpiry >= lower) {
               final itemName = itemData['ProductName'].toString();
+              //Check if user is searching or not
               if(search != null) {
+                //Checks if the product name contains the search term
                 if(itemName.toLowerCase().contains(search.toLowerCase()) || search == "") {
-                  increment++;
+                  //Converts the quantity to an integer
                   var itemQuantity = int.parse(itemData['Quantity'].toString());
+                  //Creates the expiry item widget and adds it to the list of widgets
                   final itemWidget = ExpiryItem(product: itemName,quantity: itemQuantity,expiryDate: daysTillExpiry,
                     callback: (remove) {
                       updateItemAmount(item.id, remove, itemQuantity, -1);
@@ -267,20 +216,15 @@ class DataList extends StatelessWidget {
                   itemWidgets.add(itemWidget);
                 }
               }else {
-                increment++;
                 var itemQuantity = int.parse(itemData['Quantity'].toString());
                 final itemWidget = ExpiryItem(product: itemName,quantity: itemQuantity,expiryDate: daysTillExpiry,
-                    callback: (remove) {
-                      updateItemAmount(item.id, remove, itemQuantity, -1);
-                    }
+                  callback: (remove) {
+                    updateItemAmount(item.id, remove, itemQuantity, -1);
+                  }
                 );
                 itemWidgets.add(itemWidget);
               }
             }
-          }
-          if(increment == 0) {
-            //itemWidgets.add(EmptyList());
-            isVisible(false);
           }
         }
         return Column(

@@ -40,8 +40,6 @@ Future<String> signInWithGoogle() async {
 
     userCol = user.uid;
 
-    print("hello user? ${user.uid}");
-
     print('Continue with Google: Success');
     print('$user');
 

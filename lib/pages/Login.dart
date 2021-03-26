@@ -68,9 +68,6 @@ class _LoginState extends State<Login> {
                     });
                     signInWithGoogle().then((result) {
                       if (result != null) {
-                        setState(() {
-                          showSpinner = false;
-                        });
                         Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) {
@@ -79,6 +76,9 @@ class _LoginState extends State<Login> {
                           ),
                         );
                       }
+                      setState(() {
+                        showSpinner = false;
+                      });
                     });
                   },
                 ),

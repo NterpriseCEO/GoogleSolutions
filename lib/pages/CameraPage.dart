@@ -14,8 +14,6 @@ import "package:best_before_app/UpdateDatabase.dart";
 typedef void Callback(String category);
 
 class ScanPicture extends StatefulWidget {
-  bool disabled = true;
-
   String itemName;
   String category;
   int quantity;
@@ -34,6 +32,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
   //The int value that will hold value of the current camera
   int selected = 0;
   bool barCodeScanned = false;
+  //The ocrCamera
   int _ocrCamera = FlutterMobileVision.CAMERA_BACK;
 
   String barcode = 'Unknown'; //This will hold the returned value from a barcode
@@ -61,43 +60,56 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
     widget.quantity = 0;
 
     try {
-      barcode = await FlutterBarcodeScanner.scanBarcode(
-        "#ff6666", // This is the line color for scanning part
-        "Cancel", //cancel option
-        false, //disabling flash as an option
-        ScanMode.BARCODE,
-      );
+      try {
+        //scans the barcode
+        barcode = await FlutterBarcodeScanner.scanBarcode(
+          "#ff6666", // This is the line color for scanning part
+          "Cancel", //cancel option
+          false, //disabling flash as an option
+          ScanMode.BARCODE,
+        );
 
-      if (!mounted) return;
-
-      setState(() {
-        this.barcode = barcode;
-      });
-    } on PlatformException {
-      barcode = 'Failed to get platform version.';
-      DropdownBanner.showBanner(
-        text: 'Failed to complete scan request',
-        color: Colors.red[600],
-        textStyle: TextStyle(color: Colors.white),
-      );
-      setState(() {
-        barCodeScanned = false;
-      });
-    }
-    if(barcode != "-1") {
-      String itemName = await barcodeResult(this.barcode);
-      itemName = itemName != "noData" ? itemName : "";
-      confirmBarcode(itemName, context, (String itemName, String category, int amount, bool canceled) {
-        if(!canceled) {
-          setState(() {
-            barCodeScanned = true;
-          });
-          widget.itemName = itemName;
-          widget.category = category;
-          widget.quantity = amount;
-        }
-        setupCamera();
-      });
+        if (!mounted) return;
+        //Sets teh barcode variable
+        setState(() {
+          this.barcode = barcode;
+        });
+      } on PlatformException {
+        //Called if scan request does not work
+        barcode = 'Failed to get platform version.';
+        DropdownBanner.showBanner(
+          text: 'Failed to complete scan request',
+          color: Colors.red[600],
+          textStyle: TextStyle(color: Colors.white),
+        );
+        setState(() {
+          barCodeScanned = false;
+        });
+      }
+      //Runs this code if barcode gotten
+      if(barcode != "-1") {
+        //Gets barcode data
+        String itemName = await barcodeResult(this.barcode);
+        //Sets the itemName depending on if data was found
+        itemName = itemName != "noData" ? itemName : "";
+        //Asks users to confirm the barcode and the product name etc.
+        confirmBarcode(itemName, context, (String itemName, String category, int amount, bool canceled) {
+          if(!canceled) {
+            //Sets variables if not canceled
+            setState(() {
+              //Sets this variable to indicate that the barcode has been scanned
+              barCodeScanned = true;
+            });
+            widget.itemName = itemName;
+            widget.category = category;
+            widget.quantity = amount;
+          }
+        });
+      }
+      //Reinits the camera to make sure the screen isn't black
+      setupCamera();
+    }catch(e) {
+      print(e);
     }
   }
 
@@ -111,17 +123,14 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
     if (controller == null || !controller.value.isInitialized) {
       return;
     }
 
     if (state == AppLifecycleState.inactive) {
       //Dispose of controller when necessary
-      controller?.dispose();
-    } else if (state == AppLifecycleState.resumed) {
-      //Set up camera when App lifecycle state resumed
-      setupCamera();
+      await controller?.dispose();
     }
   }
 
@@ -136,8 +145,15 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    if (controller != null) {
+    if (controller == null) {
       //A Widget for absolute positioning other widgets
+      return Align(
+        child: Icon(
+          Icons.camera_alt,
+          size: 60.0,
+        ),
+      );
+    }else {
       return Stack(
         fit: StackFit.expand,
         children: <Widget>[
@@ -154,6 +170,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
               children: [
                 //A constrained box to set the button to 1/4 the width of the app
                 Text(
+                  //Sets the text based on if expiry date has been scanned yet
                   barCodeScanned ? "Scan Expiry Date" : "Scan Barcode",
                   textAlign: TextAlign.center,
                   style: TextStyle(
@@ -171,7 +188,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(
-                      child: SizedBox(width:20.0)
+                        child: SizedBox(width:20.0)
                     ),
                     Expanded(
                       child: ConstrainedBox(
@@ -182,12 +199,14 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
                         //The button with a spherical border
                         child: TextButton(
                           onPressed: () {
+                            //Determines which function to run on click
                             if(!barCodeScanned) {
                               scanBarcode();
                             }else {
                               readExpiry(widget.itemName, widget.category, widget.quantity);
                             }
                           },
+                          //The button style
                           style: ElevatedButton.styleFrom(
                             primary: Colors.black.withOpacity(0.2),
                             shape: CircleBorder(
@@ -206,6 +225,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
                         iconSize: 40.0,
                         color: Colors.white,
                         onPressed: () {
+                          //Determines which popup to show on button click
                           if(!barCodeScanned) {
                             confirmBarcode("", context, (String itemName, String category, int amount, bool canceled) {
                               if(!canceled) {
@@ -230,21 +250,16 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
           ),
         ],
       );
-    }else {
-      return Align(
-        child: Icon(
-          Icons.camera_alt,
-          size: 60.0,
-        ),
-      );
     }
   }
 
   Future<Null> readExpiry(
+    //The variables
     String productName, String category, int quantity) async {
     List<OcrText> texts = [];
     DateTime expiry;
     try {
+      //Reads the text available to the camera
       texts = await FlutterMobileVision.read(
         flash: false,
         showText: false,
@@ -254,6 +269,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
         waitTap: true,
       );
       setState(() {
+        //Loops through text and checks if it is an expiry date
         for (OcrText text in texts) {
           if (expiry == null) {
             expiry = checkIfExpiry(text.value);
@@ -262,13 +278,17 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
           }
         }
 
+        //Checks if expiry date was found
         if(expiry != null) {
+          //Calculates the days until expiry
           int daysTillExpiry = expiry.difference(DateTime.now()).inDays;
+          //Adds the product to the database
           addItemToDB(productName, category, quantity, expiry.toString());
+          //creates a notification
           notification(productName, quantity, daysTillExpiry);
 
           barCodeScanned = false;
-
+          //Shows message saying that item was added to inventory
           final snackBar = SnackBar(
             content: Text('$quantity $productName have been added to your inventory'),
             action: SnackBarAction(
@@ -278,27 +298,34 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
           );
           ScaffoldMessenger.of(context).showSnackBar(snackBar);
         }else {
+          //Asks user to enter the expiry when no expiry found
           enterExpiry(context, productName, category, quantity);
         }
+        //Re-initialises the camera
+        setupCamera();
       });
     } on Exception {
       texts.add(OcrText('Failed to recognize text'));
     }
-    setupCamera();
   }
 
   void enterExpiry(BuildContext context, String productName, String category, int quantity) async {
+    //Shows the date picker
     DateTime expiry = await showDatePicker(
       context: context,
       initialDate:DateTime.now(),
       firstDate:DateTime.now(),
       lastDate: DateTime(2100)
     );
+    //Checks if the expiry date picker was not canceled
     if(expiry != null) {
+      //Adds the product to the databse
       addItemToDB(productName, category, quantity, expiry.toString());
       int daysTillExpiry = expiry.difference(DateTime.now()).inDays;
+      //Creates a notification
       notification(productName, quantity, daysTillExpiry);
 
+      //Shows message saying that item was added to inventory
       final snackBar = SnackBar(
         content: Text('$quantity $productName have been added to your inventory'),
         action: SnackBarAction(

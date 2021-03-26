@@ -13,7 +13,10 @@ class InventoryItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //Set the expiry date to 0 if it is less than 0
     expiryDate = expiryDate < 0 ? 0 : expiryDate;
+
+    //The colour indicator for how fresh an item is
     Color indicator = Colors.green[200];
     if(expiryDate <= 0) {
       indicator = Colors.red[200];
@@ -31,6 +34,7 @@ class InventoryItem extends StatelessWidget {
                 flex: 2,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
+                  //Buttons to hide elements
                   children: <Widget>[
                     IconButton(
                       icon: Icon(Icons.exposure_minus_1),
@@ -52,6 +56,7 @@ class InventoryItem extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
+                    //The item name
                     Text(
                       "$product",
                       style: TextStyle(
@@ -73,6 +78,7 @@ class InventoryItem extends StatelessWidget {
                 flex: 1,
                 child: Column(
                   children: <Widget>[
+                    //The item expiry date
                     Text(
                       "$expiryDate",
                       style: TextStyle(

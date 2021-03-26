@@ -15,7 +15,6 @@ class InventoryCard extends StatelessWidget {
         final result = await Navigator.pushNamed(context, "/inventory", arguments: {
           "category": category
         });
-        print(result);
         //This checks if trying to add a new item to the inventory
         if(result == 1) {
           goToPage(result);

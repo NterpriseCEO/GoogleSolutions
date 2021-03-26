@@ -2,17 +2,6 @@ import 'package:flutter/material.dart';
 
 typedef void Callback(bool remove);
 
-//Data for the expiry items
-class ExpiryItemData {
-  final DateTime expiryDate;
-  int daysTillExpiry = 0;
-  final String product;
-  int quantity;
-  String category;
-
-  ExpiryItemData({this.expiryDate, this.product, this.quantity, this.daysTillExpiry, this.category });
-}
-
 class ExpiryItem extends StatelessWidget {
   MaterialColor expiryStatus = Colors.green;
 
@@ -55,6 +44,7 @@ class ExpiryItem extends StatelessWidget {
                 ),
               ),
             ),
+            //Item quantity
             Expanded(
               flex: 1,
               child: Container(

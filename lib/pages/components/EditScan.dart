@@ -10,7 +10,7 @@ typedef void Callback2(String category);
 FirebaseFirestore firestore = FirebaseFirestore.instance;
 
 Future<void> confirmBarcode(String itemName, BuildContext context, Callback callback) {
-  int amount = 1;
+  int amount = 1; //Amount of items to add to inventory
   TextEditingController textController = new TextEditingController();
   textController.text = "1";
   String category = "Vegetables";
@@ -25,6 +25,7 @@ Future<void> confirmBarcode(String itemName, BuildContext context, Callback call
             onTap: () {
               FocusScope.of(context).unfocus();
             },
+            //The alert dialog
             child: AlertDialog(
               title: Text(
                 'Product Details',
@@ -43,6 +44,7 @@ Future<void> confirmBarcode(String itemName, BuildContext context, Callback call
                     SizedBox(height:10.0),
                     TextFormField(
                       initialValue: itemName,
+                      //When user types in input
                       onChanged: (String name) async {
                         itemName = name;
                       },
@@ -69,6 +71,7 @@ Future<void> confirmBarcode(String itemName, BuildContext context, Callback call
                       ),
                     ),
                     SizedBox(height:10.0),
+                    //Item quantity
                     Text(
                       "Quantity",
                       textAlign: TextAlign.center,
@@ -76,6 +79,8 @@ Future<void> confirmBarcode(String itemName, BuildContext context, Callback call
                         fontWeight: FontWeight.bold,
                       ),
                     ),
+                    //The increment and decrement ui
+                    //Used to change the item quantity
                     Row(
                       children: <Widget>[
                         Expanded(
@@ -141,6 +146,7 @@ Future<void> confirmBarcode(String itemName, BuildContext context, Callback call
                       ],
                     ),
                     SizedBox(height:10.0),
+                    //The category picker
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -160,6 +166,7 @@ Future<void> confirmBarcode(String itemName, BuildContext context, Callback call
                     ),
                     ElevatedButton(
                       onPressed: () {
+                        //Shows the category picker
                         showPicker(context, (String cat) {
                           setState(() {
                             category = cat;
@@ -167,6 +174,7 @@ Future<void> confirmBarcode(String itemName, BuildContext context, Callback call
                         });
                       },
                       child: Text("Choose a Category"),
+                      //Styling the yellowy orange button
                       style: ElevatedButton.styleFrom(
                         primary: Colors.amber,
                         elevation: 0,
@@ -179,6 +187,7 @@ Future<void> confirmBarcode(String itemName, BuildContext context, Callback call
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget>[
+                        //The x and tick button
                         IconButton(
                           icon: Icon(
                             Icons.cancel_outlined,
@@ -230,42 +239,60 @@ void showPicker(BuildContext context, Callback2 callback) {
     ]
 ]
     ''';
+  //The category picker
   Picker(
-      adapter: PickerDataAdapter<String>(
-        pickerdata: JsonDecoder().convert(PickerData2),
-        isArray: true,
-      ),
-      hideHeader: true,
-      title: Text("Please Select"),
-      selectedTextStyle: TextStyle(color: Colors.blue),
-      cancel: TextButton(onPressed: () {
+    adapter: PickerDataAdapter<String>(
+      pickerdata: JsonDecoder().convert(PickerData2),
+      isArray: true,
+    ),
+    hideHeader: true,
+    title: Text("Please Select"),
+    selectedTextStyle: TextStyle(color: Colors.blue),
+    cancel: TextButton(
+      onPressed: () {
         Navigator.pop(context);
-      }, child: Text("Cancel")),
-      onConfirm: (Picker picker, List value) {
-        callback(picker.getSelectedValues()[0]);
-      }
+      },
+      child: Text("Cancel")
+    ),
+    onConfirm: (Picker picker, List value) {
+      callback(picker.getSelectedValues()[0]);
+    }
   ).showDialog(context);
 }
 
 DateTime checkIfExpiry(String data) {
-  List<String> strings = data.split(" ");
+  //Splits the string by line
+  LineSplitter ls = new LineSplitter();
+  List<String> strings = ls.convert(data);
+  data = "";
+  //Creates a single line string
+  for(String str in strings) {
+    data+=str+" ";
+  }
+  int length = 0;
+  //splits the string at each space
+  strings = data.split(" ");
   String date = "";
   for(int i = 0; i < strings.length; i++) {
+    //Checks if string is 2 characters or 4 characters long
     if(strings[i].length <= 4 && strings[i].length >= 2) {
-      try {
-        if(double.parse(strings[i]) != null) {
+      length++;
+      //check if both parts of the expiry date have been gotten already
+      if(length != 3) {
+        //Tries parsing the string to a number
+        if(int.tryParse(strings[i]) != null) {
           date = strings[i]+"-"+date;
           print("Word length: ${strings[i].length}, the string: ${strings[i]}");
         }
-      }catch(e) {
-        print("error: $e");
       }
     }
   }
   //date+=01
+  //Changes date to proper format
   if(date != "") {
     date = date.substring(0,date.length-1)+"-01";
   }
+  //Parses the date
   try {
     DateTime dte = DateTime.parse(date);
     print("the date ${DateTime.parse(date)}");
@@ -273,5 +300,6 @@ DateTime checkIfExpiry(String data) {
   }catch(e) {
     print(e);
   }
+  //Return null if no date found
   return null;
 }

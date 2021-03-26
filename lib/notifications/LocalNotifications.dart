@@ -1,9 +1,3 @@
-//import 'dart:async';
-//import 'dart:io';
-//import 'dart:typed_data';
-//import 'dart:ui';
-
-//import 'package:device_info/device_info.dart';
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
@@ -39,7 +33,6 @@ void initNotifications() async {
 
   final NotificationAppLaunchDetails notificationAppLaunchDetails = await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
 
-  //Also don't ask me what this does, it is a ReactJS thing...
   final BehaviorSubject<ReceivedNotification> didReceiveNotificationSubject = BehaviorSubject<ReceivedNotification>();
   final BehaviorSubject<String> selectedNotificationSubject = BehaviorSubject<String>();
 
@@ -53,13 +46,13 @@ void initNotifications() async {
     selectedNotificationPayload = notificationAppLaunchDetails.payload;
   }
 
-  const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings("meat");
+  const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings("icon");
   final IOSInitializationSettings initializationSettingsIOS = IOSInitializationSettings(
-      onDidReceiveLocalNotification: (int id, String title, String body, String payload) async {
-        didReceiveNotificationSubject.add(ReceivedNotification(
-          id: id, title: title, body: body, payload: payload,
-        ));
-      }
+    onDidReceiveLocalNotification: (int id, String title, String body, String payload) async {
+      didReceiveNotificationSubject.add(ReceivedNotification(
+        id: id, title: title, body: body, payload: payload,
+      ));
+    }
   );
 
   final MacOSInitializationSettings initializationSettingsMacOS = MacOSInitializationSettings();
@@ -87,16 +80,17 @@ var rand = Random();
 Future<void> notification(String product, int quantity, int expiry) async {
   now = await tz.TZDateTime.now(zone);
   if(expiry > 0) {
+    //Create notification
     flutterLocalNotificationsPlugin.zonedSchedule(
-        rand.nextInt(pow(2, 31) - 1),
-        "$product going off!",
-        "$quantity $product goes off today!",
-        now.add(Duration(days : expiry)),
-        const NotificationDetails(
-          android: AndroidNotificationDetails("0", "What does", "this do"),
-        ),
-        androidAllowWhileIdle: true,
-        uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime
+      rand.nextInt(pow(2, 31) - 1),
+      "$product going off!",
+      "$quantity $product goes off tomorrow!",
+      now.add(Duration(days : expiry)),
+      const NotificationDetails(
+        android: AndroidNotificationDetails("0", "What does", "this do"),
+      ),
+      androidAllowWhileIdle: true,
+      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime
     );
   }
 }
