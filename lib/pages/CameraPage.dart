@@ -281,7 +281,8 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
         //Checks if expiry date was found
         if(expiry != null) {
           //Calculates the days until expiry
-          int daysTillExpiry = expiry.difference(DateTime.now()).inDays;
+          DateTime now = DateTime.now();
+          int daysTillExpiry = expiry.difference(DateTime(now.year, now.month, now.day)).inDays;
           //Adds the product to the database
           addItemToDB(productName, category, quantity, expiry.toString());
           //creates a notification
@@ -321,7 +322,9 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
     if(expiry != null) {
       //Adds the product to the databse
       addItemToDB(productName, category, quantity, expiry.toString());
-      int daysTillExpiry = expiry.difference(DateTime.now()).inDays;
+      DateTime now = DateTime.now();
+      int daysTillExpiry = expiry.difference(DateTime(now.year, now.month, now.day)).inDays;
+      print("heloooooooooo? $daysTillExpiry ${DateTime.now()}");
       //Creates a notification
       notification(productName, quantity, daysTillExpiry);
 

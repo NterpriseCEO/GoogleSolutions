@@ -84,13 +84,24 @@ Future<void> notification(String product, int quantity, int expiry) async {
     flutterLocalNotificationsPlugin.zonedSchedule(
       rand.nextInt(pow(2, 31) - 1),
       "$product going off!",
-      "$quantity $product goes off tomorrow!",
-      now.add(Duration(days : expiry)),
+      "$quantity $product goes off today!",
+      tz.TZDateTime(tz.local, now.year, now.month, now.day, 6).add(Duration(days: expiry)),
       const NotificationDetails(
-        android: AndroidNotificationDetails("0", "What does", "this do"),
+        android: AndroidNotificationDetails("0", "channel", "description"),
       ),
       androidAllowWhileIdle: true,
       uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime
     );
+    /*flutterLocalNotificationsPlugin.zonedSchedule(
+      rand.nextInt(pow(2, 31) - 1),
+      "$product going off!",
+      "$quantity $product goes off tomorrow!",
+      now.add(Duration(days : expiry)),
+      const NotificationDetails(
+        android: AndroidNotificationDetails("0", "channel", "description"),
+      ),
+      androidAllowWhileIdle: true,
+      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime
+    );*/
   }
 }
