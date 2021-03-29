@@ -1,5 +1,4 @@
 import 'package:best_before_app/components/BarcodeResult.dart';
-import 'package:best_before_app/components/ExpiryItem.dart';
 import 'package:dropdown_banner/dropdown_banner.dart';
 import 'package:flutter/cupertino.dart';
 import "package:flutter/material.dart";
@@ -324,7 +323,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
       addItemToDB(productName, category, quantity, expiry.toString());
       DateTime now = DateTime.now();
       int daysTillExpiry = expiry.difference(DateTime(now.year, now.month, now.day)).inDays;
-      print("heloooooooooo? $daysTillExpiry ${DateTime.now()}");
+      print("this is the amount of days till it expires: $daysTillExpiry, this is the expiry date: $expiry");
       //Creates a notification
       notification(productName, quantity, daysTillExpiry);
 
