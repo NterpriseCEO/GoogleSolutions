@@ -269,33 +269,36 @@ DateTime checkIfExpiry(String data) {
   for(String str in strings) {
     data+=str+" ";
   }
-  int length = 0;
-  //splits the string at each space
-  strings = data.split(" ");
+  var matches = RegExp(r"^((^[1-9]|0[1-9])|10|11|12)\s([0-9]{4})").allMatches(data);
   String date = "";
-  for(int i = 0; i < strings.length; i++) {
-    //Checks if string is 2 characters or 4 characters long
-    if(strings[i].length <= 4 && strings[i].length >= 2) {
-      length++;
-      //check if both parts of the expiry date have been gotten already
-      if(length != 3) {
-        //Tries parsing the string to a number
-        if(int.tryParse(strings[i]) != null) {
-          date = strings[i]+"-"+date;
-          print("Word length: ${strings[i].length}, the string: ${strings[i]}");
-        }
+  if(matches.length > 0) {
+    var match = matches.elementAt(0);
+    date = match.group(0);
+    List<String> split = date.split(" ");
+    date = split[1]+"-"+split[0]+"-01";
+    print(date);
+  }else {
+    var matches2 = RegExp(r"^(\s*(\b([1-9]|0[1-9])|1[1-9]|2[0-9]|30|31)\s*/)(\s*(\b([1-9]|0[1-9])|1[0-2])\s*/)(\s*([0-9]{2,4}))").allMatches(data);
+    if(matches2.length > 0) {
+      var match = matches2.elementAt(0);
+      date = match.group(0);
+      List<String> split = date.split("/");
+      if(split[0].length == 2) {
+        date = "20"+split[2]+"-"+split[1]+"-"+split[0];
+      }else {
+        date = split[2]+"-"+split[1]+"-"+split[0];
       }
+      print("this is the food date; ${date}");
     }
-  }
-  //date+=01
-  //Changes date to proper format
-  if(date != "") {
-    date = date.substring(0,date.length-1)+"-01";
+    //date = match.group(0);
+    //List<String> split = date.split(" ");
+    //date = split[1]+"-"+split[0]+"-01";
+    //print(date);
   }
   //Parses the date
   try {
     DateTime dte = DateTime.parse(date);
-    print("the date ${DateTime.parse(date)}");
+    print("the date ${DateTime.parse("2021-07-01")}");
     return dte;
   }catch(e) {
     print(e);
