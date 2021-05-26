@@ -237,7 +237,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
                               }
                             });
                           }else {
-                            enterExpiry(context, widget.itemName, widget.category, widget.quantity);
+                            enterExpiry(context, widget.itemName, widget.category, widget.quantity, null);
                           }
                         }
                       ),
@@ -278,29 +278,30 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
         }
 
         //Checks if expiry date was found
-        if(expiry != null) {
+        //if(expiry != null) {
           //Calculates the days until expiry
           DateTime now = DateTime.now();
-          int daysTillExpiry = expiry.difference(DateTime(now.year, now.month, now.day)).inDays;
-          //Adds the product to the database
-          addItemToDB(productName, category, quantity, expiry.toString());
-          //creates a notification
-          notification(productName, quantity, daysTillExpiry);
+          enterExpiry(context, productName, category, quantity, expiry);
+          // int daysTillExpiry = expiry.difference(DateTime(now.year, now.month, now.day)).inDays;
+          // //Adds the product to the database
+          // addItemToDB(productName, category, quantity, expiry.toString());
+          // //creates a notification
+          // notification(productName, quantity, daysTillExpiry);
 
-          barCodeScanned = false;
-          //Shows message saying that item was added to inventory
-          final snackBar = SnackBar(
-            content: Text('$quantity $productName have been added to your inventory'),
-            action: SnackBarAction(
-              label: 'Ok',
-              onPressed: () {},
-            ),
-          );
-          ScaffoldMessenger.of(context).showSnackBar(snackBar);
-        }else {
+          // barCodeScanned = false;
+          // //Shows message saying that item was added to inventory
+          // final snackBar = SnackBar(
+          //   content: Text('$quantity $productName have been added to your inventory'),
+          //   action: SnackBarAction(
+          //     label: 'Ok',
+          //     onPressed: () {},
+          //   ),
+          // );
+          // ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        //}else {
           //Asks user to enter the expiry when no expiry found
-          enterExpiry(context, productName, category, quantity);
-        }
+          //enterExpiry(context, productName, category, quantity, );
+        //}
         //Re-initialises the camera
         setupCamera();
       });
@@ -309,11 +310,12 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
     }
   }
 
-  void enterExpiry(BuildContext context, String productName, String category, int quantity) async {
+  void enterExpiry(BuildContext context, String productName, String category, int quantity, DateTime date) async {
+    date = date == null ? DateTime.now() : date;
     //Shows the date picker
     DateTime expiry = await showDatePicker(
       context: context,
-      initialDate:DateTime.now(),
+      initialDate:date,
       firstDate:DateTime.now(),
       lastDate: DateTime(2100)
     );
