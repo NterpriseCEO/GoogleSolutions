@@ -270,6 +270,8 @@ DateTime checkIfExpiry(String data) {
   for(String str in strings) {
     data+=str+" ";
   }
+  print(data);
+  print("is there a match? ${RegExp(r"\s*(\b([1-9]|0[1-9])|1[1-9]|2[0-9]|30|31)\s*(Jan|Feb|Mar|Apr|May|June|Jun|July|Jul|Aug|Sep|Oct|Nov|Dec)", caseSensitive: false).allMatches(data).length}");
   var matches = RegExp(r"^((^[1-9]|0[1-9])|10|11|12)\s([0-9]{4})").allMatches(data);
   String date = "";
   if(RegExp(r"((^[1-9]|0[1-9])|10|11|12)\s+([0-9]{4})").allMatches(data).length > 0) {
@@ -316,17 +318,20 @@ DateTime checkIfExpiry(String data) {
       date = split[2]+"-"+split[1]+"-"+split[0];
     }
     print("The date is: ${date}");
-  }else if(RegExp(r"\s*(\b([1-9]|0[1-9])|1[1-9]|2[0-9]|30|31)\s*(Jan|Feb|Mar|Apr|May|June|Jun|July|Jul|Aug|Sep|Oct|Nov|Dec)", caseSensitive: false).allMatches(data).length > 0) {
+  }else if(RegExp(r"(^\w\d)*(\b([1-9]|0[1-9])|1[1-9]|2[0-9]|30|31)\s*(Jan|Feb|Mar|Apr|May|June|Jun|July|Jul|Aug|Sep|Oct|Nov|Dec)", caseSensitive: false).allMatches(data).length > 0) {
     /////09 APR/////
-    var matches = RegExp(r"\s*(\b([1-9]|0[1-9])|1[1-9]|2[0-9]|30|31)\s*(Jan|Feb|Mar|Apr|May|June|Jun|July|Jul|Aug|Sep|Oct|Nov|Dec)", caseSensitive: false).allMatches(data);
+    var matches = RegExp(r"(^\w\d)*(\b([1-9]|0[1-9])|1[1-9]|2[0-9]|30|31)\s*(Jan|Feb|Mar|Apr|May|June|Jun|July|Jul|Aug|Sep|Oct|Nov|Dec)", caseSensitive: false).allMatches(data);
     var match = matches.elementAt(0);
     date = match.group(0);
     List<String> split = date.split(" ");
+    print("${data}  --- ${split}");
     String month = (months.indexOf(split[1].toUpperCase())+1).toString();
     print(month.length);
     if(month.length == 1) {
       month = "0"+month;
     }
+    month = month.length == 1 ? "0"+month : month;
+    split[0] = split[0].length == 1 ? "0"+split[0] : split[0];
     date = DateTime.now().year.toString()+"-"+month+"-"+split[0];
     print("The date is: ${date}");
   }else if(RegExp(r"(Jan|Feb|Mar|Apr|May|June|July|Aug|Sep|Oct|Nov|Dec)\s*([0-9]{4})", caseSensitive: false).allMatches(data).length > 0) {
@@ -335,11 +340,8 @@ DateTime checkIfExpiry(String data) {
     var match = matches.elementAt(0);
     date = match.group(0);
     List<String> split = date.split(" ");
-    String month = (months.indexOf(split[0].toUpperCase())+1).toString();
+    String month = "0"+(months.indexOf(split[0].toUpperCase())+1).toString();
     print(month.length);
-    if(month.length == 1) {
-      month = "0"+month;
-    }
     date = split[1]+"-"+month+"-01";
     print("The date is: ${date}");
   }
