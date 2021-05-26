@@ -272,13 +272,14 @@ DateTime checkIfExpiry(String data) {
   }
   var matches = RegExp(r"^((^[1-9]|0[1-9])|10|11|12)\s([0-9]{4})").allMatches(data);
   String date = "";
-  if(RegExp(r"((^[1-9]|0[1-9])|10|11|12)\s([0-9]{4})").allMatches(data).length > 0) {
+  if(RegExp(r"((^[1-9]|0[1-9])|10|11|12)\s+([0-9]{4})").allMatches(data).length > 0) {
     /////07 2021/////
-    var matches = RegExp(r"((^[1-9]|0[1-9])|10|11|12)\s([0-9]{4})").allMatches(data);
+    var matches = RegExp(r"((^[1-9]|0[1-9])|10|11|12)\s+([0-9]{4})").allMatches(data);
     var match = matches.elementAt(0);
     date = match.group(0);
     List<String> split = date.split(" ");
     date = split[1]+"-"+split[0]+"-01";
+    print("The date is: ${date}");
   }else if(RegExp(r"(\s*(\b([1-9]|0[1-9])|1[1-9]|2[0-9]|30|31)\s*/)(\s*(\b([1-9]|0[1-9])|1[0-2])\s*/)(\s*([0-9]{2,4}))").allMatches(data).length > 0) {
     /////01/07/2021/////
     var matches = RegExp(r"(\s*(\b([1-9]|0[1-9])|1[1-9]|2[0-9]|30|31)\s*/)(\s*(\b([1-9]|0[1-9])|1[0-2])\s*/)(\s*([0-9]{2,4}))").allMatches(data);
@@ -290,6 +291,7 @@ DateTime checkIfExpiry(String data) {
     }else {
       date = split[2]+"-"+split[1]+"-"+split[0];
     }
+    print("The date is: ${date}");
   }else if(RegExp(r"(\s*(\b([1-9]|0[1-9])|1[1-9]|2[0-9]|30|31)\s+)((\b([1-9]|0[1-9])|1[0-2]))(\s+([0-9]{2,4}))").allMatches(data).length > 0) {
     /////01 07 2021/////
     var matches = RegExp(r"(\s*(\b([1-9]|0[1-9])|1[1-9]|2[0-9]|30|31)\s+)((\b([1-9]|0[1-9])|1[0-2]))(\s+([0-9]{2,4}))").allMatches(data);
@@ -301,6 +303,7 @@ DateTime checkIfExpiry(String data) {
     }else {
       date = split[2]+"-"+split[1]+"-"+split[0];
     }
+    print("The date is: ${date}");
   }else if(RegExp(r"(\s*(\b([1-9]|0[1-9])|1[1-9]|2[0-9]|30|31)\s*\.)(\s*(\b([1-9]|0[1-9])|1[0-2])\s*\.)(\s*([0-9]{2,4}))").allMatches(data).length > 0) {
     /////01.07.2021/////
     var matches = RegExp(r"(\s*(\b([1-9]|0[1-9])|1[1-9]|2[0-9]|30|31)\s*\.)(\s*(\b([1-9]|0[1-9])|1[0-2])\s*\.)(\s*([0-9]{2,4}))").allMatches(data);
@@ -312,9 +315,10 @@ DateTime checkIfExpiry(String data) {
     }else {
       date = split[2]+"-"+split[1]+"-"+split[0];
     }
-  }else if(RegExp(r"\s*(\b([1-9]|0[1-9])|1[1-9]|2[0-9]|30|31)\s+(Jan|Feb|Mar|Apr|May|June|Jun|July|Jul|Aug|Sep|Oct|Nov|Dec)", caseSensitive: false).allMatches(data).length > 0) {
+    print("The date is: ${date}");
+  }else if(RegExp(r"\s*(\b([1-9]|0[1-9])|1[1-9]|2[0-9]|30|31)\s*(Jan|Feb|Mar|Apr|May|June|Jun|July|Jul|Aug|Sep|Oct|Nov|Dec)", caseSensitive: false).allMatches(data).length > 0) {
     /////09 APR/////
-    var matches = RegExp(r"\s*(\b([1-9]|0[1-9])|1[1-9]|2[0-9]|30|31)\s+(Jan|Feb|Mar|Apr|May|June|Jun|July|Jul|Aug|Sep|Oct|Nov|Dec)", caseSensitive: false).allMatches(data);
+    var matches = RegExp(r"\s*(\b([1-9]|0[1-9])|1[1-9]|2[0-9]|30|31)\s*(Jan|Feb|Mar|Apr|May|June|Jun|July|Jul|Aug|Sep|Oct|Nov|Dec)", caseSensitive: false).allMatches(data);
     var match = matches.elementAt(0);
     date = match.group(0);
     List<String> split = date.split(" ");
@@ -324,9 +328,10 @@ DateTime checkIfExpiry(String data) {
       month = "0"+month;
     }
     date = DateTime.now().year.toString()+"-"+month+"-"+split[0];
-  }else if(RegExp(r"(Jan|Feb|Mar|Apr|May|June|July|Aug|Sep|Oct|Nov|Dec)\s+([0-9]{4})", caseSensitive: false).allMatches(data).length > 0) {
+    print("The date is: ${date}");
+  }else if(RegExp(r"(Jan|Feb|Mar|Apr|May|June|July|Aug|Sep|Oct|Nov|Dec)\s*([0-9]{4})", caseSensitive: false).allMatches(data).length > 0) {
     /////APR 2021/////
-    var matches = RegExp(r"(Jan|Feb|Mar|Apr|May|June|July|Aug|Sep|Oct|Nov|Dec)\s+([0-9]{4})", caseSensitive: false).allMatches(data);
+    var matches = RegExp(r"(Jan|Feb|Mar|Apr|May|June|July|Aug|Sep|Oct|Nov|Dec)\s*([0-9]{4})", caseSensitive: false).allMatches(data);
     var match = matches.elementAt(0);
     date = match.group(0);
     List<String> split = date.split(" ");
@@ -336,6 +341,7 @@ DateTime checkIfExpiry(String data) {
       month = "0"+month;
     }
     date = split[1]+"-"+month+"-01";
+    print("The date is: ${date}");
   }
   //Parses the date
   try {

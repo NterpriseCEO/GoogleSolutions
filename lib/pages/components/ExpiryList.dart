@@ -227,6 +227,9 @@ class DataList extends StatelessWidget {
             }
           }
         }
+        if(itemWidgets.isEmpty) {
+          itemWidgets.add(Text("Nothing going off at this time"));
+        }
         return Column(
           children: itemWidgets,
         );
