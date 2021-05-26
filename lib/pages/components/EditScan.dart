@@ -261,6 +261,7 @@ void showPicker(BuildContext context, Callback2 callback) {
 }
 
 DateTime checkIfExpiry(String data) {
+  List<String> months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
   //Splits the string by line
   LineSplitter ls = new LineSplitter();
   List<String> strings = ls.convert(data);
@@ -271,34 +272,75 @@ DateTime checkIfExpiry(String data) {
   }
   var matches = RegExp(r"^((^[1-9]|0[1-9])|10|11|12)\s([0-9]{4})").allMatches(data);
   String date = "";
-  if(matches.length > 0) {
+  if(RegExp(r"((^[1-9]|0[1-9])|10|11|12)\s([0-9]{4})").allMatches(data).length > 0) {
+    /////07 2021/////
+    var matches = RegExp(r"((^[1-9]|0[1-9])|10|11|12)\s([0-9]{4})").allMatches(data);
     var match = matches.elementAt(0);
     date = match.group(0);
     List<String> split = date.split(" ");
     date = split[1]+"-"+split[0]+"-01";
-    print(date);
-  }else {
-    var matches2 = RegExp(r"^(\s*(\b([1-9]|0[1-9])|1[1-9]|2[0-9]|30|31)\s*/)(\s*(\b([1-9]|0[1-9])|1[0-2])\s*/)(\s*([0-9]{2,4}))").allMatches(data);
-    if(matches2.length > 0) {
-      var match = matches2.elementAt(0);
-      date = match.group(0);
-      List<String> split = date.split("/");
-      if(split[0].length == 2) {
-        date = "20"+split[2]+"-"+split[1]+"-"+split[0];
-      }else {
-        date = split[2]+"-"+split[1]+"-"+split[0];
-      }
-      print("this is the food date; ${date}");
+  }else if(RegExp(r"(\s*(\b([1-9]|0[1-9])|1[1-9]|2[0-9]|30|31)\s*/)(\s*(\b([1-9]|0[1-9])|1[0-2])\s*/)(\s*([0-9]{2,4}))").allMatches(data).length > 0) {
+    /////01/07/2021/////
+    var matches = RegExp(r"(\s*(\b([1-9]|0[1-9])|1[1-9]|2[0-9]|30|31)\s*/)(\s*(\b([1-9]|0[1-9])|1[0-2])\s*/)(\s*([0-9]{2,4}))").allMatches(data);
+    var match = matches.elementAt(0);
+    date = match.group(0);
+    List<String> split = date.split("/");
+    if(split[2].length == 2) {
+      date = "20"+split[2]+"-"+split[1]+"-"+split[0];
+    }else {
+      date = split[2]+"-"+split[1]+"-"+split[0];
     }
-    //date = match.group(0);
-    //List<String> split = date.split(" ");
-    //date = split[1]+"-"+split[0]+"-01";
-    //print(date);
+  }else if(RegExp(r"(\s*(\b([1-9]|0[1-9])|1[1-9]|2[0-9]|30|31)\s+)((\b([1-9]|0[1-9])|1[0-2]))(\s+([0-9]{2,4}))").allMatches(data).length > 0) {
+    /////01 07 2021/////
+    var matches = RegExp(r"(\s*(\b([1-9]|0[1-9])|1[1-9]|2[0-9]|30|31)\s+)((\b([1-9]|0[1-9])|1[0-2]))(\s+([0-9]{2,4}))").allMatches(data);
+    var match = matches.elementAt(0);
+    date = match.group(0);
+    List<String> split = date.split(" ");
+    if(split[2].length == 2) {
+      date = "20"+split[2]+"-"+split[1]+"-"+split[0];
+    }else {
+      date = split[2]+"-"+split[1]+"-"+split[0];
+    }
+  }else if(RegExp(r"(\s*(\b([1-9]|0[1-9])|1[1-9]|2[0-9]|30|31)\s*\.)(\s*(\b([1-9]|0[1-9])|1[0-2])\s*\.)(\s*([0-9]{2,4}))").allMatches(data).length > 0) {
+    /////01.07.2021/////
+    var matches = RegExp(r"(\s*(\b([1-9]|0[1-9])|1[1-9]|2[0-9]|30|31)\s*\.)(\s*(\b([1-9]|0[1-9])|1[0-2])\s*\.)(\s*([0-9]{2,4}))").allMatches(data);
+    var match = matches.elementAt(0);
+    date = match.group(0);
+    List<String> split = date.trim().split(".");
+    if(split[2].length == 2) {
+      date = "20"+split[2]+"-"+split[1]+"-"+split[0];
+    }else {
+      date = split[2]+"-"+split[1]+"-"+split[0];
+    }
+  }else if(RegExp(r"\s*(\b([1-9]|0[1-9])|1[1-9]|2[0-9]|30|31)\s+(Jan|Feb|Mar|Apr|May|June|Jun|July|Jul|Aug|Sep|Oct|Nov|Dec)", caseSensitive: false).allMatches(data).length > 0) {
+    /////09 APR/////
+    var matches = RegExp(r"\s*(\b([1-9]|0[1-9])|1[1-9]|2[0-9]|30|31)\s+(Jan|Feb|Mar|Apr|May|June|Jun|July|Jul|Aug|Sep|Oct|Nov|Dec)", caseSensitive: false).allMatches(data);
+    var match = matches.elementAt(0);
+    date = match.group(0);
+    List<String> split = date.split(" ");
+    String month = (months.indexOf(split[1].toUpperCase())+1).toString();
+    print(month.length);
+    if(month.length == 1) {
+      month = "0"+month;
+    }
+    date = DateTime.now().year.toString()+"-"+month+"-"+split[0];
+  }else if(RegExp(r"(Jan|Feb|Mar|Apr|May|June|July|Aug|Sep|Oct|Nov|Dec)\s+([0-9]{4})", caseSensitive: false).allMatches(data).length > 0) {
+    /////APR 2021/////
+    var matches = RegExp(r"(Jan|Feb|Mar|Apr|May|June|July|Aug|Sep|Oct|Nov|Dec)\s+([0-9]{4})", caseSensitive: false).allMatches(data);
+    var match = matches.elementAt(0);
+    date = match.group(0);
+    List<String> split = date.split(" ");
+    String month = (months.indexOf(split[0].toUpperCase())+1).toString();
+    print(month.length);
+    if(month.length == 1) {
+      month = "0"+month;
+    }
+    date = split[1]+"-"+month+"-01";
   }
   //Parses the date
   try {
     DateTime dte = DateTime.parse(date);
-    print("the date ${DateTime.parse("2021-07-01")}");
+    print("the date ${DateTime.parse(date)}");
     return dte;
   }catch(e) {
     print(e);

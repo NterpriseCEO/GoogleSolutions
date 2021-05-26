@@ -53,3 +53,7 @@ Future<void> signOutGoogle() async {
   await googleSignIn.signOut();
   print('Continue with Google: Signed Out');
 }
+
+void signInTestUser() {
+  userCol = "THIS_IS_THE_TEST_USER";
+}

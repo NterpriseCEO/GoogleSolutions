@@ -85,16 +85,16 @@ class _LoginState extends State<Login> {
                 SizedBox(height: 30),
                 SignInButton(
                   Buttons.Email,
-                  text: "Continue with Mail",
+                  text: "The Test User",
                   onPressed: () {
-                    print("Future functionality");
-                    /*Navigator.of(context).push(
+                    signInTestUser();
+                    Navigator.of(context).push(
                       MaterialPageRoute(
                         builder: (context) {
                           return Menu();
                         },
                       ),
-                    );*/
+                    );
                   },
                 )
               ],
