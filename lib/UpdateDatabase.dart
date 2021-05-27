@@ -44,7 +44,7 @@ void removeExpired() async {
     List<DocumentSnapshot> allDocs = snapshot.docs;
     //Loops through the documents and deletes them if the expiry date is before today's date
     allDocs.forEach((DocumentSnapshot document) {
-      DateTime date = DateTime.parse(document.data()["ExpiryDate"]);
+      DateTime date = DateTime.parse(document.get("ExpiryDate"));
       if(date.isBefore(DateTime.now())) {
         document.reference.delete();
       }
