@@ -47,14 +47,13 @@ class _InventoryState extends State<Inventory> {
             int increment = 0;
             DateTime now = DateTime.now();
             for(var item in items){
-              final itemData = item.data();
-              final itemCategory = itemData['Category'];
+              final itemCategory = item.get('Category');
               if(itemCategory == title["category"]) {
-                final itemExpiry = itemData['ExpiryDate'];
+                final itemExpiry = item.get('ExpiryDate');
                 DateTime expiry = DateTime.parse(itemExpiry);
                 int daysTillExpiry = expiry.difference(DateTime(now.year, now.month, now.day)).inDays;
-                String itemName = itemData['ProductName'].toString();
-                int itemQuantity = int.parse(itemData['Quantity'].toString());
+                String itemName = item.get('ProductName').toString();
+                int itemQuantity = int.parse(item.get('Quantity').toString());
 
                 if(itemName.toLowerCase().contains(search.toLowerCase()) || search == "") {
                   increment++;

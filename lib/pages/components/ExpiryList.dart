@@ -17,7 +17,7 @@ class ExpiryList extends StatefulWidget {
 }
 
 class _ExpiryListState extends State<ExpiryList> {
-
+//work
   @override
   Widget build(BuildContext context) {
     //Scrollable page
@@ -93,21 +93,20 @@ class DataList extends StatelessWidget {
           //Loops through the documents
           for(var item in items) {
             //Gets the document data
-            final itemData = item.data();
             //Gets the fields (ExpiryDate, ProductName, Category and quantity)
-            final itemExpiry = itemData['ExpiryDate'];
+            final itemExpiry = item.get('ExpiryDate');
             DateTime expiry = DateTime.parse(itemExpiry);
             //Calculates the days till expiry
             int daysTillExpiry = expiry.difference(DateTime(now.year, now.month, now.day)).inDays;
             //Checks if the expiry date is in the range
             if(daysTillExpiry <= upper && daysTillExpiry >= lower) {
-              final itemName = itemData['ProductName'].toString();
+              final itemName = item.get('ProductName').toString();
               //Check if user is searching or not
               if(search != null) {
                 //Checks if the product name contains the search term
                 if(itemName.toLowerCase().contains(search.toLowerCase()) || search == "") {
                   //Converts the quantity to an integer
-                  var itemQuantity = int.parse(itemData['Quantity'].toString());
+                  var itemQuantity = int.parse(item.get('Quantity').toString());
                   //Creates the expiry item widget and adds it to the list of widgets
                   final itemWidget = ExpiryItem(product: itemName,quantity: itemQuantity,expiryDate: daysTillExpiry,
                     callback: (remove) {
@@ -117,7 +116,7 @@ class DataList extends StatelessWidget {
                   itemWidgets.add(itemWidget);
                 }
               }else {
-                var itemQuantity = int.parse(itemData['Quantity'].toString());
+                var itemQuantity = int.parse(item.get('Quantity').toString());
                 final itemWidget = ExpiryItem(product: itemName,quantity: itemQuantity,expiryDate: daysTillExpiry,
                   callback: (remove) {
                     updateItemAmount(item.id, remove, itemQuantity, -1);
