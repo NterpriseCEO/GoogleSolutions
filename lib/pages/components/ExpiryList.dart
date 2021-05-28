@@ -17,75 +17,142 @@ class ExpiryList extends StatefulWidget {
 }
 
 class _ExpiryListState extends State<ExpiryList> {
-//work
+  //work
   @override
   Widget build(BuildContext context) {
     //Scrollable page
     // productStream();
-    Widget expired = DataList(upper: -1, lower: -1000000, search: widget.search, notice:"No Expired Items", header: "Expired Items");
-    Widget today = DataList(upper: 0, lower: 0, search: widget.search, notice: "No Items Going Off Today", header: "Today");
-    Widget tomorrow = DataList(upper: 1, lower: 1, search: widget.search, notice: "No Items Going Off Tomorrow", header: "Tomorrow");
-    Widget fiveDays = DataList(upper: 5, lower: 2, search: widget.search, notice: "No Items Going Off in 5 Days", header: "Next 5 Days");
-    Widget sevenDays = DataList(upper: 7, lower: 6, search: widget.search, notice: "No Items Going Off in 7 Days", header: "Next 7 Days");
+    // Widget expired = DataList(upper: -1, lower: -1000000, search: widget.search, notice:"No Expired Items", header: "Expired Items");
+    // Widget today = DataList(upper: 0, lower: 0, search: widget.search, notice: "No Items Going Off Today", header: "Today");
+    // Widget tomorrow = DataList(upper: 1, lower: 1, search: widget.search, notice: "No Items Going Off Tomorrow", header: "Tomorrow");
+    // Widget fiveDays = DataList(upper: 5, lower: 2, search: widget.search, notice: "No Items Going Off in 5 Days", header: "Next 5 Days");
+    // Widget sevenDays = DataList(upper: 7, lower: 6, search: widget.search, notice: "No Items Going Off in 7 Days", header: "Next 7 Days");
+
     return Padding(
       padding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 0.0),
-      child: Stack(
-          children: <Widget>[
-            //This is required for the SliverStickyHeader
-            CustomScrollView(
-              //The StickyHeaders
-              slivers: <Widget>[
-                expired,
-                today,
-                tomorrow,
-                fiveDays,
-                sevenDays
-              ],
-            ),
-            //Positions the Quantity text to the right
-            //of the page so that it is constantly visible
-            Align(
-              alignment: Alignment.topRight,
-              child: Text(
-                "Quantity",
-                style: TextStyle(
-                  fontSize: 20.0,
-                ),
-              ),
-            ),
-          ]
-      ),
+      child: DataList(search: widget.search, notice: "hello", header: "header"),
     );
   }
 }
 
 class DataList extends StatelessWidget {
-  final int upper;
-  final int lower;
   final String search;
   final String notice;
   final String header;
 
-  List<Widget> itemWidgets = [];
 
-  //The upper and lower date range and the search value
-  DataList({ this.upper, this.lower, this.search, this.notice, this.header});
+  DataList({this.search, this.notice, this.header});
 
-  bool get empty {
-    itemWidgets.isEmpty;
+  List<Widget> expired = [];
+
+  List<Widget> today = [];
+
+  List<Widget> tomorrow = [];
+
+  List<Widget> fiveDays = [];
+
+  List<Widget> sevenDays = [];
+
+  int counter = 0;
+
+  bool noItems = false;
+  bool results = true;
+
+  SliverStickyHeader createSliverHeader(List<Widget> items, String header, bool isExpired) {
+    return SliverStickyHeader(
+      //ColoredBox is more efficient then container with color property
+      header: ColoredBox(
+        color: Colors.white,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Visibility(
+              visible: items.isNotEmpty,
+              child: Text(
+                header,
+                style: TextStyle(
+                  fontSize: 25.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            //Button to remove all expired items
+            Visibility(
+              visible: isExpired && items.isNotEmpty,
+              child: TextButton(
+                onPressed: () {
+                  removeExpired();
+                },
+                child: Text(
+                  "Remove All",
+                  style: TextStyle(
+                    fontSize: 20.0,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      sliver: SliverList(
+        //The content associated with a StickyHeader
+        delegate: SliverChildListDelegate([
+          Visibility(
+            visible: items.isNotEmpty,
+            child: Column(
+              children: items,
+            )
+          ),
+        ])
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    //Listens for changes from the users databse of items
+    //Listens for changes from the users database of items
     //(items added / removed etc)
+
+    List<Widget> addToList(int expiry, var item, list) {
+      //Checks if the expiry date is in the range
+      final itemName = item.get('ProductName').toString();
+      //Check if user is searching or not
+      if(this.search != null) {
+        //Checks if the product name contains the search term
+        if(itemName.toLowerCase().contains(this.search.toLowerCase()) || this.search == "") {
+          //Converts the quantity to an integer
+          var itemQuantity = int.parse(item.get('Quantity').toString());
+          //Creates the expiry item widget and adds it to the list of widgets
+          final itemWidget = ExpiryItem(product: itemName,quantity: itemQuantity,expiryDate: expiry,
+            callback: (remove) {
+              updateItemAmount(item.id, remove, itemQuantity, -1);
+              expired = []; today = []; tomorrow = []; fiveDays = []; sevenDays = [];
+              counter = 0;
+            }
+          );
+          list.add(itemWidget);
+        }
+      }else {
+        var itemQuantity = int.parse(item.get('Quantity').toString());
+        final itemWidget = ExpiryItem(product: itemName,quantity: itemQuantity,expiryDate: expiry,
+          callback: (remove) {
+            updateItemAmount(item.id, remove, itemQuantity, -1);
+            expired = []; today = []; tomorrow = []; fiveDays = []; sevenDays = [];
+            counter = 0;
+          }
+        );
+        list.add(itemWidget);
+      }
+      return list;
+    }
+
     return StreamBuilder<QuerySnapshot>(
       stream: firestore.collection(userCol).snapshots(),
       builder: (context, snapshot) {
-        itemWidgets = [];
         //WHen data is gotten creates a list of expiry item widgets
         //Checks if data returned
-        if(snapshot.hasData) {
+        if(snapshot.hasData && counter == 0) {
+          counter++;
           //Gets a list of the documents
           final items = snapshot.data.docs;
 
@@ -98,97 +165,69 @@ class DataList extends StatelessWidget {
             DateTime expiry = DateTime.parse(itemExpiry);
             //Calculates the days till expiry
             int daysTillExpiry = expiry.difference(DateTime(now.year, now.month, now.day)).inDays;
-            //Checks if the expiry date is in the range
-            if(daysTillExpiry <= upper && daysTillExpiry >= lower) {
-              final itemName = item.get('ProductName').toString();
-              //Check if user is searching or not
-              if(search != null) {
-                //Checks if the product name contains the search term
-                if(itemName.toLowerCase().contains(search.toLowerCase()) || search == "") {
-                  //Converts the quantity to an integer
-                  var itemQuantity = int.parse(item.get('Quantity').toString());
-                  //Creates the expiry item widget and adds it to the list of widgets
-                  final itemWidget = ExpiryItem(product: itemName,quantity: itemQuantity,expiryDate: daysTillExpiry,
-                    callback: (remove) {
-                      updateItemAmount(item.id, remove, itemQuantity, -1);
-                    }
-                  );
-                  itemWidgets.add(itemWidget);
-                }
-              }else {
-                var itemQuantity = int.parse(item.get('Quantity').toString());
-                final itemWidget = ExpiryItem(product: itemName,quantity: itemQuantity,expiryDate: daysTillExpiry,
-                  callback: (remove) {
-                    updateItemAmount(item.id, remove, itemQuantity, -1);
-                  }
-                );
-                itemWidgets.add(itemWidget);
-              }
+
+            if(daysTillExpiry <= -1 && daysTillExpiry >= -1000000) {
+              expired = addToList(daysTillExpiry, item, expired);
+            }else if(daysTillExpiry == 0) {
+              today = addToList(daysTillExpiry, item, today);
+            }else if(daysTillExpiry == 1) {
+              tomorrow = addToList(daysTillExpiry, item, tomorrow);
+            }else if(daysTillExpiry <= 5 && daysTillExpiry >= 2) {
+              fiveDays = addToList(daysTillExpiry, item, fiveDays);
+            }else if(daysTillExpiry <= 7 && daysTillExpiry >= 6) {
+              sevenDays = addToList(daysTillExpiry, item, sevenDays);
+            }
+          }
+          if(expired.isEmpty && today.isEmpty && tomorrow.isEmpty && fiveDays.isEmpty && sevenDays.isEmpty) {
+            noItems = true;
+            if(this.search != null) {
+              results = false;
             }
           }
         }
-        // if(itemWidgets.isEmpty) {
-        //   itemWidgets.add(Padding(
-        //     padding: EdgeInsets.fromLTRB(0.0, 15.0, 0.0, 15.0),
-        //     child: Text(
-        //       this.notice,
-        //       style: TextStyle(
-        //         fontSize: 20.0,
-        //         fontWeight: FontWeight.bold,
-        //       ),
-        //     )
-        //   ));
-        // }
-        // return Column(
-        //   children: itemWidgets,
-        // );
-        return SliverStickyHeader(
-          //ColoredBox is more efficient then container with color property
-          header: ColoredBox(
-            color: Colors.white,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Visibility(
-                  visible: itemWidgets.isNotEmpty,
+
+        if(noItems) {
+          return Column(
+            children: [
+              Text(
+                !results ? "No results found" : "No items going off in the next 7 days!",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize:20.0,
+                ),
+              ),
+              Image(image: AssetImage("assets/icon.png"))
+            ],
+          );
+        }else {
+          return Stack(
+              fit: StackFit.expand,
+              children: <Widget>[
+                //This is required for the SliverStickyHeader
+                CustomScrollView(
+                  //The StickyHeaders
+                  slivers: <Widget>[
+                    createSliverHeader(expired, "Expired", true),
+                    createSliverHeader(today, "Today", false),
+                    createSliverHeader(tomorrow, "Tomorrow", false),
+                    createSliverHeader(fiveDays, "Five Days", false),
+                    createSliverHeader(sevenDays, "Seven Days", false),
+                  ]
+                ),
+                //Positions the Quantity text to the right
+                //of the page so that it is constantly visible
+                Align(
+                  alignment: Alignment.topRight,
                   child: Text(
-                    header,
+                    "Quantity",
                     style: TextStyle(
-                      fontSize: 25.0,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 20.0,
                     ),
                   ),
                 ),
-                //Button to remove all expired items
-                Visibility(
-                  visible: upper == -1 && itemWidgets.isNotEmpty,
-                  child: TextButton(
-                    onPressed: () {
-                      removeExpired();
-                    },
-                    child: Text(
-                      "Remove All",
-                      style: TextStyle(
-                        fontSize: 20.0,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          sliver: SliverList(
-            //The content associated with a StickyHeader
-            delegate: SliverChildListDelegate(
-              [Visibility(
-                visible: itemWidgets.isNotEmpty,
-                child: Column(
-                  children: itemWidgets,
-                )
-              )]
-            )
-          ),
-        );
+              ]
+          );
+        }
       }
     );
   }
