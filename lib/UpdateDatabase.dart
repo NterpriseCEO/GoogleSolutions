@@ -5,7 +5,7 @@ FirebaseFirestore firestore = FirebaseFirestore.instance;
 String userCol = "";
 
 //Changes the item quantity
-void updateItemAmount(String id, bool remove, int quantity, int increment) {
+void updateItemAmount(String id, bool remove, int quantity, int increment) async {
   //References the users database collection
   DocumentReference document = firestore.collection(userCol).doc(id);
   print(document);

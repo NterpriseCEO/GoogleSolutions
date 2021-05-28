@@ -106,7 +106,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
         });
       }
       //Reinits the camera to make sure the screen isn't black
-      setupCamera();
+      //setupCamera();
     }catch(e) {
       print(e);
     }
@@ -115,7 +115,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
   @override
   void dispose() {
     //Interface for classes that register with the Widgets layer binding.
-    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     //Dispose of the controller when necessary
     controller?.dispose();
     super.dispose();
@@ -128,8 +128,9 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
     }
 
     if (state == AppLifecycleState.inactive) {
-      //Dispose of controller when necessary
-      await controller?.dispose();
+      controller?.dispose();
+    } else if (state == AppLifecycleState.resumed) {
+      setupCamera();
     }
   }
 
@@ -303,7 +304,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
           //enterExpiry(context, productName, category, quantity, );
         //}
         //Re-initialises the camera
-        setupCamera();
+        //setupCamera();
       });
     } on Exception {
       texts.add(OcrText('Failed to recognize text'));
