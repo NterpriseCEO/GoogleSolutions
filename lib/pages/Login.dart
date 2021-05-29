@@ -1,9 +1,12 @@
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:flutter/material.dart';
 import '../components/menu.dart';
+import '../main.dart';
 import 'components/sign_in.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import "package:best_before_app/UpdateDatabase.dart";
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -24,6 +27,34 @@ class _LoginState extends State<Login> {
   @override
   void initState() {
     super.initState();
+    var initializationSettingsAndroid = AndroidInitializationSettings('@drawable/icon');
+    var initializationSettings = InitializationSettings(android: initializationSettingsAndroid);
+    flutterLocalNotificationsPlugin.initialize(initializationSettings);
+    //Called while our app is in the foreground for message handling
+    //Contains message title and body from server side
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      RemoteNotification notification = message.notification;
+      AndroidNotification android = message.notification?.android;
+      if (notification != null && android != null) {
+        flutterLocalNotificationsPlugin.show(
+            notification.hashCode,
+            notification.title,
+            notification.body,
+            NotificationDetails(
+              //assigns specific channel
+              android: AndroidNotificationDetails(
+                channel.id,
+                channel.name,
+                channel.description,
+                // TODO add a proper drawable resource to android, for now using
+                //      one that already exists in example app.
+                icon: 'launch_background',
+              ),
+            ));
+      }
+    });
+
+    getToken();
     isSignedIn();
   }
 
@@ -103,5 +134,11 @@ class _LoginState extends State<Login> {
         ),
       ),
     );
+  }
+
+  //Used to acquire the device token on loading of the page and is called after the super.init
+  getToken() async {
+    String token = await FirebaseMessaging.instance.getToken();
+    print(token);
   }
 }
