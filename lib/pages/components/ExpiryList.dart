@@ -35,7 +35,7 @@ class _ExpiryListState extends State<ExpiryList> {
   }
 }
 
-class DataList extends StatelessWidget {
+class DataList extends StatefulWidget {
   final String search;
   final String notice;
   final String header;
@@ -43,6 +43,11 @@ class DataList extends StatelessWidget {
 
   DataList({this.search, this.notice, this.header});
 
+  @override
+  _DataListState createState() => _DataListState();
+}
+
+class _DataListState extends State<DataList> {
   List<Widget> expired = [];
 
   List<Widget> today = [];
@@ -56,7 +61,10 @@ class DataList extends StatelessWidget {
   int counter = 0;
 
   bool noItems = false;
+
   bool results = true;
+
+  int deleteAmount = 0;
 
   SliverStickyHeader createSliverHeader(List<Widget> items, String header, bool isExpired) {
     return SliverStickyHeader(
@@ -80,8 +88,12 @@ class DataList extends StatelessWidget {
             Visibility(
               visible: isExpired && items.isNotEmpty,
               child: TextButton(
-                onPressed: () {
-                  removeExpired();
+                onPressed: () async {
+                  await removeExpired();
+                  deleteAmount = expired.length;
+                  expired = []; today = []; tomorrow = []; fiveDays = []; sevenDays = [];
+                  print("THis is the expired list ${expired}");
+                  counter = 0;
                 },
                 child: Text(
                   "Remove All",
@@ -117,9 +129,9 @@ class DataList extends StatelessWidget {
       //Checks if the expiry date is in the range
       final itemName = item.get('ProductName').toString();
       //Check if user is searching or not
-      if(this.search != null) {
+      if(this.widget.search != null) {
         //Checks if the product name contains the search term
-        if(itemName.toLowerCase().contains(this.search.toLowerCase()) || this.search == "") {
+        if(itemName.toLowerCase().contains(this.widget.search.toLowerCase()) || this.widget.search == "") {
           //Converts the quantity to an integer
           var itemQuantity = int.parse(item.get('Quantity').toString());
           //Creates the expiry item widget and adds it to the list of widgets
@@ -167,7 +179,11 @@ class DataList extends StatelessWidget {
             int daysTillExpiry = expiry.difference(DateTime(now.year, now.month, now.day)).inDays;
 
             if(daysTillExpiry <= -1 && daysTillExpiry >= -1000000) {
-              expired = addToList(daysTillExpiry, item, expired);
+              if(deleteAmount == 0) {
+                expired = addToList(daysTillExpiry, item, expired);
+              }else {
+                deleteAmount--;
+              }
             }else if(daysTillExpiry == 0) {
               today = addToList(daysTillExpiry, item, today);
             }else if(daysTillExpiry == 1) {
@@ -180,7 +196,7 @@ class DataList extends StatelessWidget {
           }
           if(expired.isEmpty && today.isEmpty && tomorrow.isEmpty && fiveDays.isEmpty && sevenDays.isEmpty) {
             noItems = true;
-            if(this.search != null) {
+            if(this.widget.search != null) {
               results = false;
             }
           }
