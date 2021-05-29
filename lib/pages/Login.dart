@@ -27,9 +27,11 @@ class _LoginState extends State<Login> {
   @override
   void initState() {
     super.initState();
+
     var initializationSettingsAndroid = AndroidInitializationSettings('@drawable/icon');
     var initializationSettings = InitializationSettings(android: initializationSettingsAndroid);
     flutterLocalNotificationsPlugin.initialize(initializationSettings);
+
     //Called while our app is in the foreground for message handling
     //Contains message title and body from server side
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
@@ -51,6 +53,28 @@ class _LoginState extends State<Login> {
                 icon: 'launch_background',
               ),
             ));
+      }
+    });
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message){
+      print('New onmessageopenedapp event published');
+      RemoteNotification notification = message.notification;
+      AndroidNotification android = message.notification?.android;
+      if (notification != null && android != null) {
+        showDialog(
+            context: context,
+            builder: (_) {
+              return AlertDialog(
+                title: Text("Test"),
+                content: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(notification.body)
+                  ],
+                ),
+                ),
+              );
+            });
       }
     });
 
