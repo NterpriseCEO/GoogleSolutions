@@ -8,7 +8,6 @@
         android:label="Foodify"
         android:icon="@drawable/icon">
 
-
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

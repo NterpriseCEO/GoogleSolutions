@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-
+//This the barcode function
 Future<String> barcodeResult(String barcode) async {
   //Getting barcode data
   http.Response response = await http.get(Uri.parse('https://world.openfoodfacts.org/api/v0/product/$barcode.json'));

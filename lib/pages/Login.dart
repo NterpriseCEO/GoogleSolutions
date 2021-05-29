@@ -163,6 +163,6 @@ class _LoginState extends State<Login> {
   //Used to acquire the device token on loading of the page and is called after the super.init
   getToken() async {
     String token = await FirebaseMessaging.instance.getToken();
-    print(token);
+    print("This is the token"+token);
   }
 }
