@@ -12,6 +12,8 @@ import "package:best_before_app/UpdateDatabase.dart";
 
 typedef void Callback(String category);
 
+bool scanning = false;
+
 class ScanPicture extends StatefulWidget {
   String itemName;
   String category;
@@ -54,6 +56,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
   }
 
   Future<void> scanBarcode() async {
+    scanning = true;
     widget.itemName = "";
     widget.category = "";
     widget.quantity = 0;
@@ -107,6 +110,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
       }
       //Reinits the camera to make sure the screen isn't black
       setupCamera();
+      scanning = false;
     }catch(e) {
       print(e);
     }
@@ -127,7 +131,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
       return;
     }
 
-    if (state == AppLifecycleState.inactive) {
+    if (state == AppLifecycleState.inactive && scanning == false) {
       //Dispose of controller when necessary
       await controller?.dispose();
     }//else {
@@ -254,9 +258,9 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
     }
   }
 
-  Future<Null> readExpiry(
+  Future<Null> readExpiry(String productName, String category, int quantity) async {
     //The variables
-    String productName, String category, int quantity) async {
+    scanning = true;
     List<OcrText> texts = [];
     DateTime expiry;
     try {
@@ -284,28 +288,9 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
           //Calculates the days until expiry
           DateTime now = DateTime.now();
           enterExpiry(context, productName, category, quantity, expiry);
-          // int daysTillExpiry = expiry.difference(DateTime(now.year, now.month, now.day)).inDays;
-          // //Adds the product to the database
-          // addItemToDB(productName, category, quantity, expiry.toString());
-          // //creates a notification
-          // notification(productName, quantity, daysTillExpiry);
-
-          // barCodeScanned = false;
-          // //Shows message saying that item was added to inventory
-          // final snackBar = SnackBar(
-          //   content: Text('$quantity $productName have been added to your inventory'),
-          //   action: SnackBarAction(
-          //     label: 'Ok',
-          //     onPressed: () {},
-          //   ),
-          // );
-          // ScaffoldMessenger.of(context).showSnackBar(snackBar);
-        //}else {
-          //Asks user to enter the expiry when no expiry found
-          //enterExpiry(context, productName, category, quantity, );
-        //}
         //Re-initialises the camera
         setupCamera();
+        scanning = false;
       });
     } on Exception {
       texts.add(OcrText('Failed to recognize text'));
