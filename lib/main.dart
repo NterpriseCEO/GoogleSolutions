@@ -40,6 +40,12 @@ Future<void> main() async {
       AndroidFlutterLocalNotificationsPlugin>()
       ?.createNotificationChannel(channel);
 
+  await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+    alert: true,
+    badge: true,
+    sound: true,
+  );
+
   runApp(MaterialApp(
     initialRoute: "/Login",
     debugShowCheckedModeBanner: false,
