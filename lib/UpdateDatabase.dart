@@ -11,7 +11,7 @@ void updateItemAmount(String id, bool remove, int quantity, int increment) async
   print(document);
   //Removes the item if the quantity is <= 1
   //Or if boolean = true
-  if(remove || quantity <= 1) {
+  if(remove) {
     document.delete();
   }else {
     //Checks if document exists and then increments the Quantity value
@@ -23,6 +23,9 @@ void updateItemAmount(String id, bool remove, int quantity, int increment) async
         })
       }
     });
+    if(increment == -1 && quantity == 1) {
+      document.delete();
+    }
   }
 }
 
@@ -47,6 +50,7 @@ void removeExpired() async {
       DateTime date = DateTime.parse(document.get("ExpiryDate"));
       if(date.isBefore(DateTime.now())) {
         document.reference.delete();
+        print("Hello");
       }
     });
   });

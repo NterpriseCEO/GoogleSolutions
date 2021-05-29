@@ -106,7 +106,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
         });
       }
       //Reinits the camera to make sure the screen isn't black
-      //setupCamera();
+      setupCamera();
     }catch(e) {
       print(e);
     }
@@ -128,10 +128,11 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
     }
 
     if (state == AppLifecycleState.inactive) {
-      controller?.dispose();
-    } else if (state == AppLifecycleState.resumed) {
-      setupCamera();
-    }
+      //Dispose of controller when necessary
+      await controller?.dispose();
+    }//else {
+    //   setupCamera();
+    // }
   }
 
   @override
@@ -304,7 +305,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
           //enterExpiry(context, productName, category, quantity, );
         //}
         //Re-initialises the camera
-        //setupCamera();
+        setupCamera();
       });
     } on Exception {
       texts.add(OcrText('Failed to recognize text'));
@@ -317,7 +318,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
     DateTime expiry = await showDatePicker(
       context: context,
       initialDate:date,
-      firstDate:DateTime.now(),
+      firstDate:DateTime.now().subtract(Duration(days: 10)),
       lastDate: DateTime(2100)
     );
     //Checks if the expiry date picker was not canceled
