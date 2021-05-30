@@ -28,7 +28,7 @@ class _LoginState extends State<Login> {
   void initState() {
     super.initState();
 
-    var initializationSettingsAndroid = AndroidInitializationSettings('@drawable/icon');
+    var initializationSettingsAndroid = AndroidInitializationSettings('icon');
     var initializationSettings = InitializationSettings(android: initializationSettingsAndroid);
     flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
