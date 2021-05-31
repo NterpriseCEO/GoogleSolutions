@@ -308,7 +308,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
     );
     //Checks if the expiry date picker was not canceled
     if(expiry != null) {
-      //Adds the product to the databse
+      //Adds the product to the database
       addItemToDB(productName, category, quantity, expiry.toString());
       DateTime now = DateTime.now();
       int daysTillExpiry = expiry.difference(DateTime(now.year, now.month, now.day)).inDays;
