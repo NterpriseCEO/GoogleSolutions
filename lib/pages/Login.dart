@@ -103,13 +103,13 @@ class _LoginState extends State<Login> {
         inAsyncCall: showSpinner,
         child: Container(
           decoration: BoxDecoration(
-            gradient: SweepGradient(
+            gradient: LinearGradient(
+              begin: Alignment.bottomLeft,
+              end: Alignment.topRight,
               colors: [
-                Colors.amber[800],
-                Colors.amber[300],
+                Colors.amber[500],
                 Colors.amber[800],
               ],
-              startAngle: 0.5,
             )
           ),
           child: Center(
