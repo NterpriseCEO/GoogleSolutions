@@ -40,7 +40,7 @@ class InventoryCard extends StatelessWidget {
               //Icon for the card
               Expanded(
                 flex: 4,
-                child: FadeInImage(image: AssetImage("assets/$category.png"), placeholder: AssetImage("assets/barcode.png")),
+                child: FadeInImage(image: AssetImage("assets/${category.split(" ").join()}.png"), placeholder: AssetImage("assets/barcode.png")),
               ),
               //Card Title
               Expanded(

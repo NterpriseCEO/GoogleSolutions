@@ -17,7 +17,7 @@ class _InventoryOverviewState extends State<InventoryOverview> {
   TextEditingController _controller;
   ScrollController _scrollController;
 
-  List<Widget> inventoryCards;
+  List<Widget> inventoryCards = [];
 
   @override
   void initState() {
@@ -47,51 +47,16 @@ class _InventoryOverviewState extends State<InventoryOverview> {
 
   @override
   Widget build(BuildContext context) {
-    if(inventoryCards == null) {
-      inventoryCards = [
-        InventoryCard(
-          category: "Vegetables",
+    if(inventoryCards.isEmpty) {
+      List<String> categories = ["Vegetables", "Fruit", "Dairy", "Beverages", "Sauces", "Bread", "Meat", "Seafood", "Pasta", "Snacks", "Desserts", "Homemade Meals", "Misc",];
+      for(String category in categories) {
+        inventoryCards?.add(InventoryCard(
+          category: category,
           goToPage: (int page) {
             widget.goToPage(page);
           },
-        ),
-        InventoryCard(
-          category: "Fruit",
-          goToPage: (int page) {
-            widget.goToPage(page);
-          },
-        ),
-        InventoryCard(
-          category: "Dairy",
-          goToPage: (int page) {
-            widget.goToPage(page);
-          },
-        ),
-        InventoryCard(
-          category: "Sauces",
-          goToPage: (int page) {
-            widget.goToPage(page);
-          },
-        ),
-        InventoryCard(
-          category: "Bread",
-          goToPage: (int page) {
-            widget.goToPage(page);
-          },
-        ),
-        InventoryCard(
-          category: "Meat",
-          goToPage: (int page) {
-            widget.goToPage(page);
-          },
-        ),
-        InventoryCard(
-          category: "Misc",
-          goToPage: (int page) {
-            widget.goToPage(page);
-          },
-        ),
-      ];
+        ));
+      }
     }
 
     return Padding(

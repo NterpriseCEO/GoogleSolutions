@@ -232,9 +232,15 @@ void showPicker(BuildContext context, Callback2 callback) {
         "Vegetables",
         "Fruit",
         "Dairy",
+        "Beverages",
         "Sauces",
         "Bread",
         "Meat",
+        "Seafood",
+        "Pasta",
+        "Snacks",
+        "Desserts",
+        "Homemade Meals",
         "Misc"
     ]
 ]

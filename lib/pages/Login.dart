@@ -38,21 +38,18 @@ class _LoginState extends State<Login> {
       RemoteNotification notification = message.notification;
       AndroidNotification android = message.notification?.android;
       if (notification != null && android != null) {
-        flutterLocalNotificationsPlugin.show(
-            notification.hashCode,
-            notification.title,
-            notification.body,
-            NotificationDetails(
-              //assigns specific channel
-              android: AndroidNotificationDetails(
-                channel.id,
-                channel.name,
-                channel.description,
-                // TODO add a proper drawable resource to android, for now using
-                //      one that already exists in example app.
-                icon: 'launch_background',
-              ),
-            ));
+        flutterLocalNotificationsPlugin.show(notification.hashCode, notification.title, notification.body,
+        NotificationDetails(
+          //assigns specific channel
+          android: AndroidNotificationDetails(
+            channel.id,
+            channel.name,
+            channel.description,
+            // TODO add a proper drawable resource to android, for now using
+            //      one that already exists in example app.
+            icon: 'launch_background',
+          ),
+        ));
       }
     });
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message){
@@ -61,20 +58,20 @@ class _LoginState extends State<Login> {
       AndroidNotification android = message.notification?.android;
       if (notification != null && android != null) {
         showDialog(
-            context: context,
-            builder: (_) {
-              return AlertDialog(
-                title: Text("Test"),
-                content: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(notification.body)
-                  ],
-                ),
-                ),
-              );
-            });
+          context: context,
+          builder: (_) {
+            return AlertDialog(
+              title: Text("Test"),
+              content: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(notification.body)
+                ],
+              ),
+            ),
+          );
+        });
       }
     });
 
@@ -91,8 +88,7 @@ class _LoginState extends State<Login> {
 
     if (isLoggedIn) {
       userCol = googleSignIn.currentUser.id;
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => Menu()));
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Menu()));
     }
 
     setState(() {
@@ -106,7 +102,16 @@ class _LoginState extends State<Login> {
       body: ModalProgressHUD(
         inAsyncCall: showSpinner,
         child: Container(
-          color: Colors.amber[800],
+          decoration: BoxDecoration(
+            gradient: SweepGradient(
+              colors: [
+                Colors.amber[800],
+                Colors.amber[300],
+                Colors.amber[800],
+              ],
+              startAngle: 0.5,
+            )
+          ),
           child: Center(
             child: Column(
               mainAxisSize: MainAxisSize.max,
