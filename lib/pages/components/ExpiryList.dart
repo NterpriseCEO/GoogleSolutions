@@ -1,9 +1,16 @@
 import 'package:best_before_app/components/ExpiryItem.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import "package:flutter_sticky_header/flutter_sticky_header.dart";
 
 import 'package:best_before_app/UpdateDatabase.dart';
+
+import '../../main.dart';
+
+//Counter of how many items have gone off on a specific day
+int total = 0;
+String day;
 
 typedef Callback(bool hide);
 
@@ -200,6 +207,27 @@ class _DataListState extends State<DataList> {
               results = false;
             }
           }
+          //Notification for if food is going off
+          if(expired.length > 0){
+            total = expired.length;
+            day = "Expired";
+            showNotification(total,day);
+          }
+          else if(tomorrow.length > 0){
+            total = tomorrow.length;
+            day = "Tomorrow";
+            showNotification(total,day);
+          }
+          else if(fiveDays.length > 0){
+            total = tomorrow.length;
+            day = "5 Days";
+            showNotification(total,day);
+          }
+          else if(sevenDays.length > 0){
+            total = tomorrow.length;
+            day = "7 Days";
+            showNotification(total,day);
+          }
         }
 
         if(noItems) {
@@ -247,4 +275,18 @@ class _DataListState extends State<DataList> {
       }
     );
   }
+
+  void showNotification(int total, String day) {
+    flutterLocalNotificationsPlugin.show(
+        0,
+        "$day!",
+        "Items Expiring: $total",
+        NotificationDetails(
+            android: AndroidNotificationDetails(channel.id, channel.name, channel.description,
+                importance: Importance.high,
+                color: Colors.blue,
+                playSound: true,
+                icon: '@assets/icon.png')));
+  }
+
 }
