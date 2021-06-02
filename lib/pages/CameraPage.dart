@@ -240,6 +240,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
                                 widget.itemName = itemName;
                                 widget.category = category;
                                 widget.quantity = amount;
+                                enterExpiry(context, widget.itemName, widget.category, widget.quantity, null);
                               }
                             });
                           }else {
