@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:flutter_native_timezone/flutter_native_timezone.dart';
@@ -77,31 +78,35 @@ void initNotifications() async {
 
 var rand = Random();
 
-Future<void> notification(String product, int quantity, int expiry) async {
+Future<void> cancelMessages() async {
+  await flutterLocalNotificationsPlugin.cancelAll();
+}
+
+Future<void> notification(String message, String message2, int expiry) async {
   now = await tz.TZDateTime.now(zone);
-  if(expiry > 0) {
-    //Create notification
-    flutterLocalNotificationsPlugin.zonedSchedule(
-      rand.nextInt(pow(2, 31) - 1),
-      "$product going off!",
-      "$quantity $product goes off today!",
-      tz.TZDateTime(tz.local, now.year, now.month, now.day, 6).add(Duration(days: expiry)),
-      const NotificationDetails(
-        android: AndroidNotificationDetails("0", "channel", "description"),
-      ),
-      androidAllowWhileIdle: true,
-      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime
-    );
-    /*flutterLocalNotificationsPlugin.zonedSchedule(
-      rand.nextInt(pow(2, 31) - 1),
-      "$product going off!",
-      "$quantity $product goes off tomorrow!",
-      now.add(Duration(days : expiry)),
-      const NotificationDetails(
-        android: AndroidNotificationDetails("0", "channel", "description"),
-      ),
-      androidAllowWhileIdle: true,
-      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime
-    );*/
-  }
+  //Create notification
+  print("THe date: $expiry");
+  flutterLocalNotificationsPlugin.zonedSchedule(
+    rand.nextInt(pow(2, 31) - 1),
+    message2,
+    message,
+    tz.TZDateTime(tz.local, now.year, now.month, now.day, 6).add(Duration(days: expiry)),
+    const NotificationDetails(
+      android: AndroidNotificationDetails("0", "channel", "description", importance: Importance.max, priority: Priority.high, showWhen: true),
+    ),
+    androidAllowWhileIdle: true,
+    uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime
+  );
+  // print("daysTillExpiry: $expiry $message ${now.minute} ${now.add(Duration(minutes: expiry))}");
+  // flutterLocalNotificationsPlugin.zonedSchedule(
+  //   rand.nextInt(pow(2, 31) - 1),
+  //   "$message",
+  //   "$message2",
+  //   now.add(Duration(minutes : expiry+1)),
+  //   const NotificationDetails(
+  //     android: AndroidNotificationDetails("0", "channel", "description"),
+  //   ),
+  //   androidAllowWhileIdle: true,
+  //   uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime
+  // );
 }

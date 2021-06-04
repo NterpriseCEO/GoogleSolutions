@@ -315,7 +315,6 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
       int daysTillExpiry = expiry.difference(DateTime(now.year, now.month, now.day)).inDays;
       print("this is the amount of days till it expires: $daysTillExpiry, this is the expiry date: $expiry");
       //Creates a notification
-      notification(productName, quantity, daysTillExpiry);
 
       //Shows message saying that item was added to inventory
       final snackBar = SnackBar(

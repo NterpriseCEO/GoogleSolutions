@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:best_before_app/notifications/NotifData.dart';
 
 FirebaseFirestore firestore = FirebaseFirestore.instance;
 
@@ -27,6 +28,9 @@ void updateItemAmount(String id, bool remove, int quantity, int increment) async
       document.delete();
     }
   }
+  Future.delayed(const Duration(seconds: 1), () {
+    getData();
+  });
 }
 
 //Adds an item to the databse
@@ -36,6 +40,9 @@ void addItemToDB(String itemName, String category, int amount, String expiryDate
     'ProductName': itemName,
     'Quantity': amount,
     "ExpiryDate": expiryDate
+  });
+  Future.delayed(const Duration(seconds: 1), () {
+    getData();
   });
 }
 
@@ -53,5 +60,8 @@ void removeExpired() async {
         print("Hello");
       }
     });
+  });
+  Future.delayed(const Duration(seconds: 1), () {
+    getData();
   });
 }

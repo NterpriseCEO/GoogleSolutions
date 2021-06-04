@@ -1,3 +1,4 @@
+import 'package:best_before_app/notifications/NotifData.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -42,6 +43,8 @@ Future<String> signInWithGoogle() async {
 
     print('Continue with Google: Success');
     print('$user');
+
+    getData();
 
     return '$user';
   }
