@@ -98,7 +98,6 @@ Future<void> notification(String message, String message2, int expiry) async {
     uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime
   );
   print("daysTillExpiry: $expiry $message ${now.minute} ${now.add(Duration(minutes: expiry))}");
-  // print("daysTillExpiry: $expiry $message ${now.minute} ${now.add(Duration(minutes: expiry))}");
   // flutterLocalNotificationsPlugin.zonedSchedule(
   //   rand.nextInt(pow(2, 31) - 1),
   //   "$message",

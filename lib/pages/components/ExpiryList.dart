@@ -73,6 +73,8 @@ class _DataListState extends State<DataList> {
 
   int deleteAmount = 0;
 
+  String prevSearch = "";
+
   SliverStickyHeader createSliverHeader(List<Widget> items, String header, bool isExpired) {
     return SliverStickyHeader(
       //ColoredBox is more efficient then container with color property
@@ -170,6 +172,10 @@ class _DataListState extends State<DataList> {
       builder: (context, snapshot) {
         //WHen data is gotten creates a list of expiry item widgets
         //Checks if data returned
+        if(widget.search != prevSearch) {
+          expired = []; today = []; tomorrow = []; fiveDays = []; sevenDays = [];
+          counter = 0;
+        }
         if(snapshot.hasData && counter == 0) {
           counter++;
           //Gets a list of the documents
@@ -208,26 +214,27 @@ class _DataListState extends State<DataList> {
             }
           }
           //Notification for if food is going off
-          if(expired.length > 0){
-            total = expired.length;
-            day = "Expired";
-            showNotification(total,day);
-          }
-          else if(tomorrow.length > 0){
-            total = tomorrow.length;
-            day = "Tomorrow";
-            showNotification(total,day);
-          }
-          else if(fiveDays.length > 0){
-            total = tomorrow.length;
-            day = "5 Days";
-            showNotification(total,day);
-          }
-          else if(sevenDays.length > 0){
-            total = tomorrow.length;
-            day = "7 Days";
-            showNotification(total,day);
-          }
+          // if(expired.length > 0){
+          //   total = expired.length;
+          //   day = "Expired";
+          //   showNotification(total,day);
+          // }
+          // else if(tomorrow.length > 0){
+          //   total = tomorrow.length;
+          //   day = "Tomorrow";
+          //   showNotification(total,day);
+          // }
+          // else if(fiveDays.length > 0){
+          //   total = tomorrow.length;
+          //   day = "5 Days";
+          //   showNotification(total,day);
+          // }
+          // else if(sevenDays.length > 0){
+          //   total = tomorrow.length;
+          //   day = "7 Days";
+          //   showNotification(total,day);
+          // }
+          prevSearch = this.widget.search;
         }
 
         if(noItems) {
@@ -276,17 +283,17 @@ class _DataListState extends State<DataList> {
     );
   }
 
-  void showNotification(int total, String day) {
-    flutterLocalNotificationsPlugin.show(
-        0,
-        "$day!",
-        "Items Expiring: $total",
-        NotificationDetails(
-            android: AndroidNotificationDetails(channel.id, channel.name, channel.description,
-                importance: Importance.high,
-                color: Colors.blue,
-                playSound: true,
-                icon: '@assets/icon.png')));
-  }
+  // void showNotification(int total, String day) {
+  //   flutterLocalNotificationsPlugin.show(
+  //       0,
+  //       "$day!",
+  //       "Items Expiring: $total",
+  //       NotificationDetails(
+  //           android: AndroidNotificationDetails(channel.id, channel.name, channel.description,
+  //               importance: Importance.high,
+  //               color: Colors.blue,
+  //               playSound: true,
+  //               icon: '@assets/icon.png')));
+  // }
 
 }

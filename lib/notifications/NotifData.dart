@@ -12,8 +12,9 @@ Future<void> getData() async {
   await firestore.collection(userCol).get().then((snapshot) {
     //Gets a list of all the documents
     List<DocumentSnapshot> allDocs = snapshot.docs;
-    //Loops through the documents and deletes them if the expiry date is before today's date
+    //Loops through the documents and calculates how many of each item are going off on a certain day
     allDocs.forEach((DocumentSnapshot document) {
+      //Gets and converts the expiry date into daysTillExpiry, a countdown
       DateTime date = DateTime.parse(document.get("ExpiryDate"));
       DateTime now = DateTime.now();
       int daysTillExpiry = date.difference(DateTime(now.year, now.month, now.day)).inDays;
@@ -26,6 +27,11 @@ Future<void> getData() async {
       }
       print("The quantity is: $quantity");
     });
+
+    /*Loops through the next seven days
+      and creates notifications if items have gone off
+      or are going off in the next seven days.
+     */
     for(int i = 0; i < days.length; i++) {
       if(i > 0) {
         if(days[i] > 0) {
