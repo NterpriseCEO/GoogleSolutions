@@ -50,6 +50,7 @@ dependencies:
 
   intl: ^0.17.0
   path_provider: ^2.0.2
+  firebase_ml_vision: ^0.9.3+8
 
   
 dev_dependencies:
