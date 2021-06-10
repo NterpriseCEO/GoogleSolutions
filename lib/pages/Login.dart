@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +18,8 @@ class _LoginState extends State<Login> {
   bool loading = false;
   bool isLoggedIn = false;
   bool showSpinner = false;
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   void onLoginStatusChanged(bool isLoggedIn) {
     setState(() {
@@ -80,20 +83,19 @@ class _LoginState extends State<Login> {
   }
 
   void isSignedIn() async {
-    setState(() {
-      loading = true;
-    });
-
-    isLoggedIn = await googleSignIn.isSignedIn();
-
-    if (isLoggedIn) {
-      userCol = googleSignIn.currentUser.id;
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Menu()));
+    if(_auth.currentUser != null) {
+      userCol = _auth.currentUser.uid;
+      //Waits for the widget tree to stop building before skipping login screen
+      WidgetsBinding.instance.addPostFrameCallback((_) => {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) {
+              return Menu();
+            },
+          ),
+        )
+      });
     }
-
-    setState(() {
-      loading = false;
-    });
   }
 
   @override

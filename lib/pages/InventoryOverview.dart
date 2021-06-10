@@ -126,14 +126,45 @@ class _InventoryOverviewState extends State<InventoryOverview> {
           //The scrollable list of cards
           Expanded(
             flex: 7,
-            child: GridView.count(
-              crossAxisCount: 2,
-              children: filterCards(search?.toLowerCase(), inventoryCards),
-              controller: _scrollController,
-            ),
+            child: showCategories(search, inventoryCards, _scrollController)
           ),
         ],
       ),
+    );
+  }
+}
+
+Widget showCategories(String query, List<Widget> inventoryCards, ScrollController _scrollController) {
+  List<Widget> items = [];
+
+  if(query != null) {
+    for(InventoryCard item in inventoryCards) {
+      //Checks if the search query matches any title cards
+      if(item.category.toLowerCase().contains(query)) {
+        items.add(item);
+      }
+    }
+  }else {
+    items.addAll(inventoryCards);
+  }
+  if(items.isNotEmpty || query == null || query == "") {
+   return GridView.count(
+     crossAxisCount: 2,
+     children: items,
+     controller: _scrollController,
+   );
+  }else {
+    return Column(
+      children: [
+        Text(
+          "No category found",
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize:20.0,
+          ),
+        ),
+        Image(image: AssetImage("assets/icon.png")),
+      ]
     );
   }
 }
@@ -149,6 +180,20 @@ List<Widget> filterCards(String query, List<Widget> inventoryCards) {
       if(item.category.toLowerCase().contains(query)) {
         items.add(item);
       }
+    }
+    if(items.isEmpty) {
+      items.add(Column(
+        children: [
+          Text(
+            "No category found",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize:20.0,
+            ),
+          ),
+          Image(image: AssetImage("assets/icon.png"))
+        ])
+      );
     }
     return items;
   }else {

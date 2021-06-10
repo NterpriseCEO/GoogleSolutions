@@ -1,4 +1,4 @@
-import 'package:best_before_app/pages/Settings.dart';
+import 'package:best_before_app/pages/Logout.dart';
 import 'package:flutter/material.dart';
 import "package:best_before_app/pages/CameraPage.dart";
 import "package:best_before_app/pages/ExpirationPage.dart";
