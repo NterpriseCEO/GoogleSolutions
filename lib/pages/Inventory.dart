@@ -92,14 +92,21 @@ class _InventoryState extends State<Inventory> {
               }
             }
             if(increment == 0) {
-              itemWidgets.add(Center(
-                child: Text(
-                  "There's no ${title["category"]} in your inventory",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20.0,
-                  ),
+              itemWidgets.add(Padding(
+                padding: const EdgeInsets.all(15.0),
+                child: Column(
+                  children: [
+                    Text(
+                      (search == null || search == "") ?
+                      "There's no ${title["category"].toLowerCase()} in your inventory" :
+                      "No results found!",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize:20.0,
+                      ),
+                    ),
+                    Image(image: AssetImage("assets/icon.png")),
+                  ]
                 ),
               ));
             }
