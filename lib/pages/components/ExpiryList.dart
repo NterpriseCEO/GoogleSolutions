@@ -252,31 +252,31 @@ class _DataListState extends State<DataList> {
           );
         }else {
           return Stack(
-              fit: StackFit.expand,
-              children: <Widget>[
-                //This is required for the SliverStickyHeader
-                CustomScrollView(
-                  //The StickyHeaders
-                  slivers: <Widget>[
-                    createSliverHeader(expired, "Expired", true),
-                    createSliverHeader(today, "Today", false),
-                    createSliverHeader(tomorrow, "Tomorrow", false),
-                    createSliverHeader(fiveDays, "Five Days", false),
-                    createSliverHeader(sevenDays, "Seven Days", false),
-                  ]
-                ),
-                //Positions the Quantity text to the right
-                //of the page so that it is constantly visible
-                Align(
-                  alignment: Alignment.topRight,
-                  child: Text(
-                    "Quantity",
-                    style: TextStyle(
-                      fontSize: 20.0,
-                    ),
+            fit: StackFit.expand,
+            children: <Widget>[
+              //This is required for the SliverStickyHeader
+              CustomScrollView(
+                //The StickyHeaders
+                slivers: <Widget>[
+                  createSliverHeader(expired, "Expired", true),
+                  createSliverHeader(today, "Today", false),
+                  createSliverHeader(tomorrow, "Tomorrow", false),
+                  createSliverHeader(fiveDays, "Five Days", false),
+                  createSliverHeader(sevenDays, "Seven Days", false),
+                ]
+              ),
+              //Positions the Quantity text to the right
+              //of the page so that it is constantly visible
+              Align(
+                alignment: Alignment.topRight,
+                child: Text(
+                  "Quantity",
+                  style: TextStyle(
+                    fontSize: 20.0,
                   ),
                 ),
-              ]
+              ),
+            ]
           );
         }
       }
