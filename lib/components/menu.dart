@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import "package:best_before_app/pages/CameraPage.dart";
 import "package:best_before_app/pages/ExpirationPage.dart";
 import "package:best_before_app/pages/InventoryOverview.dart";
+import 'package:best_before_app/pages/Dashboard.dart';
 
 class Menu extends StatefulWidget {
   @override
@@ -57,7 +58,9 @@ class _MenuState extends State<Menu> {
                     //The page pages
                     Container(
                       color: Colors.white,
-                      child: ExpirationPage(),
+                      child: Dashboard(),
+                      //Todo: find another route for Dahsboard and putback Expiration page
+                      // child: ExpirationPage(),
                     ),
                     Container(
                       //The ScanPicture() page
