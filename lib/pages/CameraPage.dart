@@ -1,12 +1,13 @@
 import 'package:best_before_app/components/BarcodeResult.dart';
 import 'package:dropdown_banner/dropdown_banner.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import "package:flutter/material.dart";
 import "package:camera/camera.dart";
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
-import 'package:flutter_mobile_vision/flutter_mobile_vision.dart';
-import "package:best_before_app/notifications/LocalNotifications.dart";
+//import 'package:flutter_mobile_vision/flutter_mobile_vision.dart';
+import 'package:google_ml_kit/google_ml_kit.dart';
 import 'components/EditScan.dart';
 import "package:best_before_app/UpdateDatabase.dart";
 
@@ -26,15 +27,16 @@ class ScanPicture extends StatefulWidget {
 class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
   //The cameras
   List<CameraDescription> cameras;
+  CameraDescription camera;
 
   //The camera controller
   CameraController controller;
 
+  final textDetector = GoogleMlKit.vision.textDetector();
+
   //The int value that will hold value of the current camera
   int selected = 0;
   bool barCodeScanned = false;
-  //The ocrCamera
-  int _ocrCamera = FlutterMobileVision.CAMERA_BACK;
 
   String barcode = 'Unknown'; //This will hold the returned value from a barcode
 
@@ -49,7 +51,8 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
 
   selectCamera() async {
     //Assign camera to a controller and set the Resolution preset to high
-    var controller = CameraController(cameras[selected], ResolutionPreset.high);
+    var controller = CameraController(cameras[selected], ResolutionPreset.medium);
+    camera = cameras[selected];
     //Initialise controller
     await controller.initialize();
     return controller;
@@ -260,42 +263,102 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
   }
 
   Future<Null> readExpiry(String productName, String category, int quantity) async {
-    //The variables
-    scanning = true;
-    List<OcrText> texts = [];
+    InputImage inputImage;
     DateTime expiry;
-    try {
-      //Reads the text available to the camera
-      texts = await FlutterMobileVision.read(
-        flash: false,
-        showText: false,
-        autoFocus: true,
-        multiple: true,
-        camera: _ocrCamera,
-        waitTap: true,
+    bool dateGotten;
+    controller?.startImageStream((CameraImage cameraImage) async {
+      final WriteBuffer allBytes = WriteBuffer();
+      for (Plane plane in cameraImage.planes) {
+        allBytes.putUint8List(plane.bytes);
+      }
+      final bytes = allBytes.done().buffer.asUint8List();
+
+      final Size imageSize =
+      Size(cameraImage.width.toDouble(), cameraImage.height.toDouble());
+
+      final imageRotation = InputImageRotationMethods.fromRawValue(camera.sensorOrientation) ?? InputImageRotation.Rotation_0deg;
+
+      final inputImageFormat = InputImageFormatMethods.fromRawValue(cameraImage.format.raw) ?? InputImageFormat.NV21;
+
+      final planeData = cameraImage.planes.map((Plane plane) {
+        return InputImagePlaneMetadata(
+          bytesPerRow: plane.bytesPerRow,
+          height: plane.height,
+          width: plane.width,
+        );
+      }).toList();
+
+      final inputImageData = InputImageData(
+        size: imageSize,
+        imageRotation: imageRotation,
+        inputImageFormat: inputImageFormat,
+        planeData: planeData,
       );
-      setState(() {
-        //Loops through text and checks if it is an expiry date
-        for (OcrText text in texts) {
+
+      inputImage =
+      InputImage.fromBytes(bytes: bytes, inputImageData: inputImageData);
+
+      print(inputImage.inputImageData);
+      controller?.stopImageStream();
+      final RecognisedText recognisedText = await textDetector.processImage(inputImage);
+      String text = recognisedText.text;
+      for (TextBlock block in recognisedText.blocks) {
+        final Rect rect = block.rect;
+        final List<Offset> cornerPoints = block.cornerPoints;
+        final String text = block.text;
+        final List<String> languages = block.recognizedLanguages;
+
+        for (TextLine line in block.lines) {
+          // Same getters as TextBlock
           if (expiry == null) {
-            expiry = checkIfExpiry(text.value);
+            expiry = checkIfExpiry(line.text);
+            if(expiry != null) {
+              DateTime now = DateTime.now();
+              enterExpiry(context, productName, category, quantity, expiry);
+            }
           } else {
             break;
           }
         }
-
-        //Checks if expiry date was found
-        //if(expiry != null) {
-          //Calculates the days until expiry
-          DateTime now = DateTime.now();
-          enterExpiry(context, productName, category, quantity, expiry);
-        //Re-initialises the camera
-        setupCamera();
-        scanning = false;
-      });
-    } on Exception {
-      texts.add(OcrText('Failed to recognize text'));
-    }
+      }g
+      scanning = false;
+    });
+    // //The variables
+    // scanning = true;
+    // List<OcrText> texts = [];
+    // DateTime expiry;
+    // try {
+    //   //Reads the text available to the camera
+    //   texts = await FlutterMobileVision.read(
+    //     flash: false,
+    //     showText: false,
+    //     autoFocus: true,
+    //     multiple: true,
+    //     camera: _ocrCamera,
+    //     waitTap: true,
+    //   );
+    //   setState(() {
+    //     //Loops through text and checks if it is an expiry date
+    //     for (OcrText text in texts) {
+    //       if (expiry == null) {
+    //         expiry = checkIfExpiry(text.value);
+    //       } else {
+    //         break;
+    //       }
+    //     }
+    //
+    //     //Checks if expiry date was found
+    //     //if(expiry != null) {
+    //       //Calculates the days until expiry
+    //       DateTime now = DateTime.now();
+    //       enterExpiry(context, productName, category, quantity, expiry);
+    //     //Re-initialises the camera
+    //     setupCamera();
+    //     scanning = false;
+    //   });
+    // } on Exception {
+    //   texts.add(OcrText('Failed to recognize text'));
+    // }
   }
 
   void enterExpiry(BuildContext context, String productName, String category, int quantity, DateTime date) async {
