@@ -1,3 +1,4 @@
+import 'package:best_before_app/notifications/NotifData.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
@@ -86,6 +87,7 @@ class _LoginState extends State<Login> {
     if(_auth.currentUser != null) {
       userCol = _auth.currentUser.uid;
       //Waits for the widget tree to stop building before skipping login screen
+      getData();
       WidgetsBinding.instance.addPostFrameCallback((_) => {
         Navigator.of(context).push(
           MaterialPageRoute(

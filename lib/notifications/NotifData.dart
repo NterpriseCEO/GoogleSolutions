@@ -7,7 +7,7 @@ FirebaseFirestore firestore = FirebaseFirestore.instance;
 Future<void> getData() async {
   cancelMessages();
 
-  List<int> days = [0, 0, 0, 0, 0, 0, 0];
+  List<int> days = [0, 0, 0, 0, 0, 0, 0, 0];
   int goneOffCount = 0;
   await firestore.collection(userCol).get().then((snapshot) {
     //Gets a list of all the documents
@@ -35,6 +35,7 @@ Future<void> getData() async {
     for(int i = 0; i < days.length; i++) {
       if(i > 0) {
         if(days[i] > 0) {
+          print(days[i]);
           notification("${days[i]} item(s) going off tomorrow", "Items Expiring!", i-1);
           notification("${days[i]} item(s) going off today", "Items Expiring!", i);
         }
