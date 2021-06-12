@@ -85,7 +85,7 @@ Future<void> cancelMessages() async {
 Future<void> notification(String message, String message2, int expiry) async {
   now = await tz.TZDateTime.now(zone);
   //Create notification
-  print("THe date: $expiry");
+  print("The date: $expiry");
   flutterLocalNotificationsPlugin.zonedSchedule(
     rand.nextInt(pow(2, 31) - 1),
     message2,
