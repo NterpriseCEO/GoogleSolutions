@@ -66,6 +66,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
 
     InputImage inputImage;
     bool hasScanned = false;
+    int scannerCounter = 0;
 
     controller?.startImageStream((CameraImage cameraImage) async {
       final WriteBuffer allBytes = WriteBuffer();
@@ -112,6 +113,12 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
           inputImage.inputImageData.size,
           inputImage.inputImageData.imageRotation);
       customPaint = CustomPaint(painter: painter);
+
+      scannerCounter++;
+
+      if(scannerCounter == 100000000) {
+        controller?.stopImageStream();
+      }
 
       for (Barcode barcode in barcodes) {
         final BarcodeType type = barcode.type;
@@ -248,7 +255,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
         children: <Widget>[
           //The camera viewfinder
           CameraPreview(controller),
-          if(customPaint != null) customPaint,
+          //if(customPaint != null) customPaint,
           //The container to hold the take picure button
           Container(
             margin: EdgeInsets.all(12.0),
