@@ -1,12 +1,9 @@
 import 'package:best_before_app/components/BarcodeResult.dart';
-import 'package:dropdown_banner/dropdown_banner.dart';
+import 'package:best_before_app/components/painters/barcode_detector_painter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import "package:flutter/material.dart";
 import "package:camera/camera.dart";
-import 'package:flutter/services.dart';
-import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
-//import 'package:flutter_mobile_vision/flutter_mobile_vision.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
 import 'components/EditScan.dart';
 import "package:best_before_app/UpdateDatabase.dart";
@@ -33,6 +30,9 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
   CameraController controller;
 
   final textDetector = GoogleMlKit.vision.textDetector();
+  final barcodeScanner = GoogleMlKit.vision.barcodeScanner();
+
+  CustomPaint customPaint;
 
   //The int value that will hold value of the current camera
   int selected = 0;
@@ -64,59 +64,140 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
     widget.category = "";
     widget.quantity = 0;
 
-    try {
-      try {
-        //scans the barcode
-        barcode = await FlutterBarcodeScanner.scanBarcode(
-          "#ff6666", // This is the line color for scanning part
-          "Cancel", //cancel option
-          false, //disabling flash as an option
-          ScanMode.BARCODE,
-        );
+    InputImage inputImage;
+    bool hasScanned = false;
 
-        if (!mounted) return;
-        //Sets teh barcode variable
-        setState(() {
-          this.barcode = barcode;
-        });
-      } on PlatformException {
-        //Called if scan request does not work
-        barcode = 'Failed to get platform version.';
-        DropdownBanner.showBanner(
-          text: 'Failed to complete scan request',
-          color: Colors.red[600],
-          textStyle: TextStyle(color: Colors.white),
+    controller?.startImageStream((CameraImage cameraImage) async {
+      final WriteBuffer allBytes = WriteBuffer();
+      for (Plane plane in cameraImage.planes) {
+        allBytes.putUint8List(plane.bytes);
+      }
+      final bytes = allBytes
+          .done()
+          .buffer
+          .asUint8List();
+
+      final Size imageSize =
+      Size(cameraImage.width.toDouble(), cameraImage.height.toDouble());
+
+      final imageRotation = InputImageRotationMethods.fromRawValue(
+          camera.sensorOrientation) ?? InputImageRotation.Rotation_0deg;
+
+      final inputImageFormat = InputImageFormatMethods.fromRawValue(
+          cameraImage.format.raw) ?? InputImageFormat.NV21;
+
+      final planeData = cameraImage.planes.map((Plane plane) {
+        return InputImagePlaneMetadata(
+          bytesPerRow: plane.bytesPerRow,
+          height: plane.height,
+          width: plane.width,
         );
-        setState(() {
-          barCodeScanned = false;
-        });
-      }
-      //Runs this code if barcode gotten
-      if(barcode != "-1") {
-        //Gets barcode data
-        String itemName = await barcodeResult(this.barcode);
-        //Sets the itemName depending on if data was found
-        itemName = itemName != "noData" ? itemName : "";
-        //Asks users to confirm the barcode and the product name etc.
-        confirmBarcode(itemName, context, (String itemName, String category, int amount, bool canceled) {
-          if(!canceled) {
-            //Sets variables if not canceled
-            setState(() {
-              //Sets this variable to indicate that the barcode has been scanned
-              barCodeScanned = true;
+      }).toList();
+
+      final inputImageData = InputImageData(
+        size: imageSize,
+        imageRotation: imageRotation,
+        inputImageFormat: inputImageFormat,
+        planeData: planeData,
+      );
+
+      inputImage = InputImage.fromBytes(bytes: bytes, inputImageData: inputImageData);
+
+      print(inputImage.inputImageData);
+
+      final List<Barcode> barcodes = await barcodeScanner.processImage(inputImage);
+
+      final painter = BarcodeDetectorPainter(
+          barcodes,
+          inputImage.inputImageData.size,
+          inputImage.inputImageData.imageRotation);
+      customPaint = CustomPaint(painter: painter);
+
+      for (Barcode barcode in barcodes) {
+        final BarcodeType type = barcode.type;
+        final Rect boundingBox = barcode.value.boundingBox;
+        final String displayValue = barcode.value.displayValue;
+        final String rawValue = barcode.value.rawValue;
+
+        // See API reference for complete list of supported types
+        if(type == BarcodeType.product && !hasScanned) {
+          hasScanned = true;
+          controller?.stopImageStream();
+          this.barcode = barcode.value.displayValue;
+          String itemName = await barcodeResult(this.barcode);
+          //Sets the itemName depending on if data was found
+          itemName = itemName != "noData" ? itemName : "";
+          if(itemName != "") {
+            confirmBarcode(itemName, context, (String itemName, String category, int amount, bool canceled) {
+              if(!canceled) {
+                //Sets variables if not canceled
+                setState(() {
+                  //Sets this variable to indicate that the barcode has been scanned
+                  barCodeScanned = true;
+                });
+                widget.itemName = itemName;
+                widget.category = category;
+                widget.quantity = amount;
+              }
             });
-            widget.itemName = itemName;
-            widget.category = category;
-            widget.quantity = amount;
           }
-        });
+        }
       }
-      //Reinits the camera to make sure the screen isn't black
-      setupCamera();
-      scanning = false;
-    }catch(e) {
-      print(e);
-    }
+    });
+
+    // try {
+    //   try {
+    //     //scans the barcode
+    //     barcode = await FlutterBarcodeScanner.scanBarcode(
+    //       "#ff6666", // This is the line color for scanning part
+    //       "Cancel", //cancel option
+    //       false, //disabling flash as an option
+    //       ScanMode.BARCODE,
+    //     );
+    //
+    //     if (!mounted) return;
+    //     //Sets teh barcode variable
+    //     setState(() {
+    //       this.barcode = barcode;
+    //     });
+    //   } on PlatformException {
+    //     //Called if scan request does not work
+    //     barcode = 'Failed to get platform version.';
+    //     DropdownBanner.showBanner(
+    //       text: 'Failed to complete scan request',
+    //       color: Colors.red[600],
+    //       textStyle: TextStyle(color: Colors.white),
+    //     );
+    //     setState(() {
+    //       barCodeScanned = false;
+    //     });
+    //   }
+    //   //Runs this code if barcode gotten
+    //   if(barcode != "-1") {
+    //     //Gets barcode data
+    //     String itemName = await barcodeResult(this.barcode);
+    //     //Sets the itemName depending on if data was found
+    //     itemName = itemName != "noData" ? itemName : "";
+    //     //Asks users to confirm the barcode and the product name etc.
+    //     confirmBarcode(itemName, context, (String itemName, String category, int amount, bool canceled) {
+    //       if(!canceled) {
+    //         //Sets variables if not canceled
+    //         setState(() {
+    //           //Sets this variable to indicate that the barcode has been scanned
+    //           barCodeScanned = true;
+    //         });
+    //         widget.itemName = itemName;
+    //         widget.category = category;
+    //         widget.quantity = amount;
+    //       }
+    //     });
+    //   }
+    //   //Reinits the camera to make sure the screen isn't black
+    //   setupCamera();
+    //   scanning = false;
+    // }catch(e) {
+    //   print(e);
+    // }
   }
 
   @override
@@ -167,6 +248,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
         children: <Widget>[
           //The camera viewfinder
           CameraPreview(controller),
+          if(customPaint != null) customPaint,
           //The container to hold the take picure button
           Container(
             margin: EdgeInsets.all(12.0),
@@ -315,12 +397,13 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
             if(expiry != null) {
               DateTime now = DateTime.now();
               enterExpiry(context, productName, category, quantity, expiry);
+              textDetector.close();
             }
           } else {
             break;
           }
         }
-      }g
+      }
       scanning = false;
     });
     // //The variables
