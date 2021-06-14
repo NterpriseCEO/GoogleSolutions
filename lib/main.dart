@@ -1,13 +1,14 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
+
 import "package:best_before_app/components/menu.dart";
 import "package:best_before_app/pages/Inventory.dart";
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'notifications/LocalNotifications.dart';
 import "package:best_before_app/pages/Login.dart";
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
+import 'notifications/LocalNotifications.dart';
 
 //Used for handling of firebase messaging
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {

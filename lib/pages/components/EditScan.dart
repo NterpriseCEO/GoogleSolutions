@@ -1,7 +1,8 @@
+import 'dart:convert';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_picker/flutter_picker.dart';
-import 'dart:convert';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 typedef void Callback(String itemName, String category, int amount, bool canceled);
 typedef void Callback2(String category);
@@ -276,8 +277,6 @@ DateTime checkIfExpiry(String data) {
   for(String str in strings) {
     data+=str+" ";
   }
-  print(data);
-  print("is there a match? ${RegExp(r"\s*(\b([1-9]|0[1-9])|1[1-9]|2[0-9]|30|31)\s*(Jan|Feb|Mar|Apr|May|June|Jun|July|Jul|Aug|Sep|Oct|Nov|Dec)", caseSensitive: false).allMatches(data).length}");
   var matches = RegExp(r"^((^[1-9]|0[1-9])|10|11|12)\s([0-9]{4})").allMatches(data);
   String date = "";
   if(RegExp(r"((^[1-9]|0[1-9])|10|11|12)\s+([0-9]{4})").allMatches(data).length > 0) {
@@ -332,7 +331,6 @@ DateTime checkIfExpiry(String data) {
     List<String> split = date.split(" ");
     print("${data}  --- ${split}");
     String month = (months.indexOf(split[1].toUpperCase())+1).toString();
-    print(month.length);
     if(month.length == 1) {
       month = "0"+month;
     }
@@ -347,7 +345,6 @@ DateTime checkIfExpiry(String data) {
     date = match.group(0);
     List<String> split = date.split(" ");
     String month = "0"+(months.indexOf(split[0].toUpperCase())+1).toString();
-    print(month.length);
     date = split[1]+"-"+month+"-01";
     print("The date is: ${date}");
   }

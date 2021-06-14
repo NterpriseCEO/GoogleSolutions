@@ -1,6 +1,7 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
+
 import "package:best_before_app/components/InventoryCard.dart";
+import 'package:flutter/material.dart';
 
 typedef Callback(int pageNumber);
 

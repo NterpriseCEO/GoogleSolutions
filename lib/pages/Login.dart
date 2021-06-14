@@ -1,14 +1,15 @@
+import "package:best_before_app/UpdateDatabase.dart";
 import 'package:best_before_app/notifications/NotifData.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
-import 'package:flutter/material.dart';
+import 'package:modal_progress_hud/modal_progress_hud.dart';
+
 import '../components/menu.dart';
 import '../main.dart';
 import 'components/sign_in.dart';
-import 'package:modal_progress_hud/modal_progress_hud.dart';
-import "package:best_before_app/UpdateDatabase.dart";
-import 'package:firebase_messaging/firebase_messaging.dart';
 
 class Login extends StatefulWidget {
   @override
