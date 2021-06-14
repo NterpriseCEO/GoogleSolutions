@@ -13,6 +13,7 @@ class _MenuState extends State<Menu> {
   int currentPage = 1;
   //Lets you manipulate which page is visible in page view
   PageController pageController;
+  PageController pageController;
   PageController pageController2;
 
   @override
