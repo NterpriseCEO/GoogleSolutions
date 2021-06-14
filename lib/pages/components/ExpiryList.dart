@@ -1,12 +1,8 @@
+import 'package:best_before_app/UpdateDatabase.dart';
 import 'package:best_before_app/components/ExpiryItem.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import "package:flutter_sticky_header/flutter_sticky_header.dart";
-
-import 'package:best_before_app/UpdateDatabase.dart';
-
-import '../../main.dart';
 
 //Counter of how many items have gone off on a specific day
 int total = 0;

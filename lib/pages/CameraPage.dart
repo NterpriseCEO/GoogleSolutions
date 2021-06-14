@@ -1,12 +1,12 @@
+import "package:best_before_app/UpdateDatabase.dart";
 import 'package:best_before_app/components/BarcodeResult.dart';
-import 'package:best_before_app/components/painters/barcode_detector_painter.dart';
+import "package:camera/camera.dart";
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import "package:flutter/material.dart";
-import "package:camera/camera.dart";
 import 'package:google_ml_kit/google_ml_kit.dart';
+
 import 'components/EditScan.dart';
-import "package:best_before_app/UpdateDatabase.dart";
 
 typedef void Callback(String category);
 
@@ -37,6 +37,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
   //The int value that will hold value of the current camera
   int selected = 0;
   bool barCodeScanned = false;
+  bool scanningBarcode = false;
 
   String barcode = 'Unknown'; //This will hold the returned value from a barcode
 
@@ -104,15 +105,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
 
       inputImage = InputImage.fromBytes(bytes: bytes, inputImageData: inputImageData);
 
-      print(inputImage.inputImageData);
-
       final List<Barcode> barcodes = await barcodeScanner.processImage(inputImage);
-
-      final painter = BarcodeDetectorPainter(
-          barcodes,
-          inputImage.inputImageData.size,
-          inputImage.inputImageData.imageRotation);
-      customPaint = CustomPaint(painter: painter);
 
       scannerCounter++;
 
@@ -146,6 +139,9 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
                 widget.category = category;
                 widget.quantity = amount;
               }
+              setState(() {
+                scanningBarcode = false;
+              });
             });
           }
         }
@@ -257,6 +253,21 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
           CameraPreview(controller),
           //if(customPaint != null) customPaint,
           //The container to hold the take picure button
+          Positioned(
+            left: MediaQuery.of(context).size.width*0.125,
+            top: MediaQuery.of(context).size.height*0.375,
+            width: MediaQuery.of(context).size.width*0.75,
+            height: MediaQuery.of(context).size.height/8,
+            child: Container(
+              decoration: BoxDecoration(
+                color: scanningBarcode ? Colors.black.withOpacity(0.2) : Colors.transparent,
+                border: Border.all(
+                  width: 3,
+                  color: scanningBarcode ? Colors.amber[800] : Colors.transparent
+                )
+              ),
+            ),
+          ),
           Container(
             margin: EdgeInsets.all(12.0),
             //Set it to the full width of the app
@@ -296,6 +307,10 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
                         //The button with a spherical border
                         child: TextButton(
                           onPressed: () {
+                            setState(() {
+                              scanningBarcode = true;
+                            });
+
                             //Determines which function to run on click
                             if(!barCodeScanned) {
                               scanBarcode();
@@ -387,7 +402,6 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
       inputImage =
       InputImage.fromBytes(bytes: bytes, inputImageData: inputImageData);
 
-      print(inputImage.inputImageData);
       controller?.stopImageStream();
       final RecognisedText recognisedText = await textDetector.processImage(inputImage);
       String text = recognisedText.text;
@@ -409,6 +423,9 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
           } else {
             break;
           }
+          setState(() {
+            scanningBarcode = false;
+          });
         }
       }
       scanning = false;

@@ -1,8 +1,6 @@
-import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:flutter/material.dart';
 
 import 'components/sign_in.dart';
-import '../components/menu.dart';
 
 class Settings extends StatefulWidget {
   @override

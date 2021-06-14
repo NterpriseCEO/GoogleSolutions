@@ -1,4 +1,3 @@
-import 'dart:math';
 
 import 'package:best_before_app/UpdateDatabase.dart';
 import 'package:best_before_app/components/InventoryItem.dart';
