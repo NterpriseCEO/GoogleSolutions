@@ -64,24 +64,21 @@ class _MenuState extends State<Menu> {
                       child: ScanPicture(),
                     ),
                     Container(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: InventoryOverview(
-                          goToPage: (int page) {
-                            setState(() {
-                              currentPage = page;
-                            });
-                            pageController.animateToPage(
-                              page,
-                              //The animation speed
-                              duration: Duration(
-                                milliseconds: 500,
-                              ),
-                              //The animation tweening effect
-                              curve: Curves.easeInOut,
-                            );
-                          },
-                        ),
+                      child: InventoryOverview(
+                        goToPage: (int page) {
+                          setState(() {
+                            currentPage = page;
+                          });
+                          pageController.animateToPage(
+                            page,
+                            //The animation speed
+                            duration: Duration(
+                              milliseconds: 500,
+                            ),
+                            //The animation tweening effect
+                            curve: Curves.easeInOut,
+                          );
+                        },
                       ),
                     ),
                   ],
@@ -98,8 +95,6 @@ class _MenuState extends State<Menu> {
           //The bottom menu
           bottomNavigationBar: BottomNavigationBar(
             //Disable text labels
-            showSelectedLabels: false,
-            showUnselectedLabels: false,
             backgroundColor: Colors.amber,
             selectedItemColor: Colors.white,
             //When tapping the labels
@@ -126,15 +121,15 @@ class _MenuState extends State<Menu> {
             items: <BottomNavigationBarItem>[
               BottomNavigationBarItem(
                 icon: Icon(Icons.access_time),
-                label: "",
+                label: "Expiry List",
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.camera_alt_outlined),
-                label: "",
+                label: "Camera",
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.set_meal_outlined),
-                label: "",
+                label: "Inventory",
               ),
             ],
           ),
