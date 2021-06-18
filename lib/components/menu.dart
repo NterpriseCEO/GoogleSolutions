@@ -3,6 +3,7 @@ import "package:best_before_app/pages/ExpirationPage.dart";
 import "package:best_before_app/pages/InventoryOverview.dart";
 import 'package:best_before_app/pages/Logout.dart';
 import 'package:flutter/material.dart';
+import 'package:toast/toast.dart';
 
 class Menu extends StatefulWidget {
   @override

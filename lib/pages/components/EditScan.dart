@@ -286,7 +286,7 @@ DateTime checkIfExpiry(String data) {
     date = match.group(0);
     List<String> split = date.split(" ");
     date = split[1]+"-"+split[0]+"-01";
-    print("The date is: ${date}");
+    //print("The date is: ${date}");
   }else if(RegExp(r"(\s*(\b([1-9]|0[1-9])|1[1-9]|2[0-9]|30|31)\s*/)(\s*(\b([1-9]|0[1-9])|1[0-2])\s*/)(\s*([0-9]{2,4}))").allMatches(data).length > 0) {
     /////01/07/2021/////
     var matches = RegExp(r"(\s*(\b([1-9]|0[1-9])|1[1-9]|2[0-9]|30|31)\s*/)(\s*(\b([1-9]|0[1-9])|1[0-2])\s*/)(\s*([0-9]{2,4}))").allMatches(data);
@@ -298,7 +298,7 @@ DateTime checkIfExpiry(String data) {
     }else {
       date = split[2]+"-"+split[1]+"-"+split[0];
     }
-    print("The date is: ${date}");
+    //print("The date is: ${date}");
   }else if(RegExp(r"(\s*(\b([1-9]|0[1-9])|1[1-9]|2[0-9]|30|31)\s+)((\b([1-9]|0[1-9])|1[0-2]))(\s+([0-9]{2,4}))").allMatches(data).length > 0) {
     /////01 07 2021/////
     var matches = RegExp(r"(\s*(\b([1-9]|0[1-9])|1[1-9]|2[0-9]|30|31)\s+)((\b([1-9]|0[1-9])|1[0-2]))(\s+([0-9]{2,4}))").allMatches(data);
@@ -310,7 +310,7 @@ DateTime checkIfExpiry(String data) {
     }else {
       date = split[2]+"-"+split[1]+"-"+split[0];
     }
-    print("The date is: ${date}");
+    //print("The date is: ${date}");
   }else if(RegExp(r"(\s*(\b([1-9]|0[1-9])|1[1-9]|2[0-9]|30|31)\s*\.)(\s*(\b([1-9]|0[1-9])|1[0-2])\s*\.)(\s*([0-9]{2,4}))").allMatches(data).length > 0) {
     /////01.07.2021/////
     var matches = RegExp(r"(\s*(\b([1-9]|0[1-9])|1[1-9]|2[0-9]|30|31)\s*\.)(\s*(\b([1-9]|0[1-9])|1[0-2])\s*\.)(\s*([0-9]{2,4}))").allMatches(data);
@@ -322,7 +322,19 @@ DateTime checkIfExpiry(String data) {
     }else {
       date = split[2]+"-"+split[1]+"-"+split[0];
     }
-    print("The date is: ${date}");
+    //print("The date is: ${date}");
+  }else if(RegExp(r"(\s*(\b([1-9]|0[1-9])|1[1-9]|2[0-9]|30|31)\s*\-)(\s*(\b([1-9]|0[1-9])|1[0-2])\s*\-)(\s*([0-9]{2,4}))").allMatches(data).length > 0) {
+    /////01-07-2021/////
+    var matches = RegExp(r"(\s*(\b([1-9]|0[1-9])|1[1-9]|2[0-9]|30|31)\s*\-)(\s*(\b([1-9]|0[1-9])|1[0-2])\s*\-)(\s*([0-9]{2,4}))").allMatches(data);
+    var match = matches.elementAt(0);
+    date = match.group(0);
+    List<String> split = date.trim().split("-");
+    if(split[2].length == 2) {
+      date = "20"+split[2]+"-"+split[1]+"-"+split[0];
+    }else {
+      date = split[2]+"-"+split[1]+"-"+split[0];
+    }
+    //print("The date is: ${date}");
   }else if(RegExp(r"(^\w\d)*(\b([1-9]|0[1-9])|1[1-9]|2[0-9]|30|31)\s*(Jan|Feb|Mar|Apr|May|June|Jun|July|Jul|Aug|Sep|Oct|Nov|Dec)", caseSensitive: false).allMatches(data).length > 0) {
     /////09 APR/////
     var matches = RegExp(r"(^\w\d)*(\b([1-9]|0[1-9])|1[1-9]|2[0-9]|30|31)\s*(Jan|Feb|Mar|Apr|May|June|Jun|July|Jul|Aug|Sep|Oct|Nov|Dec)", caseSensitive: false).allMatches(data);
@@ -346,7 +358,18 @@ DateTime checkIfExpiry(String data) {
     List<String> split = date.split(" ");
     String month = "0"+(months.indexOf(split[0].toUpperCase())+1).toString();
     date = split[1]+"-"+month+"-01";
-    print("The date is: ${date}");
+   // print("The date is: ${date}");
+  }else if(RegExp(r"(\s*(\b([1-9]|0[1-9])|1[1-9]|2[0-9]|30|31)\s*/)(\s*(\b([1-9]|0[1-9])|1[0-2])\s*)$").allMatches(data).length > 0) {
+    var matches = RegExp(r"(\s*(\b([1-9]|0[1-9])|1[1-9]|2[0-9]|30|31)\s*/)(\s*(\b([1-9]|0[1-9])|1[0-2])\s*)$", caseSensitive: false).allMatches(data);
+    var match = matches.elementAt(0);
+    date = match.group(0);
+    List<String> split = date.trim().split("/");
+    // if(split[2].length == 2) {
+    //   date = "20"+split[2]+"-"+split[1]+"-"+split[0];
+    // }else {
+    //   date = split[2]+"-"+split[1]+"-"+split[0];
+    // }
+    date = DateTime.now().year.toString()+"-"+split[1]+"-"+split[0];
   }
   //Parses the date
   try {

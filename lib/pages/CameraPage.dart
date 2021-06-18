@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import "package:flutter/material.dart";
 import 'package:google_ml_kit/google_ml_kit.dart';
+import 'package:toast/toast.dart';
 
 import 'components/EditScan.dart';
 
@@ -25,6 +26,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
   //The cameras
   List<CameraDescription> cameras;
   CameraDescription camera;
+  Future<void> _initializeControllerFuture;
 
   //The camera controller
   CameraController controller;
@@ -35,9 +37,9 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
   CustomPaint customPaint;
 
   //The int value that will hold value of the current camera
-  int selected = 0;
   bool barCodeScanned = false;
   bool scanningBarcode = false;
+  bool isLooping = false;
 
   String barcode = 'Unknown'; //This will hold the returned value from a barcode
 
@@ -52,10 +54,10 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
 
   selectCamera() async {
     //Assign camera to a controller and set the Resolution preset to high
-    var controller = CameraController(cameras[selected], ResolutionPreset.medium);
-    camera = cameras[selected];
+    var controller = CameraController(cameras[0], ResolutionPreset.medium);
+    camera = cameras[0];
     //Initialise controller
-    await controller.initialize();
+    _initializeControllerFuture = controller.initialize();
     return controller;
   }
 
@@ -139,66 +141,13 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
                 widget.category = category;
                 widget.quantity = amount;
               }
+              Toast.show("Barcode Successfully Scanned", context, duration: Toast.LENGTH_LONG, gravity:  Toast.BOTTOM);
               readExpiry(widget.itemName, widget.category, widget.quantity);
             });
           }
         }
       }
     });
-
-    // try {
-    //   try {
-    //     //scans the barcode
-    //     barcode = await FlutterBarcodeScanner.scanBarcode(
-    //       "#ff6666", // This is the line color for scanning part
-    //       "Cancel", //cancel option
-    //       false, //disabling flash as an option
-    //       ScanMode.BARCODE,
-    //     );
-    //
-    //     if (!mounted) return;
-    //     //Sets teh barcode variable
-    //     setState(() {
-    //       this.barcode = barcode;
-    //     });
-    //   } on PlatformException {
-    //     //Called if scan request does not work
-    //     barcode = 'Failed to get platform version.';
-    //     DropdownBanner.showBanner(
-    //       text: 'Failed to complete scan request',
-    //       color: Colors.red[600],
-    //       textStyle: TextStyle(color: Colors.white),
-    //     );
-    //     setState(() {
-    //       barCodeScanned = false;
-    //     });
-    //   }
-    //   //Runs this code if barcode gotten
-    //   if(barcode != "-1") {
-    //     //Gets barcode data
-    //     String itemName = await barcodeResult(this.barcode);
-    //     //Sets the itemName depending on if data was found
-    //     itemName = itemName != "noData" ? itemName : "";
-    //     //Asks users to confirm the barcode and the product name etc.
-    //     confirmBarcode(itemName, context, (String itemName, String category, int amount, bool canceled) {
-    //       if(!canceled) {
-    //         //Sets variables if not canceled
-    //         setState(() {
-    //           //Sets this variable to indicate that the barcode has been scanned
-    //           barCodeScanned = true;
-    //         });
-    //         widget.itemName = itemName;
-    //         widget.category = category;
-    //         widget.quantity = amount;
-    //       }
-    //     });
-    //   }
-    //   //Reinits the camera to make sure the screen isn't black
-    //   setupCamera();
-    //   scanning = false;
-    // }catch(e) {
-    //   print(e);
-    // }
   }
 
   @override
@@ -206,22 +155,13 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
     //Interface for classes that register with the Widgets layer binding.
     WidgetsBinding.instance.removeObserver(this);
     //Dispose of the controller when necessary
+    try {
+      controller.stopImageStream();
+    }catch(e) {
+      print(e);
+    }
     controller?.dispose();
     super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) async {
-    if (controller == null || !controller.value.isInitialized) {
-      return;
-    }
-
-    if (state == AppLifecycleState.inactive && scanning == false) {
-      //Dispose of controller when necessary
-      await controller?.dispose();
-    }//else {
-    //   setupCamera();
-    // }
   }
 
   @override
@@ -235,131 +175,139 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    if (controller == null) {
-      //A Widget for absolute positioning other widgets
-      return Align(
-        child: Icon(
-          Icons.camera_alt,
-          size: 60.0,
+    return Stack(
+      fit: StackFit.expand,
+      children: <Widget>[
+        //The camera viewfinder
+        FutureBuilder<void>(
+          future: _initializeControllerFuture,
+          builder: (context, snapshot) {
+            if(snapshot.connectionState == ConnectionState.done) {
+              return CameraPreview(controller);
+            }else {
+              return Align(
+                child: Icon(
+                  Icons.camera_alt,
+                  size: 60.0,
+                ),
+              );
+            }
+          }
         ),
-      );
-    }else {
-      return Stack(
-        fit: StackFit.expand,
-        children: <Widget>[
-          //The camera viewfinder
-          CameraPreview(controller),
-          //if(customPaint != null) customPaint,
-          //The container to hold the take picure button
-          Positioned(
-            left: MediaQuery.of(context).size.width*0.125,
-            top: MediaQuery.of(context).size.height*0.375,
-            width: MediaQuery.of(context).size.width*0.75,
-            height: MediaQuery.of(context).size.height/8,
-            child: Container(
-              decoration: BoxDecoration(
-                color: scanningBarcode ? Colors.black.withOpacity(0.2) : Colors.transparent,
-                border: Border.all(
-                  width: 3,
-                  color: scanningBarcode ? Colors.amber[800] : Colors.transparent
-                )
+        //if(customPaint != null) customPaint,
+        //The container to hold the take picure button
+        Positioned(
+          left: MediaQuery.of(context).size.width*0.125,
+          top: MediaQuery.of(context).size.height*0.375,
+          width: MediaQuery.of(context).size.width*0.75,
+          height: MediaQuery.of(context).size.height/8,
+          child: Container(
+            decoration: BoxDecoration(
+              color: scanningBarcode ? Colors.black.withOpacity(0.2) : Colors.transparent,
+              border: Border.all(
+                width: 3,
+                color: scanningBarcode ? Colors.amber[800] : Colors.transparent,
               ),
+              borderRadius: BorderRadius.all(Radius.circular(5.0)),
             ),
           ),
-          Container(
-            margin: EdgeInsets.all(12.0),
-            //Set it to the full width of the app
-            width: MediaQuery.of(context).size.width,
-            //A column to vertical align the button
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                //A constrained box to set the button to 1/4 the width of the app
-                Text(
-                  //Sets the text based on if expiry date has been scanned yet
-                  barCodeScanned ? "Scan Expiry Date" : "Scan Barcode",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 30.0,
-                    shadows: [
-                      Shadow(
-                        blurRadius: 10.0,
-                        color: Colors.white,
-                        offset: Offset(0.0, 0.0),
-                      ),
-                    ],
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                        child: SizedBox(width:20.0)
+        ),
+        Container(
+          margin: EdgeInsets.all(12.0),
+          //Set it to the full width of the app
+          width: MediaQuery.of(context).size.width,
+          //A column to vertical align the button
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              //A constrained box to set the button to 1/4 the width of the app
+              Text(
+                //Sets the text based on if expiry date has been scanned yet
+                barCodeScanned ? "Scan Expiry Date" : "Scan Barcode",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 30.0,
+                  shadows: [
+                    Shadow(
+                      blurRadius: 10.0,
+                      color: Colors.white,
+                      offset: Offset(0.0, 0.0),
                     ),
-                    Expanded(
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints.tightFor(
-                          width: MediaQuery.of(context).size.width / 4,
-                          height: MediaQuery.of(context).size.width / 4,
-                        ),
-                        //The button with a spherical border
-                        child: TextButton(
-                          onPressed: () async {
-                            setState(() {
-                              scanningBarcode = true;
-                            });
+                  ],
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                      child: SizedBox(width:20.0)
+                  ),
+                  Expanded(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints.tightFor(
+                        width: MediaQuery.of(context).size.width / 4,
+                        height: MediaQuery.of(context).size.width / 4,
+                      ),
+                      //The button with a spherical border
+                      child: TextButton(
+                        onPressed: () async {
+                          setState(() {
+                            scanningBarcode = true;
+                          });
 
-                            //Determines which function to run on click
-                            if(!barCodeScanned) {
-                              await scanBarcode();
-                            }
-                          },
-                          //The button style
-                          style: ElevatedButton.styleFrom(
-                            primary: Colors.black.withOpacity(0.2),
-                            shape: CircleBorder(
-                              side: BorderSide(
-                                color: Colors.amber,
-                                width: 5.0,
-                              ),
+                          //Determines which function to run on click
+                          if(!barCodeScanned) {
+                            await scanBarcode();
+                          }
+                        },
+                        //The button style
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.black.withOpacity(0.2),
+                          shape: CircleBorder(
+                            side: BorderSide(
+                              color: Colors.amber,
+                              width: 5.0,
                             ),
                           ),
                         ),
                       ),
                     ),
-                    Expanded(
-                      child: IconButton(
-                        icon: Icon(Icons.keyboard),
-                        iconSize: 40.0,
-                        color: Colors.white,
-                        onPressed: () {
-                          //Determines which popup to show on button click
-                          if(!barCodeScanned) {
-                            confirmBarcode("", context, (String itemName, String category, int amount, bool canceled) {
-                              if(!canceled) {
-                                setState(() {
-                                  barCodeScanned = true;
-                                });
-                                widget.itemName = itemName;
-                                widget.category = category;
-                                widget.quantity = amount;
-                                enterExpiry(context, widget.itemName, widget.category, widget.quantity, null);
-                              }
-                            });
-                          }else {
-                            enterExpiry(context, widget.itemName, widget.category, widget.quantity, null);
-                          }
+                  ),
+                  Expanded(
+                    child: IconButton(
+                      icon: Icon(Icons.keyboard),
+                      iconSize: 40.0,
+                      color: Colors.white,
+                      onPressed: () {
+                        //Determines which popup to show on button click
+                        if(!barCodeScanned) {
+                          confirmBarcode("", context, (String itemName, String category, int amount, bool canceled) {
+                            if(!canceled) {
+                              setState(() {
+                                barCodeScanned = true;
+                              });
+                              widget.itemName = itemName;
+                              widget.category = category;
+                              widget.quantity = amount;
+
+                              enterExpiry(context, widget.itemName, widget.category, widget.quantity, null);
+                            }
+                          });
+                        }else {
+                          scanningBarcode = false;
+                          controller?.stopImageStream();
+                          enterExpiry(context, widget.itemName, widget.category, widget.quantity, null);
                         }
-                      ),
-                    )
-                  ],
-                ),
-              ],
-            ),
+                      }
+                    ),
+                  )
+                ],
+              ),
+            ],
           ),
-        ],
-      );
-    }
+        ),
+      ],
+    );
   }
 
   Future<Null> readExpiry(String productName, String category, int quantity) async {
@@ -367,59 +315,65 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
     DateTime expiry;
     bool dateGotten;
     controller?.startImageStream((CameraImage cameraImage) async {
-      final WriteBuffer allBytes = WriteBuffer();
-      for (Plane plane in cameraImage.planes) {
-        allBytes.putUint8List(plane.bytes);
-      }
-      final bytes = allBytes.done().buffer.asUint8List();
+      if(!isLooping) {
+        isLooping = true;
+        final WriteBuffer allBytes = WriteBuffer();
+        for (Plane plane in cameraImage.planes) {
+          allBytes.putUint8List(plane.bytes);
+        }
+        final bytes = allBytes.done().buffer.asUint8List();
 
-      final Size imageSize =
-      Size(cameraImage.width.toDouble(), cameraImage.height.toDouble());
+        final Size imageSize =
+        Size(cameraImage.width.toDouble(), cameraImage.height.toDouble());
 
-      final imageRotation = InputImageRotationMethods.fromRawValue(camera.sensorOrientation) ?? InputImageRotation.Rotation_0deg;
+        final imageRotation = InputImageRotationMethods.fromRawValue(camera.sensorOrientation) ?? InputImageRotation.Rotation_0deg;
 
-      final inputImageFormat = InputImageFormatMethods.fromRawValue(cameraImage.format.raw) ?? InputImageFormat.NV21;
+        final inputImageFormat = InputImageFormatMethods.fromRawValue(cameraImage.format.raw) ?? InputImageFormat.NV21;
 
-      final planeData = cameraImage.planes.map((Plane plane) {
-        return InputImagePlaneMetadata(
-          bytesPerRow: plane.bytesPerRow,
-          height: plane.height,
-          width: plane.width,
+        final planeData = cameraImage.planes.map((Plane plane) {
+          return InputImagePlaneMetadata(
+            bytesPerRow: plane.bytesPerRow,
+            height: plane.height,
+            width: plane.width,
+          );
+        }).toList();
+
+        final inputImageData = InputImageData(
+          size: imageSize,
+          imageRotation: imageRotation,
+          inputImageFormat: inputImageFormat,
+          planeData: planeData,
         );
-      }).toList();
 
-      final inputImageData = InputImageData(
-        size: imageSize,
-        imageRotation: imageRotation,
-        inputImageFormat: inputImageFormat,
-        planeData: planeData,
-      );
+        inputImage =
+            InputImage.fromBytes(bytes: bytes, inputImageData: inputImageData);
 
-      inputImage =
-      InputImage.fromBytes(bytes: bytes, inputImageData: inputImageData);
+        final RecognisedText recognisedText = await textDetector.processImage(inputImage);
+        for (TextBlock block in recognisedText.blocks) {
+          if(scanningBarcode) {
+            for (TextLine line in block.lines) {
+              // Same getters as TextBlock
+              //print("fuck offfff: ${line.text} ${expiry}");
+              if (expiry == null) {
+                expiry = checkIfExpiry(line.text);
+                if(expiry != null) {
+                  enterExpiry(context, productName, category, quantity, expiry);
+                  textDetector.close();
+                  controller?.stopImageStream();
 
-      final RecognisedText recognisedText = await textDetector.processImage(inputImage);
-      for (TextBlock block in recognisedText.blocks) {
-        for (TextLine line in block.lines) {
-          // Same getters as TextBlock
-          print("fuck offfff: ${line.text} ${expiry}");
-          if (expiry == null) {
-            expiry = checkIfExpiry(line.text);
-            if(expiry != null) {
-              enterExpiry(context, productName, category, quantity, expiry);
-              textDetector.close();
-              controller?.stopImageStream();
-
-              setState(() {
-                scanningBarcode = false;
-              });
+                  setState(() {
+                    scanningBarcode = false;
+                  });
+                }
+              } else {
+                break;
+              }
             }
-          } else {
-            break;
           }
         }
+        scanning = false;
+        isLooping = false;
       }
-      scanning = false;
     });
     // //The variables
     // scanning = true;

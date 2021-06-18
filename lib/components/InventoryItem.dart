@@ -18,7 +18,7 @@ class InventoryItem extends StatelessWidget {
 
     //The colour indicator for how fresh an item is
     Color indicator = Colors.green[200];
-    if(expiryDate <= 0) {
+    if(expiryDate <= 1) {
       indicator = Colors.red[200];
     }else if(expiryDate <= 2) {
       indicator = Colors.orange[200];
@@ -27,7 +27,7 @@ class InventoryItem extends StatelessWidget {
       color: indicator,//indicator,
       child: ListTile(
         title: Padding(
-          padding: const EdgeInsets.all(10.0),
+          padding: const EdgeInsets.symmetric(vertical: 10),
           child: Row(
             children: <Widget>[
               Expanded(

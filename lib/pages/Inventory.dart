@@ -134,24 +134,30 @@ class _InventoryState extends State<Inventory> {
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: IconThemeData(
+          color: Colors.black,
+        ),
+        centerTitle: true,
+        title: Text(
+          title["category"],
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 34.0
+          )
+        ),
+      ),
       body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0.0),
-          child: Column(
-            children: <Widget>[
-              //Page title and back button
-              Expanded(
-                flex: 1,
-                child: Text(
-                  title["category"],
-                  style: TextStyle(
-                    fontSize: 34.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              Expanded(
-                flex: 1,
+        child: Column(
+          children: <Widget>[
+            //Page title and back button
+            SizedBox(height: 10.0),
+            Expanded(
+              flex: 1,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: TextField(
                   controller: _controller,
                   //Change the search variable when typing
@@ -200,13 +206,13 @@ class _InventoryState extends State<Inventory> {
                   ),
                 ),
               ),
-              //Adds the list of removable items from the list
-              Expanded(
-                flex: 8,
-                child: dataList(),
-              ),
-            ],
-          ),
+            ),
+            //Adds the list of removable items from the list
+            Expanded(
+              flex: 8,
+              child: dataList(),
+            ),
+          ],
         ),
       ),
     );
