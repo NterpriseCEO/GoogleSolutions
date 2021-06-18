@@ -21,6 +21,8 @@ class _LoginState extends State<Login> {
   bool isLoggedIn = false;
   bool showSpinner = false;
 
+  String token;
+
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   void onLoginStatusChanged(bool isLoggedIn) {
@@ -81,13 +83,14 @@ class _LoginState extends State<Login> {
     });
 
     getToken();
-    isSignedIn();
   }
+
 
   void isSignedIn() async {
     if(_auth.currentUser != null) {
       userCol = _auth.currentUser.uid;
       //Waits for the widget tree to stop building before skipping login screen
+      print("this is the token for notifications $token");
       getData();
       WidgetsBinding.instance.addPostFrameCallback((_) => {
         Navigator.of(context).push(
@@ -146,21 +149,6 @@ class _LoginState extends State<Login> {
                       });
                     });
                   },
-                ),
-                SizedBox(height: 30),
-                SignInButton(
-                  Buttons.Email,
-                  text: "The Test User",
-                  onPressed: () {
-                    signInTestUser();
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) {
-                          return Menu();
-                        },
-                      ),
-                    );
-                  },
                 )
               ],
             ),
@@ -172,7 +160,7 @@ class _LoginState extends State<Login> {
 
   //Used to acquire the device token on loading of the page and is called after the super.init
   getToken() async {
-    String token = await FirebaseMessaging.instance.getToken();
-    print("This is the token"+token);
+    token = await FirebaseMessaging.instance.getToken();
+    isSignedIn();
   }
 }

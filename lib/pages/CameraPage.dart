@@ -139,9 +139,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
                 widget.category = category;
                 widget.quantity = amount;
               }
-              setState(() {
-                scanningBarcode = false;
-              });
+              readExpiry(widget.itemName, widget.category, widget.quantity);
             });
           }
         }
@@ -306,16 +304,14 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
                         ),
                         //The button with a spherical border
                         child: TextButton(
-                          onPressed: () {
+                          onPressed: () async {
                             setState(() {
                               scanningBarcode = true;
                             });
 
                             //Determines which function to run on click
                             if(!barCodeScanned) {
-                              scanBarcode();
-                            }else {
-                              readExpiry(widget.itemName, widget.category, widget.quantity);
+                              await scanBarcode();
                             }
                           },
                           //The button style
@@ -402,30 +398,25 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
       inputImage =
       InputImage.fromBytes(bytes: bytes, inputImageData: inputImageData);
 
-      controller?.stopImageStream();
       final RecognisedText recognisedText = await textDetector.processImage(inputImage);
-      String text = recognisedText.text;
       for (TextBlock block in recognisedText.blocks) {
-        final Rect rect = block.rect;
-        final List<Offset> cornerPoints = block.cornerPoints;
-        final String text = block.text;
-        final List<String> languages = block.recognizedLanguages;
-
         for (TextLine line in block.lines) {
           // Same getters as TextBlock
+          print("fuck offfff: ${line.text} ${expiry}");
           if (expiry == null) {
             expiry = checkIfExpiry(line.text);
             if(expiry != null) {
-              DateTime now = DateTime.now();
               enterExpiry(context, productName, category, quantity, expiry);
               textDetector.close();
+              controller?.stopImageStream();
+
+              setState(() {
+                scanningBarcode = false;
+              });
             }
           } else {
             break;
           }
-          setState(() {
-            scanningBarcode = false;
-          });
         }
       }
       scanning = false;

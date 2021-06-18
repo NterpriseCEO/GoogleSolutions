@@ -25,7 +25,7 @@ class ExpiryItem extends StatelessWidget {
 
     return Dismissible(
       key: UniqueKey(),
-      direction: DismissDirection.startToEnd,
+      direction: DismissDirection.endToStart,
       onDismissed: (direction) {
         this.callback(true);
       },
@@ -68,7 +68,7 @@ class ExpiryItem extends StatelessWidget {
           child: Text(
             "-",
             style: TextStyle(
-              fontSize:40,
+              fontSize:35,
             )
           ),
           style: ElevatedButton.styleFrom(
@@ -98,4 +98,3 @@ class ExpiryItem extends StatelessWidget {
     );
   }
 }
-

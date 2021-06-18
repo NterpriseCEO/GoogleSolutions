@@ -25,7 +25,7 @@ class _ExpirationPageState extends State<ExpirationPage> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0.0),
+      padding: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0.0),
       child: Column(
         children: <Widget>[
           //The title of the page
@@ -34,68 +34,64 @@ class _ExpirationPageState extends State<ExpirationPage> {
             child: Text(
               "Expiration",
               style: TextStyle(
-                fontSize: 40.0,
+                fontSize: 34.0,
                 fontWeight: FontWeight.bold,
               ),
             ),
           ),
           Expanded(
             flex: 1,
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.0),
-              //The search field
-              child: TextField(
-                controller: _controller,
-                //Change the search variable when typing
-                onChanged: (String val) async {
-                  setState(() {
-                    search = val;
-                  });
-                },
-                //The input styling
-                decoration: InputDecoration(
-                  //Placeholder text
-                  hintText: "Search",
-                  //The magnifying glass icon
-                  prefixIcon: Icon(
-                    Icons.search,
-                    color: Colors.black,
-                  ),
-                  //The clear search icon
-                  suffixIcon: IconButton(
-                    icon: Icon(Icons.clear),
-                    onPressed: () {
+            child: TextField(
+              controller: _controller,
+              //Change the search variable when typing
+              onChanged: (String val) async {
+                setState(() {
+                  search = val;
+                });
+              },
+              //The input styling
+              decoration: InputDecoration(
+                //Placeholder text
+                hintText: "Search",
+                //The magnifying glass icon
+                prefixIcon: Icon(
+                  Icons.search,
+                  color: Colors.black,
+                ),
+                //The clear search icon
+                suffixIcon: IconButton(
+                  icon: Icon(Icons.clear),
+                  onPressed: () {
+                    //Clear search on click
+                    setState(() {
                       _controller.clear();
-                      //Clear search on click
-                      setState(() {
-                        search = "";
-                      });
-                    },
-                  ),
-                  //Background colour = true
-                  filled: true,
-                  //Background colour
-                  fillColor: Colors.grey[300],
-                  contentPadding: EdgeInsets.all(0.0),
-                  //Border when not focused
-                  enabledBorder: OutlineInputBorder(
-                    //Border colour
-                    borderSide: BorderSide(color: Colors.transparent),
-                    borderRadius: BorderRadius.circular(15.0),
-                  ),
-                  //Border when focused
-                  focusedBorder: OutlineInputBorder(
-                    //Border colour
-                    borderSide: BorderSide(color: Colors.transparent),
-                    borderRadius: BorderRadius.circular(15.0),
-                  ),
+                      search = "";
+                    });
+                  },
+                ),
+                //Background colour = true
+                filled: true,
+                //Background colour
+                fillColor: Colors.grey[300],
+                contentPadding: EdgeInsets.all(0.0),
+                //Border when not focused
+                enabledBorder: OutlineInputBorder(
+                  //Border colour
+                  borderSide: BorderSide(color: Colors.transparent),
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+                //Border when focused
+                focusedBorder: OutlineInputBorder(
+                  //Border colour
+                  borderSide: BorderSide(color: Colors.transparent),
+                  borderRadius: BorderRadius.circular(15.0),
                 ),
               ),
             ),
           ),
           //The list of expirable items
           Expanded(
-            flex: 7,
+            flex: 8,
             child: Container(
               //Width of page
               width: MediaQuery.of(context).size.width,
