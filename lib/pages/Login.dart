@@ -14,13 +14,13 @@ class Login extends StatefulWidget {
   @override
   _LoginState createState() => _LoginState();
 }
-
 class _LoginState extends State<Login> {
   bool loading = false;
   bool isLoggedIn = false;
   bool showSpinner = false;
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
+
 
   void onLoginStatusChanged(bool isLoggedIn) {
     setState(() {
@@ -86,6 +86,7 @@ class _LoginState extends State<Login> {
   void isSignedIn() async {
     if(_auth.currentUser != null) {
       userCol = _auth.currentUser.uid;
+      FirebaseMessaging.instance.subscribeToTopic(userCol);
       //Waits for the widget tree to stop building before skipping login screen
       getData();
       WidgetsBinding.instance.addPostFrameCallback((_) => {
@@ -172,6 +173,6 @@ class _LoginState extends State<Login> {
   //Used to acquire the device token on loading of the page and is called after the super.init
   getToken() async {
     String token = await FirebaseMessaging.instance.getToken();
-    print("This is the token"+token);
+    print("This is the token "+token);
   }
 }

@@ -320,7 +320,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
             break;
           }
         }
-      }g
+      }
       scanning = false;
     });
     // //The variables
