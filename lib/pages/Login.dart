@@ -39,9 +39,12 @@ class _LoginState extends State<Login> {
     var initializationSettings = InitializationSettings(android: initializationSettingsAndroid);
     flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
+    FirebaseMessaging.instance.getInitialMessage();
+
     //Called while our app is in the foreground for message handling
     //Contains message title and body from server side
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print("helloooooooooo");
       RemoteNotification notification = message.notification;
       AndroidNotification android = message.notification?.android;
       if (notification != null && android != null) {
@@ -64,21 +67,19 @@ class _LoginState extends State<Login> {
       RemoteNotification notification = message.notification;
       AndroidNotification android = message.notification?.android;
       if (notification != null && android != null) {
-        showDialog(
-          context: context,
-          builder: (_) {
-            return AlertDialog(
-              title: Text("Test"),
-              content: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(notification.body)
-                ],
-              ),
+        flutterLocalNotificationsPlugin.show(notification.hashCode, notification.title, notification.body,
+          NotificationDetails(
+            //assigns specific channel
+            android: AndroidNotificationDetails(
+              channel.id,
+              channel.name,
+              channel.description,
+              // TODO add a proper drawable resource to android, for now using
+              //      one that already exists in example app.
+              icon: 'launch_background',
             ),
-          );
-        });
+          )
+        );
       }
     });
 
@@ -89,6 +90,7 @@ class _LoginState extends State<Login> {
   void isSignedIn() async {
     if(_auth.currentUser != null) {
       userCol = _auth.currentUser.uid;
+      FirebaseMessaging.instance.subscribeToTopic(userCol);
       //Waits for the widget tree to stop building before skipping login screen
       print("this is the token for notifications $token");
       getData();

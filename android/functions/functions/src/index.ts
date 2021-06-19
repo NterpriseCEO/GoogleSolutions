@@ -9,12 +9,18 @@ const fcm = admin.messaging();
 // JSON.stringify(doc.data().ExpiryDate)
 export const expiryDateChecker =
 functions.https.onRequest(async (request, response) => {
-  const collections = await admin.firestore().listCollections();
-  collections.forEach(async (collection) => {
+  const collections = await db.listCollections();
+
+  const options = {
+    priority: "high",
+    timeToLive: 60 * 60 * 24,
+  };
+
+  await collections.forEach(async (collection) => {
     const snapshot = await collection.get();
-    let amount = 0;
-    let i = 0;
-    const Arr: number[] = [];
+    let amountToday = 0;
+    let amountTomorrow = 0;
+    let amountExpired = 0;
     await snapshot.forEach((doc) => {
       const Date1 = new Date();
       Date1.setHours(0, 0, 0, 0);
@@ -22,28 +28,47 @@ functions.https.onRequest(async (request, response) => {
       const diffInTime = Date2.getTime() - Date1.getTime();
       const diffInDays = Math.floor(diffInTime / (1000 * 3600 * 24));
 
-      Arr[i] = diffInDays;
-      if (JSON.stringify(Arr[i]) === "0") {
-        amount++;
+      if (diffInDays == 0) {
+        amountToday++;
+      } else if (diffInDays == 1) {
+        amountTomorrow++;
+      } else if (diffInDays < 0) {
+        amountExpired++;
       }
-      i++;
     });
-    if (amount > 0) {
-      const delivery = "94K8q26dMuRNEhcy93yMfWWnxGM2";
+    if (amountToday > 0) {
       const message = {
         notification: {
-          title: "Expiring!",
-          body: "${amount} Items Expiring!",
+          title: "Items Expiring!",
+          body: `${amountToday} Item(s) Expiring Today!`,
           sound: "default",
           badge: "1",
         },
       };
-      const options = {
-        priority: "high",
-        timeToLive: 60 * 60 * 24,
-      };
-      admin.messaging().sendToTopic(delivery, message, options);
+      fcm.sendToTopic(collection.id, message, options);
     }
-    response.send(JSON.stringify(collection.id));
+
+    if (amountTomorrow > 0) {
+      const message = {
+        notification: {
+          title: "Items Expiring!",
+          body: `${amountTomorrow} Item(s) Expiring Tommorow!`,
+          sound: "default",
+          badge: "1",
+        },
+      };
+      fcm.sendToTopic(collection.id, message, options);
+    }
+    if (amountExpired > 0) {
+      const message = {
+        notification: {
+          title: "Items Expiring!",
+          body: `${amountExpired} Item(s) Already Expired!`,
+          sound: "default",
+          badge: "1",
+        },
+      };
+      fcm.sendToTopic(collection.id, message, options);
+    }
   });
 });
