@@ -28,22 +28,26 @@ functions.https.onRequest(async (request, response) => {
       }
       i++;
     });
-    if (amount > 0) {
-      const delivery = "94K8q26dMuRNEhcy93yMfWWnxGM2";
-      const message = {
-        notification: {
-          title: "Expiring!",
-          body: "${amount} Items Expiring!",
-          sound: "default",
-          badge: "1",
-        },
-      };
-      const options = {
-        priority: "high",
-        timeToLive: 60 * 60 * 24,
-      };
-      admin.messaging().sendToTopic(delivery, message, options);
-    }
+    // if (amount > 0) {
+    const delivery = "eQInV7OQT8aZfNHLjYu-rL:APA91bF-JYj4w_jniobh9"+
+      "gv4fGR7nvue8tmVDCd1Wal98hJLc9CygNhExue7b7M7"+
+      "gfVq4eN8UlCQJrHFpPoqBFxLWttZh0B4We1LtXM"+
+      "mFtpmEMzX-s4sGOjyveGly7NE8RFQ4T0NJ1Kg";
+    const message = {
+      notification: {
+        title: "Expiring!",
+        body: "${amount} Items Expiring!",
+        sound: "default",
+        badge: "1",
+      },
+    };
+    const options = {
+      priority: "high",
+      timeToLive: 60 * 60 * 24,
+    };
+    fcm.sendToDevice(delivery,
+        message, options);
+    // }
     response.send(JSON.stringify(collection.id));
   });
 });
