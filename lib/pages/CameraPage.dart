@@ -313,66 +313,71 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
   Future<Null> readExpiry(String productName, String category, int quantity) async {
     InputImage inputImage;
     DateTime expiry;
-    bool dateGotten;
+    int counter = 0;
     controller?.startImageStream((CameraImage cameraImage) async {
-      if(!isLooping) {
-        isLooping = true;
-        final WriteBuffer allBytes = WriteBuffer();
-        for (Plane plane in cameraImage.planes) {
-          allBytes.putUint8List(plane.bytes);
-        }
-        final bytes = allBytes.done().buffer.asUint8List();
+      if(counter < 20) {
+        counter++;
+      }else {
+        counter = 0;
+        if(!isLooping) {
+          isLooping = true;
+          final WriteBuffer allBytes = WriteBuffer();
+          for (Plane plane in cameraImage.planes) {
+            allBytes.putUint8List(plane.bytes);
+          }
+          final bytes = allBytes.done().buffer.asUint8List();
 
-        final Size imageSize =
-        Size(cameraImage.width.toDouble(), cameraImage.height.toDouble());
+          final Size imageSize =
+          Size(cameraImage.width.toDouble(), cameraImage.height.toDouble());
 
-        final imageRotation = InputImageRotationMethods.fromRawValue(camera.sensorOrientation) ?? InputImageRotation.Rotation_0deg;
+          final imageRotation = InputImageRotationMethods.fromRawValue(camera.sensorOrientation) ?? InputImageRotation.Rotation_0deg;
 
-        final inputImageFormat = InputImageFormatMethods.fromRawValue(cameraImage.format.raw) ?? InputImageFormat.NV21;
+          final inputImageFormat = InputImageFormatMethods.fromRawValue(cameraImage.format.raw) ?? InputImageFormat.NV21;
 
-        final planeData = cameraImage.planes.map((Plane plane) {
-          return InputImagePlaneMetadata(
-            bytesPerRow: plane.bytesPerRow,
-            height: plane.height,
-            width: plane.width,
+          final planeData = cameraImage.planes.map((Plane plane) {
+            return InputImagePlaneMetadata(
+              bytesPerRow: plane.bytesPerRow,
+              height: plane.height,
+              width: plane.width,
+            );
+          }).toList();
+
+          final inputImageData = InputImageData(
+            size: imageSize,
+            imageRotation: imageRotation,
+            inputImageFormat: inputImageFormat,
+            planeData: planeData,
           );
-        }).toList();
 
-        final inputImageData = InputImageData(
-          size: imageSize,
-          imageRotation: imageRotation,
-          inputImageFormat: inputImageFormat,
-          planeData: planeData,
-        );
+          inputImage =
+              InputImage.fromBytes(bytes: bytes, inputImageData: inputImageData);
 
-        inputImage =
-            InputImage.fromBytes(bytes: bytes, inputImageData: inputImageData);
+          final RecognisedText recognisedText = await textDetector.processImage(inputImage);
+          for (TextBlock block in recognisedText.blocks) {
+            if(scanningBarcode) {
+              for (TextLine line in block.lines) {
+                // Same getters as TextBlock
+                //print("fuck offfff: ${line.text} ${expiry}");
+                if (expiry == null) {
+                  expiry = checkIfExpiry(line.text);
+                  if(expiry != null) {
+                    enterExpiry(context, productName, category, quantity, expiry);
+                    textDetector.close();
+                    controller?.stopImageStream();
 
-        final RecognisedText recognisedText = await textDetector.processImage(inputImage);
-        for (TextBlock block in recognisedText.blocks) {
-          if(scanningBarcode) {
-            for (TextLine line in block.lines) {
-              // Same getters as TextBlock
-              //print("fuck offfff: ${line.text} ${expiry}");
-              if (expiry == null) {
-                expiry = checkIfExpiry(line.text);
-                if(expiry != null) {
-                  enterExpiry(context, productName, category, quantity, expiry);
-                  textDetector.close();
-                  controller?.stopImageStream();
-
-                  setState(() {
-                    scanningBarcode = false;
-                  });
+                    setState(() {
+                      scanningBarcode = false;
+                    });
+                  }
+                } else {
+                  break;
                 }
-              } else {
-                break;
               }
             }
           }
+          scanning = false;
+          isLooping = false;
         }
-        scanning = false;
-        isLooping = false;
       }
     });
     // //The variables
