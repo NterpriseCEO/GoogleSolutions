@@ -94,58 +94,46 @@ class _MenuState extends State<Menu> {
             )
           ),
           //The bottom menu
-          bottomNavigationBar: Container(
-            decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Colors.amber[500],
-                    Colors.amber[800],
-                  ],
-                )
-            ),
-            child: BottomNavigationBar(
-              //Disable text labels
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-              selectedItemColor: Colors.white,
-              //When tapping the labels
-              //change the page
-              onTap: (int index) {
-                //Set states of variables in here
-                setState(() {
-                  currentPage = index;
-                });
-                //Animates to the page at this specific index
-                pageController.animateToPage(
-                  currentPage,
-                  //The animation speed
-                  duration: Duration(
-                    milliseconds: 500,
-                  ),
-                  //The animation tweening effect
-                  curve: Curves.easeInOut,
-                );
-              },
-              //set the current page
-              currentIndex: currentPage,
-              //The buttons in the navigation bar
-              items: <BottomNavigationBarItem>[
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.access_time),
-                  label: "Expiry List",
+          bottomNavigationBar: BottomNavigationBar(
+            //Disable text labels
+            backgroundColor: Colors.amber,
+            elevation: 0,
+            selectedItemColor: Colors.white,
+            //When tapping the labels
+            //change the page
+            onTap: (int index) {
+              //Set states of variables in here
+              setState(() {
+                currentPage = index;
+              });
+              //Animates to the page at this specific index
+              pageController.animateToPage(
+                currentPage,
+                //The animation speed
+                duration: Duration(
+                  milliseconds: 500,
                 ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.camera_alt_outlined),
-                  label: "Camera",
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.set_meal_outlined),
-                  label: "Inventory",
-                ),
-              ],
-            ),
+                //The animation tweening effect
+                curve: Curves.easeInOut,
+              );
+            },
+            //set the current page
+            currentIndex: currentPage,
+            //The buttons in the navigation bar
+            items: <BottomNavigationBarItem>[
+              BottomNavigationBarItem(
+                icon: Icon(Icons.access_time),
+                label: "Expiry List",
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.camera_alt_outlined),
+                label: "Camera",
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.set_meal_outlined),
+                label: "Inventory",
+              ),
+            ],
           ),
         ),
       ),

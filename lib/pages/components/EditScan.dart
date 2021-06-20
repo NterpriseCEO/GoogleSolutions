@@ -277,6 +277,7 @@ DateTime checkIfExpiry(String data) {
   for(String str in strings) {
     data+=str+" ";
   }
+  print("data goes here: $data");
   var matches = RegExp(r"^((^[1-9]|0[1-9])|10|11|12)\s([0-9]{4})").allMatches(data);
   String date = "";
   if(RegExp(r"((^[1-9]|0[1-9])|10|11|12)\s+([0-9]{4})").allMatches(data).length > 0) {

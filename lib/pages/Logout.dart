@@ -16,7 +16,7 @@ class _SettingsState extends State<Settings> {
           gradient: LinearGradient(
             begin: Alignment.bottomLeft,
             end: Alignment.topRight,
-              colors: [
+            colors: [
               Colors.amber[500],
               Colors.amber[800],
             ],

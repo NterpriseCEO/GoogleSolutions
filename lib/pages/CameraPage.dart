@@ -142,7 +142,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
                 widget.quantity = amount;
               }
               Toast.show("Barcode Successfully Scanned", context, duration: Toast.LENGTH_LONG, gravity:  Toast.BOTTOM);
-              readExpiry(widget.itemName, widget.category, widget.quantity);
+              readExpiry();
             });
           }
         }
@@ -310,7 +310,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
     );
   }
 
-  Future<Null> readExpiry(String productName, String category, int quantity) async {
+  Future<Null> readExpiry() async {
     InputImage inputImage;
     DateTime expiry;
     int counter = 0;
@@ -361,7 +361,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
                 if (expiry == null) {
                   expiry = checkIfExpiry(line.text);
                   if(expiry != null) {
-                    enterExpiry(context, productName, category, quantity, expiry);
+                    enterExpiry(context, widget.itemName, widget.category, widget.quantity, expiry);
                     textDetector.close();
                     controller?.stopImageStream();
 
@@ -380,42 +380,6 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
         }
       }
     });
-    // //The variables
-    // scanning = true;
-    // List<OcrText> texts = [];
-    // DateTime expiry;
-    // try {
-    //   //Reads the text available to the camera
-    //   texts = await FlutterMobileVision.read(
-    //     flash: false,
-    //     showText: false,
-    //     autoFocus: true,
-    //     multiple: true,
-    //     camera: _ocrCamera,
-    //     waitTap: true,
-    //   );
-    //   setState(() {
-    //     //Loops through text and checks if it is an expiry date
-    //     for (OcrText text in texts) {
-    //       if (expiry == null) {
-    //         expiry = checkIfExpiry(text.value);
-    //       } else {
-    //         break;
-    //       }
-    //     }
-    //
-    //     //Checks if expiry date was found
-    //     //if(expiry != null) {
-    //       //Calculates the days until expiry
-    //       DateTime now = DateTime.now();
-    //       enterExpiry(context, productName, category, quantity, expiry);
-    //     //Re-initialises the camera
-    //     setupCamera();
-    //     scanning = false;
-    //   });
-    // } on Exception {
-    //   texts.add(OcrText('Failed to recognize text'));
-    // }
   }
 
   void enterExpiry(BuildContext context, String productName, String category, int quantity, DateTime date) async {
