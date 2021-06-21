@@ -1,6 +1,7 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
+
 import "package:best_before_app/components/InventoryCard.dart";
+import 'package:flutter/material.dart';
 
 typedef Callback(int pageNumber);
 
@@ -58,9 +59,8 @@ class _InventoryOverviewState extends State<InventoryOverview> {
         ));
       }
     }
-
     return Padding(
-      padding: EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0.0),
+      padding: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0.0),
       child: Column(
         children: <Widget>[
           Expanded(
@@ -68,7 +68,7 @@ class _InventoryOverviewState extends State<InventoryOverview> {
             child: Text(
               "My Fridge",
               style: TextStyle(
-                fontSize: 40.0,
+                fontSize: 34.0,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -125,7 +125,7 @@ class _InventoryOverviewState extends State<InventoryOverview> {
           ),
           //The scrollable list of cards
           Expanded(
-            flex: 7,
+            flex: 9,
             child: showCategories(search, inventoryCards, _scrollController)
           ),
         ],

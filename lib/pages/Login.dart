@@ -1,13 +1,15 @@
+import "package:best_before_app/UpdateDatabase.dart";
+import 'package:best_before_app/notifications/NotifData.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
-import 'package:flutter/material.dart';
+import 'package:modal_progress_hud/modal_progress_hud.dart';
+
 import '../components/menu.dart';
 import '../main.dart';
 import 'components/sign_in.dart';
-import 'package:modal_progress_hud/modal_progress_hud.dart';
-import "package:best_before_app/UpdateDatabase.dart";
-import 'package:firebase_messaging/firebase_messaging.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -18,6 +20,8 @@ class _LoginState extends State<Login> {
   bool loading = false;
   bool isLoggedIn = false;
   bool showSpinner = false;
+
+  String token;
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -35,9 +39,12 @@ class _LoginState extends State<Login> {
     var initializationSettings = InitializationSettings(android: initializationSettingsAndroid);
     flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
+    FirebaseMessaging.instance.getInitialMessage();
+
     //Called while our app is in the foreground for message handling
     //Contains message title and body from server side
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print("helloooooooooo");
       RemoteNotification notification = message.notification;
       AndroidNotification android = message.notification?.android;
       if (notification != null && android != null) {
@@ -50,7 +57,7 @@ class _LoginState extends State<Login> {
             channel.description,
             // TODO add a proper drawable resource to android, for now using
             //      one that already exists in example app.
-            icon: 'launch_background',
+            icon: 'icon',
           ),
         ));
       }
@@ -60,32 +67,33 @@ class _LoginState extends State<Login> {
       RemoteNotification notification = message.notification;
       AndroidNotification android = message.notification?.android;
       if (notification != null && android != null) {
-        showDialog(
-          context: context,
-          builder: (_) {
-            return AlertDialog(
-              title: Text("Test"),
-              content: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(notification.body)
-                ],
-              ),
+        flutterLocalNotificationsPlugin.show(notification.hashCode, notification.title, notification.body,
+          NotificationDetails(
+            //assigns specific channel
+            android: AndroidNotificationDetails(
+              channel.id,
+              channel.name,
+              channel.description,
+              // TODO add a proper drawable resource to android, for now using
+              //      one that already exists in example app.
+              icon: 'icon',
             ),
-          );
-        });
+          )
+        );
       }
     });
 
     getToken();
-    isSignedIn();
   }
+
 
   void isSignedIn() async {
     if(_auth.currentUser != null) {
       userCol = _auth.currentUser.uid;
+      FirebaseMessaging.instance.subscribeToTopic(userCol);
       //Waits for the widget tree to stop building before skipping login screen
+      print("this is the token for notifications $token");
+      getData();
       WidgetsBinding.instance.addPostFrameCallback((_) => {
         Navigator.of(context).push(
           MaterialPageRoute(
@@ -143,21 +151,6 @@ class _LoginState extends State<Login> {
                       });
                     });
                   },
-                ),
-                SizedBox(height: 30),
-                SignInButton(
-                  Buttons.Email,
-                  text: "The Test User",
-                  onPressed: () {
-                    signInTestUser();
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) {
-                          return Menu();
-                        },
-                      ),
-                    );
-                  },
                 )
               ],
             ),
@@ -169,7 +162,7 @@ class _LoginState extends State<Login> {
 
   //Used to acquire the device token on loading of the page and is called after the super.init
   getToken() async {
-    String token = await FirebaseMessaging.instance.getToken();
-    print("This is the token"+token);
+    token = await FirebaseMessaging.instance.getToken();
+    isSignedIn();
   }
 }

@@ -1,4 +1,3 @@
-import 'dart:math';
 
 import 'package:best_before_app/UpdateDatabase.dart';
 import 'package:best_before_app/components/InventoryItem.dart';
@@ -118,110 +117,102 @@ class _InventoryState extends State<Inventory> {
       );
     }
 
+    // Expanded(
+    //   flex: 1,
+    //   child: TextButton.icon(
+    //     onPressed: () {
+    //       Navigator.pop(context, 1);
+    //     },
+    //     label: Text(""),
+    //     icon: Icon(
+    //       Icons.add,
+    //       size: 45.0,
+    //       color: Colors.amber[800],
+    //     ),
+    //   ),
+    // ),
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: IconThemeData(
+          color: Colors.black,
+        ),
+        centerTitle: true,
+        title: Text(
+          title["category"],
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 34.0
+          )
+        ),
+      ),
       body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(8.0, 8.0, 8.0, 0.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              //Page title and back button
-              Expanded(
-                flex: 1,
-                child: Row(
-                  children: <Widget>[
-                    Expanded(
-                      flex: 3,
-                      child: Text(
-                        title["category"],
-                        style: TextStyle(
-                          fontSize: 40.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+        child: Column(
+          children: <Widget>[
+            //Page title and back button
+            SizedBox(height: 10.0),
+            Expanded(
+              flex: 1,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: TextField(
+                  controller: _controller,
+                  //Change the search variable when typing
+                  onChanged: (String val) async {
+                    setState(() {
+                      search = val;
+                    });
+                  },
+                  //The input styling
+                  decoration: InputDecoration(
+                    //Placeholder text
+                    hintText: "Search",
+                    //The magnifying glass icon
+                    prefixIcon: Icon(
+                      Icons.search,
+                      color: Colors.black,
                     ),
-                    Expanded(
-                      flex: 1,
-                      child: TextButton.icon(
-                        onPressed: () {
-                          Navigator.pop(context, 1);
-                        },
-                        label: Text(""),
-                        icon: Icon(
-                          Icons.add,
-                          size: 45.0,
-                          color: Colors.amber[800],
-                        ),
-                      ),
+                    //The clear search icon
+                    suffixIcon: IconButton(
+                      icon: Icon(Icons.clear),
+                      onPressed: () {
+                        _controller.clear();
+                        //Clear search on click
+                        setState(() {
+                          search = "";
+                        });
+                      },
                     ),
-                  ],
+                    //Background colour = true
+                    filled: true,
+                    //Background colour
+                    fillColor: Colors.grey[300],
+                    contentPadding: EdgeInsets.all(0.0),
+                    //Border when not focused
+                    enabledBorder: OutlineInputBorder(
+                      //Border colour
+                      borderSide: BorderSide(color: Colors.transparent),
+                      borderRadius: BorderRadius.circular(15.0),
+                    ),
+                    //Border when focused
+                    focusedBorder: OutlineInputBorder(
+                      //Border colour
+                      borderSide: BorderSide(color: Colors.transparent),
+                      borderRadius: BorderRadius.circular(15.0),
+                    ),
+                  ),
                 ),
               ),
-              Expanded(
-                flex: 1,
-                child: Row(
-                  children: [
-                    Expanded(
-                      flex: 3,
-                      child: TextField(
-                        controller: _controller,
-                        //Change the search variable when typing
-                        onChanged: (String val) async {
-                          setState(() {
-                            search = val;
-                          });
-                        },
-                        //The input styling
-                        decoration: InputDecoration(
-                          //Placeholder text
-                          hintText: "Search",
-                          //The magnifying glass icon
-                          prefixIcon: Icon(
-                            Icons.search,
-                            color: Colors.black,
-                          ),
-                          //The clear search icon
-                          suffixIcon: IconButton(
-                            icon: Icon(Icons.clear),
-                            onPressed: () {
-                              _controller.clear();
-                              //Clear search on click
-                              setState(() {
-                                search = "";
-                              });
-                            },
-                          ),
-                          //Background colour = true
-                          filled: true,
-                          //Background colour
-                          fillColor: Colors.grey[300],
-                          contentPadding: EdgeInsets.all(0.0),
-                          //Border when not focused
-                          enabledBorder: OutlineInputBorder(
-                            //Border colour
-                            borderSide: BorderSide(color: Colors.transparent),
-                            borderRadius: BorderRadius.circular(15.0),
-                          ),
-                          //Border when focused
-                          focusedBorder: OutlineInputBorder(
-                            //Border colour
-                            borderSide: BorderSide(color: Colors.transparent),
-                            borderRadius: BorderRadius.circular(15.0),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              //Adds the list of removable items from the list
-              Expanded(
-                flex: 7,
-                child: dataList(),
-              ),
-            ],
-          ),
+            ),
+            //Adds the list of removable items from the list
+            Expanded(
+              flex: 8,
+              child: dataList(),
+            ),
+          ],
         ),
       ),
     );

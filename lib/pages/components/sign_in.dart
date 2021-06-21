@@ -1,8 +1,9 @@
-import 'package:best_before_app/notifications/NotifData.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import "package:best_before_app/UpdateDatabase.dart";
+import 'package:best_before_app/notifications/NotifData.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 final GoogleSignIn googleSignIn = GoogleSignIn();
@@ -40,6 +41,7 @@ Future<String> signInWithGoogle() async {
     assert(user.uid == currentUser.uid);
 
     userCol = user.uid;
+    FirebaseMessaging.instance.subscribeToTopic(userCol);
 
     print('Continue with Google: Success');
     print('$user');
@@ -53,8 +55,11 @@ Future<String> signInWithGoogle() async {
 }
 
 Future<void> signOutGoogle() async {
-  await googleSignIn.signOut();
-  print('Continue with Google: Signed Out');
+  _auth.signOut().then((_) async {
+    await googleSignIn.signOut();
+    FirebaseMessaging.instance.unsubscribeFromTopic(userCol);
+    print('Continue with Google: Signed Out');
+  });
 }
 
 void signInTestUser() {

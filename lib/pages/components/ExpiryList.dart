@@ -1,12 +1,8 @@
+import 'package:best_before_app/UpdateDatabase.dart';
 import 'package:best_before_app/components/ExpiryItem.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import "package:flutter_sticky_header/flutter_sticky_header.dart";
-
-import 'package:best_before_app/UpdateDatabase.dart';
-
-import '../../main.dart';
 
 //Counter of how many items have gone off on a specific day
 int total = 0;
@@ -67,8 +63,6 @@ class _DataListState extends State<DataList> {
 
   int counter = 0;
 
-  bool noItems = false;
-
   bool results = true;
 
   int deleteAmount = 0;
@@ -88,7 +82,7 @@ class _DataListState extends State<DataList> {
               child: Text(
                 header,
                 style: TextStyle(
-                  fontSize: 25.0,
+                  fontSize: 28.0,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -104,6 +98,9 @@ class _DataListState extends State<DataList> {
                   print("THis is the expired list ${expired}");
                   counter = 0;
                 },
+                style: TextButton.styleFrom(
+                  padding: EdgeInsets.zero
+                ),
                 child: Text(
                   "Remove All",
                   style: TextStyle(
@@ -133,6 +130,8 @@ class _DataListState extends State<DataList> {
   Widget build(BuildContext context) {
     //Listens for changes from the users database of items
     //(items added / removed etc)
+
+    bool noItems = false;
 
     List<Widget> addToList(int expiry, var item, list) {
       //Checks if the expiry date is in the range
@@ -213,27 +212,6 @@ class _DataListState extends State<DataList> {
               results = false;
             }
           }
-          //Notification for if food is going off
-          // if(expired.length > 0){
-          //   total = expired.length;
-          //   day = "Expired";
-          //   showNotification(total,day);
-          // }
-          // else if(tomorrow.length > 0){
-          //   total = tomorrow.length;
-          //   day = "Tomorrow";
-          //   showNotification(total,day);
-          // }
-          // else if(fiveDays.length > 0){
-          //   total = tomorrow.length;
-          //   day = "5 Days";
-          //   showNotification(total,day);
-          // }
-          // else if(sevenDays.length > 0){
-          //   total = tomorrow.length;
-          //   day = "7 Days";
-          //   showNotification(total,day);
-          // }
           prevSearch = this.widget.search;
         }
 
@@ -272,7 +250,7 @@ class _DataListState extends State<DataList> {
                 child: Text(
                   "Quantity",
                   style: TextStyle(
-                    fontSize: 20.0,
+                    fontSize: 23.0,
                   ),
                 ),
               ),

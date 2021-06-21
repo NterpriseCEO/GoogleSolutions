@@ -3,8 +3,8 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:rxdart/subjects.dart';
 import 'package:flutter_native_timezone/flutter_native_timezone.dart';
+import 'package:rxdart/subjects.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -85,7 +85,7 @@ Future<void> cancelMessages() async {
 Future<void> notification(String message, String message2, int expiry) async {
   now = await tz.TZDateTime.now(zone);
   //Create notification
-  print("THe date: $expiry");
+  print("The date: $expiry");
   flutterLocalNotificationsPlugin.zonedSchedule(
     rand.nextInt(pow(2, 31) - 1),
     message2,
@@ -97,7 +97,7 @@ Future<void> notification(String message, String message2, int expiry) async {
     androidAllowWhileIdle: true,
     uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime
   );
-  print("daysTillExpiry: $expiry $message ${now.minute} ${now.add(Duration(minutes: expiry))}");
+  print("daysTillExpiry: $expiry $message ${now.minute} ${tz.TZDateTime(tz.local, now.year, now.month, now.day, 6).add(Duration(days: expiry))}");
   // flutterLocalNotificationsPlugin.zonedSchedule(
   //   rand.nextInt(pow(2, 31) - 1),
   //   "$message",
