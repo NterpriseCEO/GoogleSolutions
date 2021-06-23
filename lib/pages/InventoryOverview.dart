@@ -36,16 +36,6 @@ class _InventoryOverviewState extends State<InventoryOverview> {
     super.dispose();
   }
 
-  void toEnd() {
-    Timer(Duration(milliseconds: 100), () {
-      _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: Duration(milliseconds: 500),
-          curve: Curves.ease
-      );
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     if(inventoryCards.isEmpty) {
@@ -53,9 +43,8 @@ class _InventoryOverviewState extends State<InventoryOverview> {
       for(String category in categories) {
         inventoryCards?.add(InventoryCard(
           category: category,
-          goToPage: (int page) {
-            widget.goToPage(page);
-          },
+          isBreakdownCard: false,
+          expiredAmount: 0,
         ));
       }
     }

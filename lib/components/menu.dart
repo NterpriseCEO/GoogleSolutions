@@ -1,9 +1,9 @@
 import "package:best_before_app/pages/CameraPage.dart";
-import "package:best_before_app/pages/ExpirationPage.dart";
+import 'package:best_before_app/pages/DashboardCategories.dart';
+import 'package:best_before_app/pages/ExpirationPage.dart';
 import "package:best_before_app/pages/InventoryOverview.dart";
 import 'package:best_before_app/pages/Logout.dart';
 import 'package:flutter/material.dart';
-import 'package:toast/toast.dart';
 import 'package:best_before_app/pages/Dashboard.dart';
 
 class Menu extends StatefulWidget {
@@ -59,8 +59,7 @@ class _MenuState extends State<Menu> {
                     //The page pages
                     Container(
                       color: Colors.white,
-                      child: Dashboard(),
-                      //Todo: find another route for Dahsboard and putback Expiration page
+                      child: ExpirationPage(),
                       // child: ExpirationPage(),
                     ),
                     Container(
@@ -69,20 +68,20 @@ class _MenuState extends State<Menu> {
                     ),
                     Container(
                       child: InventoryOverview(
-                        goToPage: (int page) {
-                          setState(() {
-                            currentPage = page;
-                          });
-                          pageController.animateToPage(
-                            page,
-                            //The animation speed
-                            duration: Duration(
-                              milliseconds: 500,
-                            ),
-                            //The animation tweening effect
-                            curve: Curves.easeInOut,
-                          );
-                        },
+                        // goToPage: (int page) {
+                        //   setState(() {
+                        //     currentPage = page;
+                        //   });
+                        //   pageController.animateToPage(
+                        //     page,
+                        //     //The animation speed
+                        //     duration: Duration(
+                        //       milliseconds: 500,
+                        //     ),
+                        //     //The animation tweening effect
+                        //     curve: Curves.easeInOut,
+                        //   );
+                        // },
                       ),
                     ),
                   ],
@@ -93,6 +92,9 @@ class _MenuState extends State<Menu> {
                     });
                   },
                 ),
+                Container(
+                  child:DashboardCategories()
+                )
               ],
             )
           ),
@@ -102,6 +104,7 @@ class _MenuState extends State<Menu> {
             backgroundColor: Colors.amber,
             elevation: 0,
             selectedItemColor: Colors.white,
+            type: BottomNavigationBarType.fixed,
             //When tapping the labels
             //change the page
             onTap: (int index) {

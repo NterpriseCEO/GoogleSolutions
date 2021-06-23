@@ -93,6 +93,7 @@ class _LoginState extends State<Login> {
       FirebaseMessaging.instance.subscribeToTopic(userCol);
       //Waits for the widget tree to stop building before skipping login screen
       print("this is the token for notifications $token");
+      deleteOldData();
       getData();
       WidgetsBinding.instance.addPostFrameCallback((_) => {
         Navigator.of(context).push(

@@ -33,6 +33,8 @@ Future<String> signInWithGoogle() async {
   final User user = authResult.user;
   userCol = user.uid;
 
+  deleteOldData();
+
   if (user != null) {
     assert(!user.isAnonymous);
     assert(await user.getIdToken() != null);

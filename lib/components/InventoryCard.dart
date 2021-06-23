@@ -4,26 +4,28 @@ typedef Callback(int pageNumber);
 
 class InventoryCard extends StatelessWidget {
   final String category;
-  final Callback goToPage;
-  InventoryCard({ this.category, @required this.goToPage});
+  final bool isBreakdownCard;
+  final expiredAmount;
+
+  InventoryCard({ this.category, this.isBreakdownCard, this.expiredAmount });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () async {
-        //This code navigates to the correct inventory page
-        final result = await Navigator.pushNamed(context, "/inventory", arguments: {
-          "category": category
-        });
-        //This checks if trying to add a new item to the inventory
-        if(result == 1) {
-          goToPage(result);
+        if(this.isBreakdownCard) {
+
+        }else {
+          Navigator.pushNamed(context, "/inventory", arguments: {
+            "category": category
+          });
         }
       },
       //The Card that links to an inventory page
       child: Card(
         //Make it flat
         elevation: 0,
+        clipBehavior: Clip.hardEdge,
         //Give it a border with border radius
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15.0),
@@ -33,29 +35,45 @@ class InventoryCard extends StatelessWidget {
             width:2.0,
           ),
         ),
-        child: Padding(
-          padding: EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              //Icon for the card
-              Expanded(
-                flex: 4,
-                child: FadeInImage(image: AssetImage("assets/${category.split(" ").join()}.png"), placeholder: AssetImage("assets/barcode.png")),
-              ),
-              //Card Title
-              Expanded(
-                flex: 1,
-                child: Text(
-                  category,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize:20.0,
-                    fontWeight: FontWeight.bold,
-                  ),
+        child: Stack(
+          alignment: Alignment.bottomCenter,
+          children: [
+            this.isBreakdownCard ? FractionallySizedBox(
+              widthFactor: 1,
+              heightFactor: (1/40)*this.expiredAmount,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.redAccent,
+                  borderRadius: BorderRadius.circular(7.5),
                 ),
               ),
-            ],
-          ),
+            ) : Container(),
+            Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  //Icon for the card
+                  Expanded(
+                    flex: 4,
+                    child: FadeInImage(image: AssetImage("assets/${category.split(" ").join()}.png"), placeholder: AssetImage("assets/barcode.png")),
+                  ),
+                  //Card Title
+                  Expanded(
+                    flex: 1,
+                    child: Text(
+                      "${(1/20)*this.expiredAmount} ${this.expiredAmount}",
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize:20.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
