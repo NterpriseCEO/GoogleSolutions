@@ -1,5 +1,7 @@
 import 'package:best_before_app/notifications/NotifData.dart';
+import 'package:best_before_app/pages/components/Utils.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 
 FirebaseFirestore firestore = FirebaseFirestore.instance;
 
@@ -40,6 +42,14 @@ void addItemToDB(String itemName, String category, int amount, String expiryDate
     'ProductName': itemName,
     'Quantity': amount,
     "ExpiryDate": expiryDate
+  }).then((docRef) {
+    firestore.collection("expiryGroups/Users/$userCol/").doc(docRef.id).set({
+      'Category': category,
+      'ProductName': itemName,
+      'Quantity': amount,
+      "Expired": false,
+      "week": weekNumber(DateTime.parse(expiryDate))
+    });
   });
   Future.delayed(const Duration(seconds: 1), () {
     getData();
@@ -63,5 +73,16 @@ void removeExpired() async {
   });
   Future.delayed(const Duration(seconds: 1), () {
     getData();
+  });
+}
+
+void deleteOldData() {
+  WriteBatch batch = FirebaseFirestore.instance.batch();
+  firestore.collection("expiryGroups/Users/$userCol/")
+  .where("week", isLessThanOrEqualTo: weekNumber(DateTime.now())-2).get().then((querySnapshot) {
+    querySnapshot.docs.forEach((document) {
+      batch.delete(document.reference);
+    });
+    return batch.commit();
   });
 }
