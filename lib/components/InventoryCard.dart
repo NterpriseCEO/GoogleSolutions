@@ -2,22 +2,27 @@ import 'package:flutter/material.dart';
 
 typedef Callback(int pageNumber);
 
-class InventoryCard extends StatelessWidget {
+class InventoryCard extends StatefulWidget {
   final String category;
   final bool isBreakdownCard;
-  final expiredAmount;
+  int expiredAmount;
 
   InventoryCard({ this.category, this.isBreakdownCard, this.expiredAmount });
 
   @override
+  _InventoryCardState createState() => _InventoryCardState();
+}
+
+class _InventoryCardState extends State<InventoryCard> {
+  @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () async {
-        if(this.isBreakdownCard) {
+        if(this.widget.isBreakdownCard) {
 
         }else {
           Navigator.pushNamed(context, "/inventory", arguments: {
-            "category": category
+            "category": widget.category
           });
         }
       },
@@ -38,9 +43,9 @@ class InventoryCard extends StatelessWidget {
         child: Stack(
           alignment: Alignment.bottomCenter,
           children: [
-            this.isBreakdownCard ? FractionallySizedBox(
+            this.widget.isBreakdownCard ? FractionallySizedBox(
               widthFactor: 1,
-              heightFactor: (1/40)*this.expiredAmount,
+              heightFactor: (1/40)*this.widget.expiredAmount,
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.redAccent,
@@ -55,13 +60,13 @@ class InventoryCard extends StatelessWidget {
                   //Icon for the card
                   Expanded(
                     flex: 4,
-                    child: FadeInImage(image: AssetImage("assets/${category.split(" ").join()}.png"), placeholder: AssetImage("assets/barcode.png")),
+                    child: FadeInImage(image: AssetImage("assets/${widget.category.split(" ").join()}.png"), placeholder: AssetImage("assets/barcode.png")),
                   ),
                   //Card Title
                   Expanded(
                     flex: 1,
                     child: Text(
-                      "${(1/20)*this.expiredAmount} ${this.expiredAmount}",
+                      "${(1/20)*this.widget.expiredAmount} ${this.widget.expiredAmount}",
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: Colors.black,

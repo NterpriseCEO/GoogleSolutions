@@ -1,5 +1,5 @@
 import "package:best_before_app/pages/CameraPage.dart";
-import 'package:best_before_app/pages/DashboardCategories.dart';
+import '../pages/components/DashboardCategories.dart';
 import 'package:best_before_app/pages/ExpirationPage.dart';
 import "package:best_before_app/pages/InventoryOverview.dart";
 import 'package:best_before_app/pages/Logout.dart';
@@ -93,7 +93,7 @@ class _MenuState extends State<Menu> {
                   },
                 ),
                 Container(
-                  child:DashboardCategories()
+                  child:Dashboard()
                 )
               ],
             )

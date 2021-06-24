@@ -12,7 +12,6 @@ class DashboardCategories extends StatefulWidget {
 
 class _DashboardCategoriesState extends State<DashboardCategories> {
   String search;
-  TextEditingController _controller;
   ScrollController _scrollController;
 
   List<Widget> inventoryCards = [];
@@ -20,49 +19,15 @@ class _DashboardCategoriesState extends State<DashboardCategories> {
   @override
   void initState() {
     super.initState();
-    _controller = TextEditingController();
 
     _scrollController = new ScrollController(
       initialScrollOffset: 0.0,
       keepScrollOffset: true,
     );
   }
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0.0),
-      child: Column(
-        children: <Widget>[
-          Expanded(
-            flex: 1,
-            child: Text(
-              "Weekly Breakdown",
-              style: TextStyle(
-                fontSize: 34.0,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          //The scrollable list of cards
-          // Expanded(
-          //   flex: 9,
-          //   child: showCategories(search, inventoryCards, _scrollController)
-          // ),
-          Expanded(
-            flex: 9,
-            child: categoriesList(),
-          ),
-        ],
-      ),
-    );
-  }
-  Widget categoriesList() {
     if(inventoryCards.isEmpty) {
       Map<String, int> categories = {
         "Vegetables": 0,
@@ -84,6 +49,16 @@ class _DashboardCategoriesState extends State<DashboardCategories> {
       int weekDay = d.weekday;
       var firstDayOfWeek = first.subtract(Duration(days: weekDay));
 
+      for(String category in categories.keys) {
+        print("test ${categories[category]}");
+        inventoryCards?.add(InventoryCard(
+            category: category,
+            isBreakdownCard: true,
+            expiredAmount: categories[category]
+        ));
+        print(inventoryCards);
+      }
+
       return StreamBuilder<QuerySnapshot>(
         stream: firestore.collection(userCol).snapshots(),
         builder: (context, snapshot) {
@@ -102,31 +77,32 @@ class _DashboardCategoriesState extends State<DashboardCategories> {
                 print("Helllo");
               }
             }
-            for(String category in categories.keys) {
-              print("test ${categories[category]}");
-              inventoryCards?.add(InventoryCard(
-                category: category,
-                isBreakdownCard: true,
-                expiredAmount: categories[category]
-              ));
+            for(InventoryCard card in inventoryCards) {
+              card.expiredAmount = categories[card.category];
+              print("testing now ${card.expiredAmount}");
             }
-            return GridView.count(
+            print("Hello motherfucker $inventoryCards");
+            return SliverGrid.count(
               crossAxisCount: 2,
               children: inventoryCards,
-              controller: _scrollController,
             );
           }else {
-            return Container();
+            return SliverGrid.count(
+              crossAxisCount: 2,
+              children: inventoryCards,
+            );
           }
         }
       );
     }else {
-      return GridView.count(
+      return SliverGrid.count(
         crossAxisCount: 2,
         children: inventoryCards,
-        controller: _scrollController,
       );
     }
+  }
+  Widget categoriesList() {
+    print(inventoryCards.isEmpty);
   }
 }
 
@@ -162,38 +138,6 @@ Widget showCategories(String query, List<Widget> inventoryCards, ScrollControlle
         Image(image: AssetImage("assets/icon.png")),
       ]
     );
-  }
-}
-
-List<Widget> filterCards(String query, List<Widget> inventoryCards) {
-  List<Widget> items = [];
-  print(inventoryCards);
-  //If search result is not null, filter cards,
-  //otherwise return all cards
-  if(query != null) {
-    for(InventoryCard item in inventoryCards) {
-      //Checks if the search query matches any title cards
-      if(item.category.toLowerCase().contains(query)) {
-        items.add(item);
-      }
-    }
-    if(items.isEmpty) {
-      items.add(Column(
-        children: [
-          Text(
-            "No category found",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize:20.0,
-            ),
-          ),
-          Image(image: AssetImage("assets/icon.png"))
-        ])
-      );
-    }
-    return items;
-  }else {
-    return inventoryCards;
   }
 }
 
