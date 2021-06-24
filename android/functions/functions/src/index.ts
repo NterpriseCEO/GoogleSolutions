@@ -34,8 +34,13 @@ export const expiryDateChecker = functions.pubsub.schedule("0 06 * * *")
             amountTomorrow++;
           } else if (diffInDays < 0) {
             amountExpired++;
-            // db.collection("expiryGroups/Users/"+collection.id)
-            //    .doc(doc.id).update({Expired: "true"});
+            try {
+              db.collection("expiryGroups").doc("Users")
+                  .collection(collection.id).doc(doc.id)
+                  .update({Expired: "true"});
+            } catch (e: unknown) {
+              console.log(e);
+            }
           }
         });
         if (amountToday > 0) {

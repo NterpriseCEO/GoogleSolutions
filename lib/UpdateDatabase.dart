@@ -86,3 +86,23 @@ void deleteOldData() {
     return batch.commit();
   });
 }
+
+void CalculateData(String Cat) async {
+  int foodCountTotal = 0;
+  int expiredCount = 0;
+  int percentExpired = 0;
+  await firestore.collection(userCol).get().then((snapshot) {
+    List<DocumentSnapshot> Docs = snapshot.docs;
+    Docs.forEach((DocumentSnapshot document) {
+      if(Cat == document.get("Category")){
+        foodCountTotal = foodCountTotal + 1;
+        if(document.get("Expired") == "false"){
+          expiredCount = expiredCount + 1;
+        }
+      }
+    });
+    percentExpired = percentExpired + ((expiredCount/foodCountTotal)*100).round();
+
+    return percentExpired;
+  });
+}
