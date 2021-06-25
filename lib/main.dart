@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import "package:best_before_app/components/menu.dart";
+import 'package:best_before_app/pages/Dashboard.dart';
 import "package:best_before_app/pages/Inventory.dart";
 import "package:best_before_app/pages/Login.dart";
 import 'package:firebase_core/firebase_core.dart';
@@ -54,6 +55,7 @@ Future<void> main() async {
       "/": (context) => Menu(),
       "/Login": (context) => Login(),
       "/inventory": (context) => Inventory(),
+      "/Dashboard": (context) => Dashboard()
     },
   ));
 }

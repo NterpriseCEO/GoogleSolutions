@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-typedef Callback(int pageNumber);
-
 class InventoryCard extends StatefulWidget {
   final String category;
   final bool isBreakdownCard;
@@ -45,7 +43,7 @@ class _InventoryCardState extends State<InventoryCard> {
           children: [
             this.widget.isBreakdownCard ? FractionallySizedBox(
               widthFactor: 1,
-              heightFactor: (1/40)*this.widget.expiredAmount,
+              heightFactor: widget.expiredAmount/100,
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.redAccent,
@@ -66,7 +64,7 @@ class _InventoryCardState extends State<InventoryCard> {
                   Expanded(
                     flex: 1,
                     child: Text(
-                      "${(1/20)*this.widget.expiredAmount} ${this.widget.expiredAmount}",
+                      widget.isBreakdownCard ? "${widget.expiredAmount}% wasted" : widget.category,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         color: Colors.black,

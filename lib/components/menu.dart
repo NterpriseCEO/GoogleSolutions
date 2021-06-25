@@ -66,23 +66,21 @@ class _MenuState extends State<Menu> {
                       //The ScanPicture() page
                       child: ScanPicture(),
                     ),
-                    Container(
-                      child: InventoryOverview(
-                        // goToPage: (int page) {
-                        //   setState(() {
-                        //     currentPage = page;
-                        //   });
-                        //   pageController.animateToPage(
-                        //     page,
-                        //     //The animation speed
-                        //     duration: Duration(
-                        //       milliseconds: 500,
-                        //     ),
-                        //     //The animation tweening effect
-                        //     curve: Curves.easeInOut,
-                        //   );
-                        // },
-                      ),
+                    InventoryOverview(
+                      // goToPage: (int page) {
+                      //   setState(() {
+                      //     currentPage = page;
+                      //   });
+                      //   pageController.animateToPage(
+                      //     page,
+                      //     //The animation speed
+                      //     duration: Duration(
+                      //       milliseconds: 500,
+                      //     ),
+                      //     //The animation tweening effect
+                      //     curve: Curves.easeInOut,
+                      //   );
+                      // },
                     ),
                   ],
                   //Check if the page is changed and set the currentPage index
@@ -91,9 +89,6 @@ class _MenuState extends State<Menu> {
                       currentPage = index;
                     });
                   },
-                ),
-                Container(
-                  child:Dashboard()
                 )
               ],
             )

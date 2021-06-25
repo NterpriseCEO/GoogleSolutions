@@ -5,14 +5,19 @@ enum LegendShape { Circle, Rectangle }
 
 class ExpiryChart extends StatefulWidget {
 
+  final double expiredAmount;
+  final double total;
+
+  ExpiryChart({ this.expiredAmount, this.total });
+
   @override
   _ExpiryChartState createState() => _ExpiryChartState();
 }
 
 class _ExpiryChartState extends State<ExpiryChart> {
   Map<String, double> dataMap = {
-    "Consumed": 76,
-    "Wasted": 24,
+    "Consumed": 0,
+    "Wasted": 0,
   };
 
   List<Color> colorList = [
@@ -20,10 +25,17 @@ class _ExpiryChartState extends State<ExpiryChart> {
     Colors.red,
   ];
 
-  int key = 0;
+  @override
+  void initState() {
+    super.initState();
+    dataMap["Consumed"] = widget.total - widget.expiredAmount;
+    dataMap["Wasted"] = widget.expiredAmount;
+  }
 
   @override
   Widget build(BuildContext context) {
+
+    int key = 0;
 
     print(dataMap);
     return Column(
@@ -50,7 +62,7 @@ class _ExpiryChartState extends State<ExpiryChart> {
                   Expanded(
                     child: PieChart(
                       dataMap: dataMap,
-                      animationDuration: Duration(milliseconds: 800),
+                      animationDuration: Duration(seconds: 20),
                       chartLegendSpacing: 32,
                       chartRadius: MediaQuery.of(context).size.width / 2,
                       colorList: colorList,
