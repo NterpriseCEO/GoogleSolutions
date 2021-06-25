@@ -221,19 +221,20 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               //A constrained box to set the button to 1/4 the width of the app
-              Text(
-                //Sets the text based on if expiry date has been scanned yet
-                barCodeScanned ? "Scan Expiry Date" : "Scan Barcode",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 30.0,
-                  shadows: [
-                    Shadow(
-                      blurRadius: 10.0,
-                      color: Colors.white,
-                      offset: Offset(0.0, 0.0),
-                    ),
-                  ],
+              Container(
+                padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 15.0),
+                decoration: BoxDecoration(
+                  color: Colors.amber,
+                  borderRadius: BorderRadius.all(Radius.circular(20))
+                ),
+                child: Text(
+                  //Sets the text based on if expiry date has been scanned yet
+                  barCodeScanned ? "Scan Expiry Date" : "Scan Barcode",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.black54,
+                    fontSize: 25.0,
+                  ),
                 ),
               ),
               Row(
