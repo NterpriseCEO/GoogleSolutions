@@ -56,7 +56,6 @@ class _DashboardState extends State<Dashboard> {
 
     for(String category in categories) {
       List<int> expired = await CalculateData(category);
-      print("expired amount ${expired[2]}");
       inventoryCards?.add(InventoryCard(
           category: category,
           isBreakdownCard: true,
@@ -65,8 +64,6 @@ class _DashboardState extends State<Dashboard> {
       total += expired[1];
       expiredAmount += expired[2];
     }
-
-    print("expired = ${expiredAmount} ${total}");
 
     return 1;
   }

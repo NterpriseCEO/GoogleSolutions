@@ -34,8 +34,6 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
   final textDetector = GoogleMlKit.vision.textDetector();
   final barcodeScanner = GoogleMlKit.vision.barcodeScanner();
 
-  CustomPaint customPaint;
-
   //The int value that will hold value of the current camera
   bool barCodeScanned = false;
   bool scanningBarcode = false;
@@ -117,9 +115,6 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
 
       for (Barcode barcode in barcodes) {
         final BarcodeType type = barcode.type;
-        final Rect boundingBox = barcode.value.boundingBox;
-        final String displayValue = barcode.value.displayValue;
-        final String rawValue = barcode.value.rawValue;
 
         // See API reference for complete list of supported types
         if(type == BarcodeType.product && !hasScanned) {
@@ -194,7 +189,6 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
             }
           }
         ),
-        //if(customPaint != null) customPaint,
         //The container to hold the take picure button
         Positioned(
           left: MediaQuery.of(context).size.width*0.125,
@@ -358,7 +352,6 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
             if(scanningBarcode) {
               for (TextLine line in block.lines) {
                 // Same getters as TextBlock
-                //print("fuck offfff: ${line.text} ${expiry}");
                 if (expiry == null) {
                   expiry = checkIfExpiry(line.text);
                   if(expiry != null) {

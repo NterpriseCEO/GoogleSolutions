@@ -36,9 +36,14 @@ export const expiryDateChecker = functions.pubsub.schedule("0 06 * * *")
             amountExpired++;
             try {
               db.collection("expiryGroups").doc("Users")
-                  .collection(collection.id).doc(doc.id)
-                  .update({Expired: "true"});
-            } catch (e: unknown) {
+                  .collection(collection.id).doc(doc.id).get().then((doc) => {
+                    if (doc.exists) {
+                      db.collection("expiryGroups").doc("Users")
+                          .collection(collection.id).doc(doc.id)
+                          .update({Expired: true});
+                    }
+                  });
+            } catch (e) {
               console.log(e);
             }
           }
@@ -79,3 +84,81 @@ export const expiryDateChecker = functions.pubsub.schedule("0 06 * * *")
         }
       });
     });
+
+export const edc2 =
+functions.https.onRequest(async (request, response) => {
+  const collections = await db.listCollections();
+
+  const options = {
+    priority: "high",
+    timeToLive: 60 * 60 * 24,
+  };
+
+  await collections.forEach(async (collection) => {
+    const snapshot = await collection.get();
+    let amountToday = 0;
+    let amountTomorrow = 0;
+    let amountExpired = 0;
+    await snapshot.forEach((doc) => {
+      const Date1 = new Date();
+      Date1.setHours(0, 0, 0, 0);
+      const Date2 = new Date(doc.data().ExpiryDate);
+      const diffInTime = Date2.getTime() - Date1.getTime();
+      const diffInDays = Math.floor(diffInTime / (1000 * 3600 * 24));
+
+      if (diffInDays == 0) {
+        amountToday++;
+      } else if (diffInDays == 1) {
+        amountTomorrow++;
+      } else if (diffInDays < 0) {
+        amountExpired++;
+        try {
+          db.collection("expiryGroups").doc("Users")
+              .collection(collection.id).doc(doc.id).get().then((doc) => {
+                if (doc.exists) {
+                  db.collection("expiryGroups").doc("Users")
+                      .collection(collection.id).doc(doc.id)
+                      .update({Expired: true});
+                }
+              });
+        } catch (e) {
+          console.log(e);
+        }
+      }
+    });
+    if (amountToday > 0) {
+      const message = {
+        notification: {
+          title: "Items Expiring!",
+          body: `${amountToday} Item(s) Expiring Today!`,
+          sound: "default",
+          badge: "1",
+        },
+      };
+      fcm.sendToTopic("94K8q26dMuRNEhcy93yMfWWnxGM2", message, options);
+    }
+
+    if (amountTomorrow > 0) {
+      const message = {
+        notification: {
+          title: "Items Expiring!",
+          body: `${amountTomorrow} Item(s) Expiring Tommorow!`,
+          sound: "default",
+          badge: "1",
+        },
+      };
+      fcm.sendToTopic("94K8q26dMuRNEhcy93yMfWWnxGM2", message, options);
+    }
+    if (amountExpired > 0) {
+      const message = {
+        notification: {
+          title: "Items Expiring!",
+          body: `${amountExpired} Item(s) Already Expired!`,
+          sound: "default",
+          badge: "1",
+        },
+      };
+      fcm.sendToTopic("94K8q26dMuRNEhcy93yMfWWnxGM2", message, options);
+    }
+  });
+});

@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:pie_chart/pie_chart.dart';
 
+import '../../UpdateDatabase.dart';
+
 enum LegendShape { Circle, Rectangle }
+
+int percent = 0;
 
 class ExpiryChart extends StatefulWidget {
 
@@ -25,6 +29,10 @@ class _ExpiryChartState extends State<ExpiryChart> {
     Colors.red,
   ];
 
+  void get() async {
+    percent = await CalculatePercent();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -37,7 +45,6 @@ class _ExpiryChartState extends State<ExpiryChart> {
 
     int key = 0;
 
-    print(dataMap);
     return Column(
       children: <Widget>[
         Container(
@@ -66,7 +73,7 @@ class _ExpiryChartState extends State<ExpiryChart> {
                       chartLegendSpacing: 32,
                       chartRadius: MediaQuery.of(context).size.width / 2,
                       colorList: colorList,
-                      initialAngleInDegree: 0,
+                      initialAngleInDegree: 90,
                       chartType: ChartType.ring,
                       ringStrokeWidth: 32,
                       centerText: "Score",
@@ -88,42 +95,32 @@ class _ExpiryChartState extends State<ExpiryChart> {
                       ),
                     ),
                   ),
+                  SizedBox(width:20.0,),
                   Padding(
                     padding: const EdgeInsets.only(top: 20.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Image(
-                          width: MediaQuery.of(context).size.width/8,
-                          image: AssetImage("assets/UpArrow.png"),
-                        ),
-                        Text("Food wastage is up 20%")
-                      ],
+                    child: FutureBuilder<int>(
+                      future: CalculatePercent(),
+                      builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
+                        if(snapshot.hasData) {
+                          return Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Image(
+                                width: MediaQuery.of(context).size.width / 8,
+                                image: AssetImage(snapshot.data < 0 ? "assets/DownArrow.png" : "assets/UpArrow.png"),
+                              ),
+                              Text(
+                                snapshot.data < 0 ? "Food wastage is \ndown ${snapshot.data*-1}%" : "Food wastage is \nup ${snapshot.data}%",
+                                textAlign: TextAlign.center,
+                              )
+                            ],
+                          );
+                        }else {
+                          return Text("Loading...");
+                        }
+                      }
                     ),
                   ),
-                  // Column(
-                  //   crossAxisAlignment: CrossAxisAlignment.start,
-                  //   children: [
-                  //
-                  //     Text(
-                  //       "20% less",
-                  //       style: TextStyle(
-                  //         fontSize: 12.0,
-                  //         fontWeight: FontWeight.normal,
-                  //       )
-                  //     ),
-                  //     Text(
-                  //       "Wastage",
-                  //       style: TextStyle(
-                  //         fontSize: 17.0,
-                  //         fontWeight: FontWeight.bold,
-                  //       ),
-                  //     ),
-                  //     Divider(
-                  //       color: Colors.black,
-                  //     )
-                  //   ],
-                  // ),
                 ],
               )
             ],
