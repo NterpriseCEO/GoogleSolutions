@@ -174,7 +174,12 @@ Future<void> confirmBarcode(String itemName, BuildContext context, Callback call
                           });
                         });
                       },
-                      child: Text("Choose a Category"),
+                      child: Text(
+                        "Choose a Category",
+                        style: TextStyle(
+                          color: Colors.black54,
+                        ),
+                      ),
                       //Styling the yellowy orange button
                       style: ElevatedButton.styleFrom(
                         primary: Colors.amber,
