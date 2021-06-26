@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import "package:best_before_app/UpdateDatabase.dart";
 import 'package:best_before_app/components/BarcodeResult.dart';
 import "package:camera/camera.dart";
@@ -10,8 +12,6 @@ import 'package:toast/toast.dart';
 import 'components/EditScan.dart';
 
 typedef void Callback(String category);
-
-bool scanning = false;
 
 class ScanPicture extends StatefulWidget {
   String itemName;
@@ -36,7 +36,8 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
 
   //The int value that will hold value of the current camera
   bool barCodeScanned = false;
-  bool scanningBarcode = false;
+  bool expiryScanned = false;
+  bool scanning = false;
   bool isLooping = false;
 
   String barcode = 'Unknown'; //This will hold the returned value from a barcode
@@ -59,7 +60,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
     return controller;
   }
 
-  Future<void> scanBarcode() async {
+  Future<void> scan() async {
     scanning = true;
     widget.itemName = "";
     widget.category = "";
@@ -68,78 +69,137 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
     InputImage inputImage;
     bool hasScanned = false;
     int scannerCounter = 0;
+    int counter = 0;
+
+    DateTime expiry;
 
     controller?.startImageStream((CameraImage cameraImage) async {
-      final WriteBuffer allBytes = WriteBuffer();
-      for (Plane plane in cameraImage.planes) {
-        allBytes.putUint8List(plane.bytes);
-      }
-      final bytes = allBytes
-          .done()
-          .buffer
-          .asUint8List();
+      if(counter < 5) {
+        counter++;
+      }else {
+        counter = 0;
+        final WriteBuffer allBytes = WriteBuffer();
+        for (Plane plane in cameraImage.planes) {
+          allBytes.putUint8List(plane.bytes);
+        }
+        final bytes = allBytes
+            .done()
+            .buffer
+            .asUint8List();
 
-      final Size imageSize =
-      Size(cameraImage.width.toDouble(), cameraImage.height.toDouble());
+        final Size imageSize =
+        Size(cameraImage.width.toDouble(), cameraImage.height.toDouble());
 
-      final imageRotation = InputImageRotationMethods.fromRawValue(
-          camera.sensorOrientation) ?? InputImageRotation.Rotation_0deg;
+        final imageRotation = InputImageRotationMethods.fromRawValue(
+            camera.sensorOrientation) ?? InputImageRotation.Rotation_0deg;
 
-      final inputImageFormat = InputImageFormatMethods.fromRawValue(
-          cameraImage.format.raw) ?? InputImageFormat.NV21;
+        final inputImageFormat = InputImageFormatMethods.fromRawValue(
+            cameraImage.format.raw) ?? InputImageFormat.NV21;
 
-      final planeData = cameraImage.planes.map((Plane plane) {
-        return InputImagePlaneMetadata(
-          bytesPerRow: plane.bytesPerRow,
-          height: plane.height,
-          width: plane.width,
+        final planeData = cameraImage.planes.map((Plane plane) {
+          return InputImagePlaneMetadata(
+            bytesPerRow: plane.bytesPerRow,
+            height: plane.height,
+            width: plane.width,
+          );
+        }).toList();
+
+        final inputImageData = InputImageData(
+          size: imageSize,
+          imageRotation: imageRotation,
+          inputImageFormat: inputImageFormat,
+          planeData: planeData,
         );
-      }).toList();
 
-      final inputImageData = InputImageData(
-        size: imageSize,
-        imageRotation: imageRotation,
-        inputImageFormat: inputImageFormat,
-        planeData: planeData,
-      );
+        inputImage =
+            InputImage.fromBytes(bytes: bytes, inputImageData: inputImageData);
 
-      inputImage = InputImage.fromBytes(bytes: bytes, inputImageData: inputImageData);
+        scannerCounter++;
 
-      final List<Barcode> barcodes = await barcodeScanner.processImage(inputImage);
-
-      scannerCounter++;
-
-      if(scannerCounter == 100000000) {
-        controller?.stopImageStream();
-      }
-
-      for (Barcode barcode in barcodes) {
-        final BarcodeType type = barcode.type;
-
-        // See API reference for complete list of supported types
-        if(type == BarcodeType.product && !hasScanned) {
-          hasScanned = true;
+        if (scannerCounter == 100000000) {
           controller?.stopImageStream();
-          this.barcode = barcode.value.displayValue;
-          String itemName = await barcodeResult(this.barcode);
-          //Sets the itemName depending on if data was found
-          itemName = itemName != "noData" ? itemName : "";
-          if(itemName != "") {
-            confirmBarcode(itemName, context, (String itemName, String category, int amount, bool canceled) {
-              if(!canceled) {
-                //Sets variables if not canceled
-                setState(() {
-                  //Sets this variable to indicate that the barcode has been scanned
-                  barCodeScanned = true;
-                });
-                widget.itemName = itemName;
-                widget.category = category;
-                widget.quantity = amount;
+        }
+
+        if (!barCodeScanned) {
+          final List<Barcode> barcodes = await barcodeScanner.processImage(
+              inputImage);
+
+          for (Barcode barcode in barcodes) {
+            final BarcodeType type = barcode.type;
+
+            // See API reference for complete list of supported types
+            if (type == BarcodeType.product && !hasScanned) {
+              barCodeScanned = true;
+              hasScanned = true;
+              //controller?.stopImageStream();
+              this.barcode = barcode.value.displayValue;
+              widget.itemName = await barcodeResult(this.barcode);
+              print("fuck off ${widget.itemName}");
+              //Sets the itemName depending on if data was found
+              widget.itemName = widget.itemName != "noData" ? widget.itemName : "";
+              if (widget.itemName != "") {
+                Toast.show("Barcode Successfully found", context, duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+                // confirmBarcode(itemName, context, (String itemName, String category, int amount, bool canceled) {
+                //   if (!canceled) {
+                //     //Sets variables if not canceled
+                //     widget.itemName = itemName;
+                //     widget.category = category;
+                //     widget.quantity = amount;
+                //   }
+                //   Toast.show("Barcode Successfully Scanned", context, duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+                //   //readExpiry();
+                // });
               }
-              Toast.show("Barcode Successfully Scanned", context, duration: Toast.LENGTH_LONG, gravity:  Toast.BOTTOM);
-              readExpiry();
-            });
+            }
           }
+        }
+        if (!expiryScanned) {
+          final RecognisedText recognisedText = await textDetector.processImage(inputImage);
+          for (TextBlock block in recognisedText.blocks) {
+            if(scanning) {
+              for (TextLine line in block.lines) {
+                // Same getters as TextBlock
+                if (expiry == null) {
+                  expiry = checkIfExpiry(line.text);
+                  if(expiry != null) {
+                    expiryScanned = true;
+                    Toast.show("Expiry Successfully Scanned", context, duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
+                    // enterExpiry(context, widget.itemName, widget.category, widget.quantity, expiry);
+                    // textDetector.close();
+                    // controller?.stopImageStream();
+                    //
+                    // setState(() {
+                    //   scanning = false;
+                    // });
+                  }
+                } else {
+                  break;
+                }
+              }
+            }
+          }
+        }
+        if(barCodeScanned && expiryScanned) {
+          print("Hello");
+          controller?.stopImageStream();
+          barCodeScanned = false;
+          expiryScanned = false;
+          print("hello mateys ${widget.itemName}");
+          confirmBarcode(widget.itemName, context, (String itemName, String category, int amount, bool canceled) {
+            if (!canceled) {
+              //Sets variables if not canceled
+              widget.category = category;
+              widget.quantity = amount;
+              print("helllllloooooooooooooooooo");
+              enterExpiry(context, widget.itemName, widget.category, widget.quantity, expiry);
+              textDetector.close();
+              controller?.stopImageStream();
+
+              setState(() {
+                scanning = false;
+              });
+            }
+          });
         }
       }
     });
@@ -197,10 +257,10 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
           height: MediaQuery.of(context).size.height/8,
           child: Container(
             decoration: BoxDecoration(
-              color: scanningBarcode ? Colors.black.withOpacity(0.2) : Colors.transparent,
+              color: scanning ? Colors.black.withOpacity(0.2) : Colors.transparent,
               border: Border.all(
                 width: 3,
-                color: scanningBarcode ? Colors.amber[800] : Colors.transparent,
+                color: scanning ? Colors.amber[800] : Colors.transparent,
               ),
               borderRadius: BorderRadius.all(Radius.circular(5.0)),
             ),
@@ -223,11 +283,11 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
                 ),
                 child: Text(
                   //Sets the text based on if expiry date has been scanned yet
-                  barCodeScanned ? "Scan Expiry Date" : "Scan Barcode",
+                  "Scan Barcode & Expiry Date",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.black54,
-                    fontSize: 25.0,
+                    fontSize: 20.0,
                   ),
                 ),
               ),
@@ -247,13 +307,11 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
                       child: TextButton(
                         onPressed: () async {
                           setState(() {
-                            scanningBarcode = true;
+                            scanning = true;
                           });
 
                           //Determines which function to run on click
-                          if(!barCodeScanned) {
-                            await scanBarcode();
-                          }
+                          await scan();
                         },
                         //The button style
                         style: ElevatedButton.styleFrom(
@@ -275,24 +333,15 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
                       color: Colors.white,
                       onPressed: () {
                         //Determines which popup to show on button click
-                        if(!barCodeScanned) {
-                          confirmBarcode("", context, (String itemName, String category, int amount, bool canceled) {
-                            if(!canceled) {
-                              setState(() {
-                                barCodeScanned = true;
-                              });
-                              widget.itemName = itemName;
-                              widget.category = category;
-                              widget.quantity = amount;
+                        confirmBarcode("", context, (String itemName, String category, int amount, bool canceled) {
+                          if(!canceled) {
+                            widget.itemName = itemName;
+                            widget.category = category;
+                            widget.quantity = amount;
 
-                              enterExpiry(context, widget.itemName, widget.category, widget.quantity, null);
-                            }
-                          });
-                        }else {
-                          scanningBarcode = false;
-                          controller?.stopImageStream();
-                          enterExpiry(context, widget.itemName, widget.category, widget.quantity, null);
-                        }
+                            enterExpiry(context, widget.itemName, widget.category, widget.quantity, null);
+                          }
+                        });
                       }
                     ),
                   )
@@ -349,7 +398,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
 
           final RecognisedText recognisedText = await textDetector.processImage(inputImage);
           for (TextBlock block in recognisedText.blocks) {
-            if(scanningBarcode) {
+            if(scanning) {
               for (TextLine line in block.lines) {
                 // Same getters as TextBlock
                 if (expiry == null) {
@@ -360,7 +409,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
                     controller?.stopImageStream();
 
                     setState(() {
-                      scanningBarcode = false;
+                      scanning = false;
                     });
                   }
                 } else {
@@ -369,7 +418,6 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
               }
             }
           }
-          scanning = false;
           isLooping = false;
         }
       }
@@ -392,7 +440,6 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
       DateTime now = DateTime.now();
       int daysTillExpiry = expiry.difference(DateTime(now.year, now.month, now.day)).inDays;
       print("this is the amount of days till it expires: $daysTillExpiry, this is the expiry date: $expiry");
-      //Creates a notification
 
       //Shows message saying that item was added to inventory
       final snackBar = SnackBar(
@@ -404,9 +451,5 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
       );
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
-
-    setState(() {
-      barCodeScanned = false;
-    });
   }
 }
