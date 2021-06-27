@@ -8,7 +8,6 @@ import 'components/ExpiryChart.dart';
 enum LegendShape { Circle, Rectangle }
 
 class Dashboard extends StatefulWidget {
-
   @override
   _DashboardState createState() => _DashboardState();
 }
@@ -54,13 +53,12 @@ class _DashboardState extends State<Dashboard> {
     ];
     DateTime d = DateTime.now();
 
-    for(String category in categories) {
+    for (String category in categories) {
       List<int> expired = await CalculateData(category);
       inventoryCards?.add(InventoryCard(
           category: category,
           isBreakdownCard: true,
-          expiredAmount: expired[0]
-      ));
+          expiredAmount: expired[0]));
       total += expired[1];
       expiredAmount += expired[2];
     }
@@ -72,7 +70,6 @@ class _DashboardState extends State<Dashboard> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: SafeArea(
@@ -87,20 +84,16 @@ class _DashboardState extends State<Dashboard> {
                     expandedHeight: MediaQuery.of(context).size.width,
                     automaticallyImplyLeading: false,
                     leading: IconButton(
-                      icon: Icon(
-                        Icons.arrow_back,
-                        size: 36,
-                        color: Colors.black
-                      ),
-                      tooltip: 'Return to Inventory',
-                      onPressed: () {
-                        Navigator.pop(context);
-                      }
-                    ),
+                        icon: Icon(Icons.arrow_back,
+                            size: 36, color: Colors.black),
+                        tooltip: 'Return to Inventory',
+                        onPressed: () {
+                          Navigator.pop(context);
+                        }),
                     stretch: true,
                     pinned: true,
                     flexibleSpace: FlexibleSpaceBar(
-                      titlePadding: EdgeInsets.symmetric(vertical:10.0),
+                      titlePadding: EdgeInsets.symmetric(vertical: 10.0),
                       centerTitle: true,
                       title: Text(
                         "Breakdown",
@@ -113,17 +106,17 @@ class _DashboardState extends State<Dashboard> {
                       ),
                       background: Padding(
                         padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          children: [
-                            Text(
-                              "Hello",
-                              style: TextStyle(
-                                color: Colors.transparent,
-                              ),
+                        child: Column(children: [
+                          Text(
+                            "Hello",
+                            style: TextStyle(
+                              color: Colors.transparent,
                             ),
-                            ExpiryChart(expiredAmount: 1.0*expiredAmount, total: 1.0*total),
-                          ]
-                        ),
+                          ),
+                          ExpiryChart(
+                              expiredAmount: 1.0 * expiredAmount,
+                              total: 1.0 * total),
+                        ]),
                       ),
                     ),
                   ),
@@ -147,6 +140,43 @@ class _DashboardState extends State<Dashboard> {
                         inventoryCards[12],
                       ],
                     ),
+                  ),
+                  SliverPadding(
+                    padding: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0),
+                    sliver: SliverToBoxAdapter(
+                        child: Container(
+                      height: 150,
+                      padding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
+                      decoration: BoxDecoration(
+                        color: Colors.orange,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Expanded(
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                'Food Waste Facts',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 20.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            Text(
+                              'Every 60 seconds in Africa, one minute passes. Every 24 hours in Africa, one day passes. Thank You!',
+                              textAlign: TextAlign.justify,
+                              style: TextStyle(
+                                height: 1.5,
+                                fontSize: 15.0,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )),
                   )
                 ],
               );
@@ -154,14 +184,13 @@ class _DashboardState extends State<Dashboard> {
               return CustomScrollView(
                 slivers: [
                   SliverToBoxAdapter(
-                    child: Text(
-                      "Loading...",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 36.0,
-                      ),
-                    )
-                  )
+                      child: Text(
+                    "Loading...",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 36.0,
+                    ),
+                  ))
                 ],
               );
             }
