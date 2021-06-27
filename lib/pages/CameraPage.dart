@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import "package:best_before_app/UpdateDatabase.dart";
@@ -61,7 +62,24 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
   }
 
   Future<void> scan() async {
-    scanning = true;
+    Timer t = Timer(Duration(seconds: 30), () {
+      if(scanning) {
+        setState(() {
+          scanning = false;
+        });
+        final snackBar = SnackBar(
+          content: Text('Scanner timed out, please try again!'),
+          action: SnackBarAction(
+            label: 'Ok',
+            onPressed: () {},
+          ),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      }
+    });
+    setState(() {
+      scanning = true;
+    });
     widget.itemName = "";
     widget.category = "";
     widget.quantity = 0;
@@ -129,7 +147,6 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
 
             // See API reference for complete list of supported types
             if (type == BarcodeType.product && !hasScanned) {
-              barCodeScanned = true;
               hasScanned = true;
               //controller?.stopImageStream();
               this.barcode = barcode.value.displayValue;
@@ -138,17 +155,8 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
               //Sets the itemName depending on if data was found
               widget.itemName = widget.itemName != "noData" ? widget.itemName : "";
               if (widget.itemName != "") {
-                Toast.show("Barcode Successfully found", context, duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
-                // confirmBarcode(itemName, context, (String itemName, String category, int amount, bool canceled) {
-                //   if (!canceled) {
-                //     //Sets variables if not canceled
-                //     widget.itemName = itemName;
-                //     widget.category = category;
-                //     widget.quantity = amount;
-                //   }
-                //   Toast.show("Barcode Successfully Scanned", context, duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
-                //   //readExpiry();
-                // });
+                barCodeScanned = true;
+                Toast.show("Barcode scanned", context, duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
               }
             }
           }
@@ -163,14 +171,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
                   expiry = checkIfExpiry(line.text);
                   if(expiry != null) {
                     expiryScanned = true;
-                    Toast.show("Expiry Successfully Scanned", context, duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
-                    // enterExpiry(context, widget.itemName, widget.category, widget.quantity, expiry);
-                    // textDetector.close();
-                    // controller?.stopImageStream();
-                    //
-                    // setState(() {
-                    //   scanning = false;
-                    // });
+                    Toast.show("Expiry date scanned", context, duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
                   }
                 } else {
                   break;
@@ -180,7 +181,6 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
           }
         }
         if(barCodeScanned && expiryScanned) {
-          print("Hello");
           controller?.stopImageStream();
           barCodeScanned = false;
           expiryScanned = false;
@@ -194,11 +194,11 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
               enterExpiry(context, widget.itemName, widget.category, widget.quantity, expiry);
               textDetector.close();
               controller?.stopImageStream();
-
-              setState(() {
-                scanning = false;
-              });
             }
+            t.cancel();
+            setState(() {
+              scanning = false;
+            });
           });
         }
       }
@@ -305,14 +305,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
                       ),
                       //The button with a spherical border
                       child: TextButton(
-                        onPressed: () async {
-                          setState(() {
-                            scanning = true;
-                          });
-
-                          //Determines which function to run on click
-                          await scan();
-                        },
+                        onPressed: () async => await scan(),
                         //The button style
                         style: ElevatedButton.styleFrom(
                           primary: Colors.black.withOpacity(0.2),
@@ -352,76 +345,6 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
         ),
       ],
     );
-  }
-
-  Future<Null> readExpiry() async {
-    InputImage inputImage;
-    DateTime expiry;
-    int counter = 0;
-    controller?.startImageStream((CameraImage cameraImage) async {
-      if(counter < 20) {
-        counter++;
-      }else {
-        counter = 0;
-        if(!isLooping) {
-          isLooping = true;
-          final WriteBuffer allBytes = WriteBuffer();
-          for (Plane plane in cameraImage.planes) {
-            allBytes.putUint8List(plane.bytes);
-          }
-          final bytes = allBytes.done().buffer.asUint8List();
-
-          final Size imageSize =
-          Size(cameraImage.width.toDouble(), cameraImage.height.toDouble());
-
-          final imageRotation = InputImageRotationMethods.fromRawValue(camera.sensorOrientation) ?? InputImageRotation.Rotation_0deg;
-
-          final inputImageFormat = InputImageFormatMethods.fromRawValue(cameraImage.format.raw) ?? InputImageFormat.NV21;
-
-          final planeData = cameraImage.planes.map((Plane plane) {
-            return InputImagePlaneMetadata(
-              bytesPerRow: plane.bytesPerRow,
-              height: plane.height,
-              width: plane.width,
-            );
-          }).toList();
-
-          final inputImageData = InputImageData(
-            size: imageSize,
-            imageRotation: imageRotation,
-            inputImageFormat: inputImageFormat,
-            planeData: planeData,
-          );
-
-          inputImage =
-              InputImage.fromBytes(bytes: bytes, inputImageData: inputImageData);
-
-          final RecognisedText recognisedText = await textDetector.processImage(inputImage);
-          for (TextBlock block in recognisedText.blocks) {
-            if(scanning) {
-              for (TextLine line in block.lines) {
-                // Same getters as TextBlock
-                if (expiry == null) {
-                  expiry = checkIfExpiry(line.text);
-                  if(expiry != null) {
-                    enterExpiry(context, widget.itemName, widget.category, widget.quantity, expiry);
-                    textDetector.close();
-                    controller?.stopImageStream();
-
-                    setState(() {
-                      scanning = false;
-                    });
-                  }
-                } else {
-                  break;
-                }
-              }
-            }
-          }
-          isLooping = false;
-        }
-      }
-    });
   }
 
   void enterExpiry(BuildContext context, String productName, String category, int quantity, DateTime date) async {
