@@ -62,42 +62,37 @@ class _ExpiryChartState extends State<ExpiryChart> {
               //     ),
               //   ),
               // ),
-              Row(
-                mainAxisAlignment : MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.start,
+              Stack(
+                alignment: Alignment.center,
                 children: [
-                  Expanded(
-                    child: PieChart(
-                      dataMap: dataMap,
-                      animationDuration: Duration(seconds: 20),
-                      chartLegendSpacing: 32,
-                      chartRadius: MediaQuery.of(context).size.width / 2,
-                      colorList: colorList,
-                      initialAngleInDegree: 90,
-                      chartType: ChartType.ring,
-                      ringStrokeWidth: 32,
-                      centerText: "Score",
-                      legendOptions: LegendOptions(
-                        showLegendsInRow: true,
-                        legendPosition: LegendPosition.bottom,
-                        showLegends: true,
-                        legendShape: BoxShape.circle,
-                        legendTextStyle: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      chartValuesOptions: ChartValuesOptions(
-                        showChartValueBackground: true,
-                        showChartValues: true,
-                        showChartValuesInPercentage: true,
-                        showChartValuesOutside: true,
-                        decimalPlaces: 1,
+                  PieChart(
+                    dataMap: dataMap,
+                    animationDuration: Duration(seconds: 20),
+                    chartLegendSpacing: 32,
+                    chartRadius: MediaQuery.of(context).size.width / 2,
+                    colorList: colorList,
+                    initialAngleInDegree: 90,
+                    chartType: ChartType.ring,
+                    ringStrokeWidth: 32,
+                    legendOptions: LegendOptions(
+                      showLegendsInRow: true,
+                      legendPosition: LegendPosition.bottom,
+                      showLegends: true,
+                      legendShape: BoxShape.circle,
+                      legendTextStyle: TextStyle(
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
+                    chartValuesOptions: ChartValuesOptions(
+                      showChartValueBackground: true,
+                      showChartValues: true,
+                      showChartValuesInPercentage: true,
+                      showChartValuesOutside: true,
+                      decimalPlaces: 1,
+                    ),
                   ),
-                  SizedBox(width:20.0,),
                   Padding(
-                    padding: const EdgeInsets.only(top: 20.0),
+                    padding: const EdgeInsets.only(bottom: 55.0),
                     child: FutureBuilder<int>(
                       future: CalculatePercent(),
                       builder: (BuildContext context, AsyncSnapshot<int> snapshot) {

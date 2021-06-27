@@ -113,8 +113,6 @@ Future<List<int>> CalculateData(String Cat) async {
 
 Future<int> CalculatePercent() async {
   //boolean false means we wasted, true means we wasted less
-  int lessWaste = 0;
-
   int foodCountTotal = 0;
   int expiredCount = 0;
   int percentExpired = 0;

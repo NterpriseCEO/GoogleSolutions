@@ -49,18 +49,24 @@ class _DashboardState extends State<Dashboard> {
       "Snacks",
       "Desserts",
       "Homemade Meals",
-      "Misc"
+      "NA",
+      "Misc",
+      "NA"
     ];
     DateTime d = DateTime.now();
 
+    int number = 0;
     for (String category in categories) {
+      print("The number $number");
       List<int> expired = await CalculateData(category);
       inventoryCards?.add(InventoryCard(
-          category: category,
-          isBreakdownCard: true,
-          expiredAmount: expired[0]));
+        category: category,
+        isBreakdownCard: true,
+        expiredAmount: expired[0])
+      );
       total += expired[1];
       expiredAmount += expired[2];
+      number++;
     }
 
     return 1;
@@ -84,12 +90,14 @@ class _DashboardState extends State<Dashboard> {
                     expandedHeight: MediaQuery.of(context).size.width,
                     automaticallyImplyLeading: false,
                     leading: IconButton(
-                        icon: Icon(Icons.arrow_back,
-                            size: 36, color: Colors.black),
-                        tooltip: 'Return to Inventory',
-                        onPressed: () {
-                          Navigator.pop(context);
-                        }),
+                    icon: Icon(
+                      Icons.arrow_back,
+                      size: 36, color: Colors.black),
+                      tooltip: 'Return to Inventory',
+                      onPressed: () {
+                        Navigator.pop(context);
+                      }
+                    ),
                     stretch: true,
                     pinned: true,
                     flexibleSpace: FlexibleSpaceBar(
@@ -114,8 +122,8 @@ class _DashboardState extends State<Dashboard> {
                             ),
                           ),
                           ExpiryChart(
-                              expiredAmount: 1.0 * expiredAmount,
-                              total: 1.0 * total),
+                            expiredAmount: 1.0 * expiredAmount,
+                            total: 1.0 * total),
                         ]),
                       ),
                     ),
@@ -123,7 +131,7 @@ class _DashboardState extends State<Dashboard> {
                   SliverPadding(
                     padding: EdgeInsets.symmetric(horizontal: 16.0),
                     sliver: SliverGrid.count(
-                      crossAxisCount: 2,
+                      crossAxisCount: 3,
                       children: [
                         inventoryCards[0],
                         inventoryCards[1],
@@ -138,20 +146,21 @@ class _DashboardState extends State<Dashboard> {
                         inventoryCards[10],
                         inventoryCards[11],
                         inventoryCards[12],
+                        inventoryCards[13],
+                        inventoryCards[14],
                       ],
                     ),
                   ),
                   SliverPadding(
                     padding: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0),
                     sliver: SliverToBoxAdapter(
-                        child: Container(
-                      height: 150,
-                      padding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
-                      decoration: BoxDecoration(
-                        color: Colors.orange,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Expanded(
+                      child: Container(
+                        height: 150,
+                        padding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
+                        decoration: BoxDecoration(
+                          color: Colors.orange,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                         child: Column(
                           children: [
                             Padding(
@@ -175,8 +184,8 @@ class _DashboardState extends State<Dashboard> {
                             ),
                           ],
                         ),
-                      ),
-                    )),
+                      )
+                    ),
                   )
                 ],
               );
@@ -184,13 +193,14 @@ class _DashboardState extends State<Dashboard> {
               return CustomScrollView(
                 slivers: [
                   SliverToBoxAdapter(
-                      child: Text(
-                    "Loading...",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 36.0,
-                    ),
-                  ))
+                    child: Text(
+                      "Loading...",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 36.0,
+                      ),
+                    )
+                  )
                 ],
               );
             }

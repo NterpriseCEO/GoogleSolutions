@@ -9,6 +9,7 @@ typedef void Callback2(String category);
 
 //fireabase init
 FirebaseFirestore firestore = FirebaseFirestore.instance;
+List<String> months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
 Future<void> confirmBarcode(String itemName, BuildContext context, Callback callback) {
   int amount = 1; //Amount of items to add to inventory
@@ -273,7 +274,6 @@ void showPicker(BuildContext context, Callback2 callback) {
 }
 
 DateTime checkIfExpiry(String data) {
-  List<String> months = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
   //Splits the string by line
   LineSplitter ls = new LineSplitter();
   List<String> strings = ls.convert(data);
@@ -283,16 +283,19 @@ DateTime checkIfExpiry(String data) {
     data+=str+" ";
   }
   print("data goes here: $data");
-  var matches = RegExp(r"^((^[1-9]|0[1-9])|10|11|12)\s([0-9]{4})").allMatches(data);
   String date = "";
-  if(RegExp(r"((^[1-9]|0[1-9])|10|11|12)\s+([0-9]{4})").allMatches(data).length > 0) {
+  if(RegExp(r"((^[1-9]|0[1-9])|10|11|12)\s+([0-9]{2,4})").allMatches(data).length > 0) {
     /////07 2021/////
-    var matches = RegExp(r"((^[1-9]|0[1-9])|10|11|12)\s+([0-9]{4})").allMatches(data);
+    var matches = RegExp(r"((^[1-9]|0[1-9])|10|11|12)\s+([0-9]{2,4})").allMatches(data);
     var match = matches.elementAt(0);
     date = match.group(0);
     List<String> split = date.split(" ");
-    date = split[1]+"-"+split[0]+"-01";
-    //print("The date is: ${date}");
+    if(split[1].length == 2) {
+      date = "20"+split[1]+"-"+split[0]+"-01";;
+    }else {
+      date = split[1]+"-"+split[0]+"-01";
+    }
+    print("The date is: ${date}");
   }else if(RegExp(r"(\s*(\b([1-9]|0[1-9])|1[1-9]|2[0-9]|30|31)\s*/)(\s*(\b([1-9]|0[1-9])|1[0-2])\s*/)(\s*([0-9]{2,4}))").allMatches(data).length > 0) {
     /////01/07/2021/////
     var matches = RegExp(r"(\s*(\b([1-9]|0[1-9])|1[1-9]|2[0-9]|30|31)\s*/)(\s*(\b([1-9]|0[1-9])|1[0-2])\s*/)(\s*([0-9]{2,4}))").allMatches(data);

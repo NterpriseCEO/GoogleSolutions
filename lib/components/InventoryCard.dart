@@ -34,7 +34,7 @@ class _InventoryCardState extends State<InventoryCard> {
           borderRadius: BorderRadius.circular(15.0),
           //Border colour and width
           side: BorderSide(
-            color: Colors.orange,
+            color: widget.category != "NA" ? Colors.orange : Colors.white,
             width:2.0,
           ),
         ),
@@ -58,14 +58,18 @@ class _InventoryCardState extends State<InventoryCard> {
                   //Icon for the card
                   Expanded(
                     flex: 4,
-                    child: FadeInImage(image: AssetImage("assets/${widget.category.split(" ").join()}.png"), placeholder: AssetImage("assets/barcode.png")),
+                    child: widget.category != "NA" ?
+                      FadeInImage(
+                        image: AssetImage("assets/${widget.category.split(" ").join()}.png"),
+                        placeholder: AssetImage("assets/barcode.png")
+                      ) : Container(),
                   ),
-                  //Card Title
                   Expanded(
                     flex: 1,
                     child: Text(
-                      widget.isBreakdownCard ? "${widget.expiredAmount}% wasted" : widget.category,
+                      widget.isBreakdownCard ? widget.category != "NA" ? "${widget.expiredAmount}%" : "" : widget.category,
                       overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.black,
                         fontSize:20.0,

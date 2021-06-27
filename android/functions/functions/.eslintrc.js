@@ -25,6 +25,7 @@ module.exports = {
     "import",
   ],
   rules: {
+    "max-len": "off",
     "quotes": ["error", "double"],
     "linebreak-style": 0,
     "require-jsdoc": 0,

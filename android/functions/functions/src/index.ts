@@ -21,7 +21,9 @@ export const expiryDateChecker = functions.pubsub.schedule("0 06 * * *")
         let amountToday = 0;
         let amountTomorrow = 0;
         let amountExpired = 0;
-        await snapshot.forEach((doc) => {
+        let counter = 0;
+        let check = 0;
+        await snapshot.forEach(async (doc) => {
           const Date1 = new Date();
           Date1.setHours(0, 0, 0, 0);
           const Date2 = new Date(doc.data().ExpiryDate);
@@ -35,14 +37,39 @@ export const expiryDateChecker = functions.pubsub.schedule("0 06 * * *")
           } else if (diffInDays < 0) {
             amountExpired++;
             try {
-              db.collection("expiryGroups").doc("Users")
-                  .collection(collection.id).doc(doc.id).get().then((doc) => {
-                    if (doc.exists) {
-                      db.collection("expiryGroups").doc("Users")
-                          .collection(collection.id).doc(doc.id)
-                          .update({Expired: true});
-                    }
-                  });
+              counter = parseInt(doc.data().Quantity
+                  .toString());
+              const doc2 = await db.collection("expiryGroups").doc("Users")
+                  .collection(collection.id).doc(doc.id).get();
+              if (doc2.exists) {
+                db.collection("expiryGroups").doc("Users")
+                    .collection(collection.id).doc(doc2.id)
+                    .update({Expired: true});
+                check = 0;
+                check = parseInt(doc2?.data()?.expiryCount.toString()) || 0;
+                if (check == 0) {
+                  db.collection("expiryGroups").doc("Users")
+                      .collection(collection.id).doc(doc2.id)
+                      .update({expiryCount: admin.firestore.FieldValue.increment(counter)});
+                }
+              }
+              // db.collection("expiryGroups").doc("Users")
+              //    .collection(collection.id).doc(doc.id).get().then((doc2) => {
+              //      if (doc2.exists) {
+              //        db.collection("expiryGroups").doc("Users")
+              //            .collection(collection.id).doc(doc2.id)
+              //            .update({Expired: true});
+              //        check = 0;
+              //        if (doc2.data()) {
+              //          check = parseInt(doc2.data().expiryCount.toString()) || 0;
+              //        }
+              //        if (check == 0) {
+              //          db.collection("expiryGroups").doc("Users")
+              //              .collection(collection.id).doc(doc.id)
+              //              .update({expiryCount: admin.firestore.FieldValue.increment(counter)});
+              //        }
+              //      }
+              //    });
             } catch (e) {
               console.log(e);
             }
@@ -99,7 +126,9 @@ functions.https.onRequest(async (request, response) => {
     let amountToday = 0;
     let amountTomorrow = 0;
     let amountExpired = 0;
-    await snapshot.forEach((doc) => {
+    let counter = 0;
+    let check = 0;
+    await snapshot.forEach(async (doc) => {
       const Date1 = new Date();
       Date1.setHours(0, 0, 0, 0);
       const Date2 = new Date(doc.data().ExpiryDate);
@@ -113,14 +142,21 @@ functions.https.onRequest(async (request, response) => {
       } else if (diffInDays < 0) {
         amountExpired++;
         try {
-          db.collection("expiryGroups").doc("Users")
-              .collection(collection.id).doc(doc.id).get().then((doc) => {
-                if (doc.exists) {
-                  db.collection("expiryGroups").doc("Users")
-                      .collection(collection.id).doc(doc.id)
-                      .update({Expired: true});
-                }
-              });
+          counter = parseInt(doc.data().Quantity
+              .toString());
+          const doc2 = await db.collection("expiryGroups").doc("Users")
+              .collection(collection.id).doc(doc.id).get();
+          if (doc2.exists) {
+            db.collection("expiryGroups").doc("Users")
+                .collection(collection.id).doc(doc2.id)
+                .update({Expired: true});
+            check = parseInt(doc2?.data()?.expiryCount.toString()) || 0;
+            if (check == 0) {
+              db.collection("expiryGroups").doc("Users")
+                  .collection(collection.id).doc(doc2.id)
+                  .update({expiryCount: admin.firestore.FieldValue.increment(counter)});
+            }
+          }
         } catch (e) {
           console.log(e);
         }
