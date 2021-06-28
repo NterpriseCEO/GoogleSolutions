@@ -88,19 +88,20 @@ class _DashboardState extends State<Dashboard> {
                     expandedHeight: MediaQuery.of(context).size.width,
                     automaticallyImplyLeading: false,
                     leading: IconButton(
-                        icon: Icon(Icons.arrow_back,
-                            size: 36, color: Colors.black),
-                        tooltip: 'Return to Inventory',
-                        onPressed: () {
-                          Navigator.pop(context);
-                        }),
+                      icon: Icon(Icons.arrow_back,
+                      size: 36, color: Colors.black),
+                      tooltip: 'Return to Inventory',
+                      onPressed: () {
+                        Navigator.pop(context);
+                      }
+                    ),
                     stretch: true,
                     pinned: true,
                     flexibleSpace: FlexibleSpaceBar(
                       titlePadding: EdgeInsets.symmetric(vertical: 10.0),
                       centerTitle: true,
                       title: Text(
-                        "Breakdown",
+                        "Wastage",
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.black,
@@ -112,14 +113,15 @@ class _DashboardState extends State<Dashboard> {
                         padding: const EdgeInsets.all(16.0),
                         child: Column(children: [
                           Text(
-                            "Hello",
+                            "Do Not Remove",
                             style: TextStyle(
                               color: Colors.transparent,
                             ),
                           ),
                           ExpiryChart(
-                              expiredAmount: 1.0 * expiredAmount,
-                              total: 1.0 * total),
+                            expiredAmount: 1.0 * expiredAmount,
+                            total: 1.0 * total
+                          ),
                         ]),
                       ),
                     ),
@@ -150,44 +152,45 @@ class _DashboardState extends State<Dashboard> {
                   SliverPadding(
                     padding: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0),
                     sliver: SliverToBoxAdapter(
-                        child: Container(
-                      height: 150,
-                      padding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        gradient: LinearGradient(
-                          begin: Alignment.bottomLeft,
-                          end: Alignment.topRight,
-                          colors: [
-                            Colors.amber[500],
-                            Colors.amber[600],
-                          ],
+                      child: Container(
+                        height: 150,
+                        padding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          gradient: LinearGradient(
+                            begin: Alignment.bottomLeft,
+                            end: Alignment.topRight,
+                            colors: [
+                              Colors.amber[500],
+                              Colors.amber[600],
+                            ],
+                          ),
                         ),
-                      ),
-                      child: Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              'Food Waste Facts',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 20.0,
-                                fontWeight: FontWeight.bold,
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                'Food Waste Facts',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 20.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
-                          ),
-                          Text(
-                            '25% of the world’s fresh water supply is used to grow food that is never eaten.',
-                            textAlign: TextAlign.justify,
-                            style: TextStyle(
-                              height: 1.5,
-                              fontSize: 15.0,
+                            Text(
+                              '25% of the world’s fresh water supply is used to grow food that is never eaten.',
+                              textAlign: TextAlign.justify,
+                              style: TextStyle(
+                                height: 1.5,
+                                fontSize: 15.0,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    )),
+                          ],
+                        ),
+                      )
+                    ),
                   )
                 ],
               );

@@ -119,14 +119,15 @@ class _LoginState extends State<Login> {
         inAsyncCall: showSpinner,
         child: Container(
           decoration: BoxDecoration(
-              gradient: LinearGradient(
-            begin: Alignment.bottomLeft,
-            end: Alignment.topRight,
-            colors: [
-              Colors.amber[500],
-              Colors.amber[800],
-            ],
-          )),
+            gradient: LinearGradient(
+              begin: Alignment.bottomLeft,
+              end: Alignment.topRight,
+              colors: [
+                Colors.amber[500],
+                Colors.amber[800],
+              ],
+            )
+          ),
           child: Center(
             child: Column(
               mainAxisSize: MainAxisSize.max,

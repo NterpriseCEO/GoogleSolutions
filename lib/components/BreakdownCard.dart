@@ -61,10 +61,10 @@ class _InventoryCardState extends State<InventoryCard> {
                   Expanded(
                     flex: 4,
                     child: widget.category != "NA" ?
-                      FadeInImage(
-                        image: AssetImage("assets/${widget.category.split(" ").join()}.png"),
-                        placeholder: AssetImage("assets/barcode.png")
-                      ) : Container(),
+                    FadeInImage(
+                      image: AssetImage("assets/${widget.category.split(" ").join()}.png"),
+                      placeholder: AssetImage("assets/barcode.png")
+                    ) : Container(),
                   ),
                   Expanded(
                     flex: widget.isBreakdownCard ? 2 : 1,

@@ -12,7 +12,7 @@ class Inventory extends StatefulWidget {
 }
 
 class _InventoryState extends State<Inventory> {
-  Map title = {};
+  Map category = {};
 
   TextEditingController _controller;
 
@@ -32,12 +32,12 @@ class _InventoryState extends State<Inventory> {
   @override
   Widget build(BuildContext context) {
 
-    title = ModalRoute.of(context).settings.arguments;
+    category = ModalRoute.of(context).settings.arguments;
 
     //Creates the list of expiry items
     Widget dataList()  {
       return StreamBuilder<QuerySnapshot>(
-        stream: firestore.collection(userCol).snapshots(),
+        stream: firestore.collection(userCol).where("Category", isEqualTo: category["category"]).snapshots(),
         builder: (context, snapshot){
           List<Widget> itemWidgets = [];
           if(snapshot.hasData){
@@ -46,48 +46,45 @@ class _InventoryState extends State<Inventory> {
             int increment = 0;
             DateTime now = DateTime.now();
             for(var item in items){
-              final itemCategory = item.get('Category');
-              if(itemCategory == title["category"]) {
-                final itemExpiry = item.get('ExpiryDate');
-                DateTime expiry = DateTime.parse(itemExpiry);
-                int daysTillExpiry = expiry.difference(DateTime(now.year, now.month, now.day)).inDays;
-                String itemName = item.get('ProductName').toString();
-                int itemQuantity = int.parse(item.get('Quantity').toString());
+              final itemExpiry = item.get('ExpiryDate');
+              DateTime expiry = DateTime.parse(itemExpiry);
+              int daysTillExpiry = expiry.difference(DateTime(now.year, now.month, now.day)).inDays;
+              String itemName = item.get('ProductName').toString();
+              int itemQuantity = int.parse(item.get('Quantity').toString());
 
-                if(itemName.toLowerCase().contains(search.toLowerCase()) || search == "") {
-                  increment++;
-                  final itemWidget = Dismissible(
-                    key: UniqueKey(),
-                    direction: DismissDirection.endToStart,
-                    child: InventoryItem(
-                      expiryDate: daysTillExpiry,
-                      product: itemName,
-                      quantity: itemQuantity,
-                      callback: (int direction) {
-                        updateItemAmount(item.id, false, itemQuantity, direction);
-                      },
-                    ),
-                    onDismissed: (direction) {
-                      updateItemAmount(item.id, true, itemQuantity, 0);
+              if(itemName.toLowerCase().contains(search.toLowerCase()) || search == "") {
+                increment++;
+                final itemWidget = Dismissible(
+                  key: UniqueKey(),
+                  direction: DismissDirection.endToStart,
+                  child: InventoryItem(
+                    expiryDate: daysTillExpiry,
+                    product: itemName,
+                    quantity: itemQuantity,
+                    callback: (int direction) {
+                      updateItemAmount(item.id, false, itemQuantity, direction);
                     },
-                    background: Container(
-                      color: Colors.red,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: <Widget>[
-                          Padding(
-                            padding: EdgeInsets.only(right: 15.0),
-                            child: Icon(
-                              Icons.delete,
-                              color: Colors.white,
-                            ),
-                          )
-                        ]
-                      ),
+                  ),
+                  onDismissed: (direction) {
+                    updateItemAmount(item.id, true, itemQuantity, 0);
+                  },
+                  background: Container(
+                    color: Colors.red,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        Padding(
+                          padding: EdgeInsets.only(right: 15.0),
+                          child: Icon(
+                            Icons.delete,
+                            color: Colors.white,
+                          ),
+                        )
+                      ]
                     ),
-                  );
-                  itemWidgets.add(itemWidget);
-                }
+                  ),
+                );
+                itemWidgets.add(itemWidget);
               }
             }
             if(increment == 0) {
@@ -97,7 +94,7 @@ class _InventoryState extends State<Inventory> {
                   children: [
                     Text(
                       (search == null || search == "") ?
-                      "There's no ${title["category"].toLowerCase()} in your inventory" :
+                      "There's no ${category["category"].toLowerCase()} in your inventory" :
                       "No results found!",
                       textAlign: TextAlign.center,
                       style: TextStyle(
@@ -137,12 +134,17 @@ class _InventoryState extends State<Inventory> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: IconThemeData(
-          color: Colors.black,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back,
+          size: 36, color: Colors.black),
+          tooltip: 'Return to Inventory',
+          onPressed: () {
+            Navigator.pop(context);
+          }
         ),
         centerTitle: true,
         title: Text(
-          title["category"],
+          category["category"],
           style: TextStyle(
             color: Colors.black,
             fontSize: 34.0
