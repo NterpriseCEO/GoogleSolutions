@@ -1,87 +1,72 @@
 import 'package:flutter/material.dart';
 
-class InventoryCard extends StatefulWidget {
-  final String category;
-  final bool isBreakdownCard;
-  int expiredAmount;
+class BreakdownCard extends StatelessWidget {
+  final String product;
+  final int quantity;
+  final int expiryCount;
+  //The callback for removing the item from the inventory
 
-  InventoryCard({ this.category, this.isBreakdownCard, this.expiredAmount });
+  BreakdownCard({this.quantity, this.product, this.expiryCount,});
 
-  @override
-  _InventoryCardState createState() => _InventoryCardState();
-}
-
-class _InventoryCardState extends State<InventoryCard> {
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () async {
-        if(this.widget.isBreakdownCard) {
-          Navigator.pushNamed(context, "/DashboardBreakdown", arguments: {
-            "category": widget.category
-          });
-        }else {
-          Navigator.pushNamed(context, "/inventory", arguments: {
-            "category": widget.category
-          });
-        }
-      },
-      //The Card that links to an inventory page
-      child: Card(
-        //Make it flat
-        elevation: 0,
-        clipBehavior: Clip.hardEdge,
-        //Give it a border with border radius
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15.0),
-          //Border colour and width
-          side: BorderSide(
-            color: widget.category != "NA" ? Colors.orange : Colors.white,
-            width:2.0,
-          ),
-        ),
-        child: Stack(
-          alignment: Alignment.bottomCenter,
-          children: [
-            this.widget.isBreakdownCard ? FractionallySizedBox(
-              widthFactor: 1,
-              heightFactor: widget.expiredAmount/100,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.redAccent,
-                  borderRadius: BorderRadius.circular(7.5),
-                ),
-              ),
-            ) : Container(),
-            Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Column(
-                children: [
-                  //Icon for the card
-                  Expanded(
-                    flex: 4,
-                    child: widget.category != "NA" ?
-                    FadeInImage(
-                      image: AssetImage("assets/${widget.category.split(" ").join()}.png"),
-                      placeholder: AssetImage("assets/barcode.png")
-                    ) : Container(),
+    //Set the expiry date to 0 if it is less than 0
+
+    //The colour indicator for how fresh an item is
+    return ListTile(
+      title: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              this.product,
+              style: TextStyle(
+                fontSize: 20.0,
+                fontWeight: FontWeight.bold
+              )
+            ),
+            SizedBox(height: 10.0),
+            Stack(
+              children: <Widget>[
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.blue,
+                    borderRadius: BorderRadius.circular(7.5),
                   ),
-                  Expanded(
-                    flex: widget.isBreakdownCard ? 2 : 1,
-                    child: Text(
-                      widget.isBreakdownCard ? widget.category != "NA" ? "${widget.expiredAmount}%" : "" : widget.category,
-                      overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize:20.0,
-                        fontWeight: FontWeight.bold,
+                  height: 30.0,
+                  width: MediaQuery.of(context).size.width,
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: FractionallySizedBox(
+                      widthFactor: this.expiryCount/this.quantity,
+                      heightFactor: 1,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.redAccent,
+                          borderRadius: BorderRadius.circular(7.5),
+                        ),
                       ),
                     ),
                   ),
-                ],
-              ),
-            ),
+                ),
+                Container(
+                  height: 30.0,
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 16.0),
+                      child: Text(
+                        ((this.expiryCount/this.quantity)*100).toString()+"%",
+                        style: TextStyle(
+                          color: Colors.white
+                        )
+                      ),
+                    ),
+                  ),
+                )
+              ],
+            )
           ],
         ),
       ),

@@ -1,4 +1,4 @@
-import 'package:best_before_app/components/InventoryItem.dart';
+import 'package:best_before_app/components/BreakdownCard.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -18,15 +18,6 @@ class _DashboardBreakdownState extends State<DashboardBreakdown> {
 
     category = ModalRoute.of(context).settings.arguments;
 
-    firestore.collection("expiryGroups").doc("Users").collection(userCol)
-    .where("Category", isEqualTo: category["category"]).get()
-    .then((snapshot) {
-      List<DocumentSnapshot> docs = snapshot.docs;
-      docs.forEach((DocumentSnapshot document) {
-        print("hello mate! ${document.get("Category")}");
-      });
-    });
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -41,7 +32,7 @@ class _DashboardBreakdownState extends State<DashboardBreakdown> {
         ),
         centerTitle: true,
         title: Text(
-          "Expiration",
+          "Expired Items",
           style: TextStyle(
             color: Colors.black,
             fontSize: 34.0
@@ -60,43 +51,17 @@ class _DashboardBreakdownState extends State<DashboardBreakdown> {
             DateTime now = DateTime.now();
             for(var item in items){
               final itemCategory = item.get('Category');
-              if(itemCategory == category["category"]) {
-                String itemName = item.get('ProductName').toString();
-                int itemQuantity = int.parse(item.get('Quantity').toString());
+              String itemName = item.get('ProductName').toString();
+              int itemQuantity = int.parse(item.get('Quantity').toString());
+              int expiredCount = int.parse(item.get('expiryCount').toString());
 
-                increment++;
-                final itemWidget = Dismissible(
-                  key: UniqueKey(),
-                  direction: DismissDirection.endToStart,
-                  child: InventoryItem(
-                    expiryDate: 10,
-                    product: itemName,
-                    quantity: itemQuantity,
-                    callback: (int direction) {
-                      updateItemAmount(item.id, false, itemQuantity, direction);
-                    },
-                  ),
-                  onDismissed: (direction) {
-                    updateItemAmount(item.id, true, itemQuantity, 0);
-                  },
-                  background: Container(
-                    color: Colors.red,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: <Widget>[
-                        Padding(
-                          padding: EdgeInsets.only(right: 15.0),
-                          child: Icon(
-                            Icons.delete,
-                            color: Colors.white,
-                          ),
-                        )
-                      ]
-                    ),
-                  ),
-                );
-                itemWidgets.add(itemWidget);
-              }
+              increment++;
+
+              itemWidgets.add(BreakdownCard(
+                product: itemName,
+                quantity: itemQuantity,
+                expiryCount: expiredCount,
+              ));
             }
             if(increment == 0) {
               itemWidgets.add(Padding(
@@ -104,7 +69,7 @@ class _DashboardBreakdownState extends State<DashboardBreakdown> {
                 child: Column(
                   children: [
                     Text(
-                      "No results found!",
+                      "No items expired!",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize:20.0,

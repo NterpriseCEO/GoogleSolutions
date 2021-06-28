@@ -273,6 +273,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
                       icon: Icon(Icons.keyboard),
                       iconSize: 40.0,
                       color: Colors.white,
+                      tooltip: "Enter details manually",
                       onPressed: () {
                         //Determines which popup to show on button click
                         if(!barCodeScanned) {
