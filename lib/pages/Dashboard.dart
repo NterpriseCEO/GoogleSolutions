@@ -59,10 +59,9 @@ class _DashboardState extends State<Dashboard> {
       List<int> expired = await CalculateData(category);
       //print("expired yo ${expired[0]}");
       inventoryCards?.add(InventoryCard(
-        category: category,
-        isBreakdownCard: true,
-        expiredAmount: expired[0])
-      );
+          category: category,
+          isBreakdownCard: true,
+          expiredAmount: expired[0]));
       total += expired[1];
       expiredAmount += expired[2];
     }
@@ -89,14 +88,12 @@ class _DashboardState extends State<Dashboard> {
                     expandedHeight: MediaQuery.of(context).size.width,
                     automaticallyImplyLeading: false,
                     leading: IconButton(
-                    icon: Icon(
-                      Icons.arrow_back,
-                      size: 36, color: Colors.black),
-                      tooltip: 'Return to Inventory',
-                      onPressed: () {
-                        Navigator.pop(context);
-                      }
-                    ),
+                        icon: Icon(Icons.arrow_back,
+                            size: 36, color: Colors.black),
+                        tooltip: 'Return to Inventory',
+                        onPressed: () {
+                          Navigator.pop(context);
+                        }),
                     stretch: true,
                     pinned: true,
                     flexibleSpace: FlexibleSpaceBar(
@@ -121,8 +118,8 @@ class _DashboardState extends State<Dashboard> {
                             ),
                           ),
                           ExpiryChart(
-                            expiredAmount: 1.0 * expiredAmount,
-                            total: 1.0 * total),
+                              expiredAmount: 1.0 * expiredAmount,
+                              total: 1.0 * total),
                         ]),
                       ),
                     ),
@@ -153,38 +150,44 @@ class _DashboardState extends State<Dashboard> {
                   SliverPadding(
                     padding: EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0),
                     sliver: SliverToBoxAdapter(
-                      child: Container(
-                        height: 150,
-                        padding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
-                        decoration: BoxDecoration(
-                          color: Colors.orange,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                'Food Waste Facts',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 20.0,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            Text(
-                              'Every 60 seconds in Africa, one minute passes. Every 24 hours in Africa, one day passes. Thank You!',
-                              textAlign: TextAlign.justify,
-                              style: TextStyle(
-                                height: 1.5,
-                                fontSize: 15.0,
-                              ),
-                            ),
+                        child: Container(
+                      height: 150,
+                      padding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        gradient: LinearGradient(
+                          begin: Alignment.bottomLeft,
+                          end: Alignment.topRight,
+                          colors: [
+                            Colors.amber[500],
+                            Colors.amber[600],
                           ],
                         ),
-                      )
-                    ),
+                      ),
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              'Food Waste Facts',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 20.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          Text(
+                            '25% of the world’s fresh water supply is used to grow food that is never eaten.',
+                            textAlign: TextAlign.justify,
+                            style: TextStyle(
+                              height: 1.5,
+                              fontSize: 15.0,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )),
                   )
                 ],
               );
@@ -192,14 +195,13 @@ class _DashboardState extends State<Dashboard> {
               return CustomScrollView(
                 slivers: [
                   SliverToBoxAdapter(
-                    child: Text(
-                      "Loading...",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 36.0,
-                      ),
-                    )
-                  )
+                      child: Text(
+                    "Loading...",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 36.0,
+                    ),
+                  ))
                 ],
               );
             }

@@ -36,7 +36,8 @@ class _LoginState extends State<Login> {
     super.initState();
 
     var initializationSettingsAndroid = AndroidInitializationSettings('icon');
-    var initializationSettings = InitializationSettings(android: initializationSettingsAndroid);
+    var initializationSettings =
+        InitializationSettings(android: initializationSettingsAndroid);
     flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
     FirebaseMessaging.instance.getInitialMessage();
@@ -48,47 +49,51 @@ class _LoginState extends State<Login> {
       RemoteNotification notification = message.notification;
       AndroidNotification android = message.notification?.android;
       if (notification != null && android != null) {
-        flutterLocalNotificationsPlugin.show(notification.hashCode, notification.title, notification.body,
-        NotificationDetails(
-          //assigns specific channel
-          android: AndroidNotificationDetails(
-            channel.id,
-            channel.name,
-            channel.description,
-            // TODO add a proper drawable resource to android, for now using
-            //      one that already exists in example app.
-            icon: 'icon',
-          ),
-        ));
+        flutterLocalNotificationsPlugin.show(
+            notification.hashCode,
+            notification.title,
+            notification.body,
+            NotificationDetails(
+              //assigns specific channel
+              android: AndroidNotificationDetails(
+                channel.id,
+                channel.name,
+                channel.description,
+                // TODO add a proper drawable resource to android, for now using
+                //      one that already exists in example app.
+                icon: 'icon',
+              ),
+            ));
       }
     });
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message){
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       print('New onmessageopenedapp event published');
       RemoteNotification notification = message.notification;
       AndroidNotification android = message.notification?.android;
       if (notification != null && android != null) {
-        flutterLocalNotificationsPlugin.show(notification.hashCode, notification.title, notification.body,
-          NotificationDetails(
-            //assigns specific channel
-            android: AndroidNotificationDetails(
-              channel.id,
-              channel.name,
-              channel.description,
-              // TODO add a proper drawable resource to android, for now using
-              //      one that already exists in example app.
-              icon: 'icon',
-            ),
-          )
-        );
+        flutterLocalNotificationsPlugin.show(
+            notification.hashCode,
+            notification.title,
+            notification.body,
+            NotificationDetails(
+              //assigns specific channel
+              android: AndroidNotificationDetails(
+                channel.id,
+                channel.name,
+                channel.description,
+                // TODO add a proper drawable resource to android, for now using
+                //      one that already exists in example app.
+                icon: 'icon',
+              ),
+            ));
       }
     });
 
     getToken();
   }
 
-
   void isSignedIn() async {
-    if(_auth.currentUser != null) {
+    if (_auth.currentUser != null) {
       userCol = _auth.currentUser.uid;
       FirebaseMessaging.instance.subscribeToTopic(userCol);
       //Waits for the widget tree to stop building before skipping login screen
@@ -96,14 +101,14 @@ class _LoginState extends State<Login> {
       deleteOldData();
       getData();
       WidgetsBinding.instance.addPostFrameCallback((_) => {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) {
-              return Menu();
-            },
-          ),
-        )
-      });
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) {
+                  return Menu();
+                },
+              ),
+            ),
+          });
     }
   }
 
@@ -114,15 +119,14 @@ class _LoginState extends State<Login> {
         inAsyncCall: showSpinner,
         child: Container(
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.bottomLeft,
-              end: Alignment.topRight,
-              colors: [
-                Colors.amber[500],
-                Colors.amber[800],
-              ],
-            )
-          ),
+              gradient: LinearGradient(
+            begin: Alignment.bottomLeft,
+            end: Alignment.topRight,
+            colors: [
+              Colors.amber[500],
+              Colors.amber[800],
+            ],
+          )),
           child: Center(
             child: Column(
               mainAxisSize: MainAxisSize.max,
@@ -139,13 +143,45 @@ class _LoginState extends State<Login> {
                     });
                     signInWithGoogle().then((result) {
                       if (result != null) {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return Menu();
-                            },
-                          ),
+                        // create a tutorial dialog
+
+                        Widget okButton = FlatButton(
+                          child: Text("OK"),
+                          onPressed: () {
+                            // proceed to the app
+
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) {
+                                  return Menu();
+                                },
+                              ),
+                            );
+                          },
                         );
+
+                        // set up the AlertDialog
+                        AlertDialog alert = AlertDialog(
+                          title: Text("Tutorial"),
+                          content: Text(
+                              "To use our app effectively, you should know about next 3 pages: \n\n"
+                              "1. Camera Page - use your phone camera to scan barcodes and recognize expiry dates. \n\n"
+                              "2. Expiry List - swipe left to check products that are expiring soon and remove them as you eat them. \n\n"
+                              "3. Inventory - swipe right to check what is inside your fridge.",
+                              textAlign: TextAlign.justify),
+                          actions: [
+                            okButton,
+                          ],
+                        );
+
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return alert;
+                          },
+                        );
+
+                        showDialog();
                       }
                       setState(() {
                         showSpinner = false;
