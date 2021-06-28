@@ -65,7 +65,7 @@ class _InventoryCardState extends State<InventoryCard> {
                       ) : Container(),
                   ),
                   Expanded(
-                    flex: 1,
+                    flex: widget.isBreakdownCard ? 2 : 1,
                     child: Text(
                       widget.isBreakdownCard ? widget.category != "NA" ? "${widget.expiredAmount}%" : "" : widget.category,
                       overflow: TextOverflow.ellipsis,

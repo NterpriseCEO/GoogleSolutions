@@ -55,10 +55,9 @@ class _DashboardState extends State<Dashboard> {
     ];
     DateTime d = DateTime.now();
 
-    int number = 0;
     for (String category in categories) {
-      print("The number $number");
       List<int> expired = await CalculateData(category);
+      //print("expired yo ${expired[0]}");
       inventoryCards?.add(InventoryCard(
         category: category,
         isBreakdownCard: true,
@@ -66,7 +65,6 @@ class _DashboardState extends State<Dashboard> {
       );
       total += expired[1];
       expiredAmount += expired[2];
-      number++;
     }
 
     return 1;
@@ -83,6 +81,7 @@ class _DashboardState extends State<Dashboard> {
           future: getCards(),
           builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
             if (snapshot.hasData) {
+              print("!broooooooooooooo $expiredAmount");
               return CustomScrollView(
                 slivers: [
                   SliverAppBar(

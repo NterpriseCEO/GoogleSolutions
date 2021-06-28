@@ -57,15 +57,8 @@ class _MenuState extends State<Menu> {
                   //The pages in the PageView
                   children: <Widget>[
                     //The page pages
-                    Container(
-                      color: Colors.white,
-                      child: ExpirationPage(),
-                      // child: ExpirationPage(),
-                    ),
-                    Container(
-                      //The ScanPicture() page
-                      child: ScanPicture(),
-                    ),
+                    ExpirationPage(),
+                    ScanPicture(),
                     InventoryOverview(
                       // goToPage: (int page) {
                       //   setState(() {
