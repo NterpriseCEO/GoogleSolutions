@@ -66,7 +66,7 @@ class _InventoryOverviewState extends State<InventoryOverview> {
         ),
         centerTitle: true,
         title: Text(
-          "Expiration",
+          "My Fridge",
           style: TextStyle(
             color: Colors.black,
             fontSize: 34.0

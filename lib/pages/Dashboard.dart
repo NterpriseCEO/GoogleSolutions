@@ -180,6 +180,20 @@ class _DashboardState extends State<Dashboard> {
                     ),
                   ),
                   SliverPadding(
+                    padding:  EdgeInsets.fromLTRB(8.0,24.0,8.0,8.0),
+                    sliver: SliverToBoxAdapter(
+                      child: Text(
+                        "Food Facts",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 24.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                       ),
+                     ),
+                  ),
+                  SliverPadding(
                     padding: EdgeInsets.all(16.0),
                     sliver: SliverToBoxAdapter(
                       child: Container(
@@ -191,22 +205,14 @@ class _DashboardState extends State<Dashboard> {
                             end: Alignment.topRight,
                             colors: [
                               Colors.amber[500],
-                              Colors.amber[800],
+                              Colors.amber[500],
                             ],
                           ),
                         ),
                         child: Column(
                           children: [
-                            Text(
-                              'Food Waste Facts',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 28.0,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
                             SizedBox(
-                              height: 10.0,
+                              height: 1.0,
                             ),
                             Text(
                               textElement,

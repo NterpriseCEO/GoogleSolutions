@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../UpdateDatabase.dart';
+import 'components/Utils.dart';
 
 class DashboardBreakdown extends StatefulWidget {
   @override
@@ -41,7 +42,7 @@ class _DashboardBreakdownState extends State<DashboardBreakdown> {
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream:  firestore.collection("expiryGroups").doc("Users").collection(userCol)
-            .where("Category", isEqualTo: category["category"]).get().asStream(),
+            .where("Category", isEqualTo: category["category"]).where("week", isEqualTo: weekNumber(DateTime.now())-1).get().asStream(),
         builder: (context, snapshot){
           List<Widget> itemWidgets = [];
           if(snapshot.hasData){
