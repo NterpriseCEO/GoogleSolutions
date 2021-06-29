@@ -191,20 +191,12 @@ class _DashboardState extends State<Dashboard> {
                             end: Alignment.topRight,
                             colors: [
                               Colors.amber[500],
-                              Colors.amber[800],
+                              Colors.amber[500],
                             ],
                           ),
                         ),
                         child: Column(
                           children: [
-                            Text(
-                              'Food Waste Facts',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 28.0,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
                             SizedBox(
                               height: 10.0,
                             ),

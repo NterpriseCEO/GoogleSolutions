@@ -13,6 +13,7 @@ String userCol = "";
 void updateItemAmount(String id, bool remove, int quantity, int increment) async {
   //References the users database collection
   DocumentReference document = firestore.collection(userCol).doc(id);
+  DocumentReference document2 = firestore.collection("expiryGroups/Users/$userCol/").doc(id);
   //Removes the item if the quantity is <= 1
   //Or if boolean = true
   if(remove) {
@@ -23,6 +24,10 @@ void updateItemAmount(String id, bool remove, int quantity, int increment) async
       if(doc.exists) {
         document.update({"Quantity": FieldValue.increment(increment)})
         .catchError((error) {
+          print(error);
+        }),
+        document2.update({"Quantity": FieldValue.increment(increment)})
+            .catchError((error) {
           print(error);
         })
       }
@@ -48,6 +53,7 @@ void addItemToDB(String itemName, String category, int amount, String expiryDate
       'Category': category,
       'ProductName': itemName,
       'Quantity': amount,
+      'expiryCount': 0,
       "Expired": false,
       "week": weekNumber(DateTime.parse(expiryDate))
     });
