@@ -94,27 +94,31 @@ void deleteOldData() {
 }
 
 Future<List<int>> CalculateData(String Cat) async {
-  int foodCountTotal = 0;
-  int expiredCount = 0;
+  int foodCount = 0;
+  int expiryCount = 0;
   int percentExpired = 0;
   await firestore.collection("expiryGroups/Users/$userCol/")
     .where("week", isEqualTo: weekNumber(DateTime.now())-1).get().then((snapshot) {
     List<DocumentSnapshot> Docs = snapshot.docs;
     Docs.forEach((DocumentSnapshot document) {
       if(Cat == document.get("Category")){
-        foodCountTotal = foodCountTotal + 1;
+        //get total here, get item quantity
+        foodCount += document.get("Quantity");
         if(document.get("Expired") == true){
-          expiredCount = expiredCount + 1;
+          //get expired here, get expiry count
+          expiryCount += document.get("expiryCount");
         }
       }
     });
   });
   try {
-    percentExpired = percentExpired + ((expiredCount/foodCountTotal)*100).round();
+    percentExpired = percentExpired + ((expiryCount/foodCount)*100).round();
   } catch (e) {
     print(e);
   }
-  return [percentExpired, foodCountTotal, expiredCount];
+  return [percentExpired, expiryCount, foodCount];
+  foodCount = 0;
+  expiryCount = 0;
 }
 
 Future<int> CalculatePercent() async {
@@ -134,14 +138,15 @@ Future<int> CalculatePercent() async {
       .then((snapshot) {
     List<DocumentSnapshot> Docs = snapshot.docs;
     Docs.forEach((DocumentSnapshot document) {
-      foodCountTotal = foodCountTotal + 1;
+      foodCountTotal += document.get("Quantity");
       if (document.get("Expired") == true) {
-        expiredCount = expiredCount + 1;
+        expiredCount += document.get("expiryCount");
       }
     });
     try {
       percentExpired =
           percentExpired + ((expiredCount / foodCountTotal) * 100).round();
+      print(percentExpired);
     } catch (e) {
       print(e);
     }
@@ -154,13 +159,14 @@ Future<int> CalculatePercent() async {
       .then((snapshot) {
     List<DocumentSnapshot> Docs = snapshot.docs;
     Docs.forEach((DocumentSnapshot document) {
-      foodCountTotal2 = foodCountTotal2 + 1;
+      foodCountTotal2 = document.get("Quantity");
       if (document.get("Expired") == true) {
-        expiredCount2 = expiredCount2 + 1;
+        expiredCount2 = document.get("expiryCount");
       }
     });
     try {
       percentExpired2 = ((expiredCount2 / foodCountTotal2) * 100).round();
+      print(percentExpired2);
     } catch (e) {
       print(e);
     }
