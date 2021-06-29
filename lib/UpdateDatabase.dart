@@ -98,30 +98,30 @@ Future<List<int>> CalculateData(String Cat) async {
   int expiryCount = 0;
   int percentExpired = 0;
   await firestore.collection("expiryGroups/Users/$userCol/")
-    .where("week", isEqualTo: weekNumber(DateTime.now())-1).get().then((snapshot) {
+    .where("week", isEqualTo: weekNumber(DateTime.now())-1)
+    .where("Category", isEqualTo: Cat).get().then((snapshot) {
     List<DocumentSnapshot> Docs = snapshot.docs;
     Docs.forEach((DocumentSnapshot document) {
-      if(Cat == document.get("Category")){
-        //get total here, get item quantity
-        foodCount += document.get("Quantity");
-        if(document.get("Expired") == true){
-          //get expired here, get expiry count
-          expiryCount += document.get("expiryCount");
-        }
+      //get total here, get item quantity
+      foodCount += document.get("Quantity");
+      if(document.get("Expired") == true){
+        //get expired here, get expiry count
+        expiryCount += document.get("expiryCount");
       }
     });
   });
   try {
     percentExpired = percentExpired + ((expiryCount/foodCount)*100).round();
   } catch (e) {
-    print(e);
+    //print(e);
   }
-  return [percentExpired, expiryCount, foodCount];
+  print("expiryCount = $expiryCount, foocCount = $foodCount, category = $Cat");
+  return [percentExpired, foodCount, expiryCount];
   foodCount = 0;
   expiryCount = 0;
 }
 
-Future<int> CalculatePercent() async {
+Future<List<int>> CalculatePercent() async {
   //boolean false means we wasted, true means we wasted less
   int foodCountTotal = 0;
   int expiredCount = 0;
@@ -144,8 +144,7 @@ Future<int> CalculatePercent() async {
       }
     });
     try {
-      percentExpired =
-          percentExpired + ((expiredCount / foodCountTotal) * 100).round();
+      percentExpired = ((expiredCount / foodCountTotal) * 100).round();
       print(percentExpired);
     } catch (e) {
       print(e);
@@ -180,6 +179,7 @@ Future<int> CalculatePercent() async {
   //   lessWaste = 1;
   // }
   //return the change in % and if we wasted more or less in a bool in the return statement
-  return expiryChange;
+  print("useless fuck $percentExpired - $percentExpired2 = $expiryChange");
+  return [expiryChange, percentExpired];
 }
 

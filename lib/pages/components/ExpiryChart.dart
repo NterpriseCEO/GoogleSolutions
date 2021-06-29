@@ -29,13 +29,10 @@ class _ExpiryChartState extends State<ExpiryChart> {
     Colors.red,
   ];
 
-  void get() async {
-    percent = await CalculatePercent();
-  }
-
   @override
   void initState() {
     super.initState();
+    print("hello mate ${widget.total} - ${widget.expiredAmount} = ${widget.total - widget.expiredAmount}");
     dataMap["Consumed"] = widget.total - widget.expiredAmount;
     dataMap["Wasted"] = widget.expiredAmount;
   }
@@ -45,23 +42,13 @@ class _ExpiryChartState extends State<ExpiryChart> {
 
     int key = 0;
 
-    return Column(
-      children: <Widget>[
-        Container(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            crossAxisAlignment: CrossAxisAlignment.end,
+    return FutureBuilder<List<int>>(
+      future: CalculatePercent(),
+      builder: (BuildContext context, AsyncSnapshot<List<int>> snapshot) {
+        if(snapshot.hasData) {
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Container(
-              //   margin: EdgeInsets.fromLTRB(50, 20, 120, 20),
-              //   child: Text(
-              //     "Food Score",
-              //     style: TextStyle(
-              //       fontSize: 22.0,
-              //       fontWeight: FontWeight.bold,
-              //     ),
-              //   ),
-              // ),
               Stack(
                 alignment: Alignment.center,
                 children: [
@@ -74,6 +61,7 @@ class _ExpiryChartState extends State<ExpiryChart> {
                     initialAngleInDegree: 90,
                     chartType: ChartType.ring,
                     ringStrokeWidth: 32,
+                    centerText: "Score:\n${100-snapshot.data[1]} / 100",
                     legendOptions: LegendOptions(
                       showLegendsInRow: true,
                       legendPosition: LegendPosition.bottom,
@@ -91,58 +79,39 @@ class _ExpiryChartState extends State<ExpiryChart> {
                       decimalPlaces: 1,
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 55.0),
-                    child: FutureBuilder<int>(
-                      future: CalculatePercent(),
-                      builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
-                        if(snapshot.hasData) {
-                          return Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Image(
-                                width: MediaQuery.of(context).size.width / 8,
-                                image: AssetImage(snapshot.data < 0 ? "assets/DownArrow.png" : "assets/UpArrow.png"),
-                              ),
-                              Text(
-                                snapshot.data < 0 ? "Food wastage is \ndown ${snapshot.data*-1}%" : "Food wastage is \nup ${snapshot.data}%",
-                                textAlign: TextAlign.center,
-                              )
-                            ],
-                          );
-                        }else {
-                          return Text("Loading...");
-                        }
-                      }
-                    ),
-                  ),
+                  // Padding(
+                  //   padding: const EdgeInsets.only(bottom: 15.0),
+                  //   child: Text(
+                  //       "${100-snapshot.data[1]} / 100",
+                  //       style: TextStyle(
+                  //           fontSize: 30.0
+                  //       )
+                  //   ),
+                  // ),
                 ],
-              )
-            ],
-          )
-        ),
-        // Container(
-        //   margin: EdgeInsets.all(30),
-        //   child: Column(
-        //     children: [
-        //       Text(
-        //         "Your Food Trends",
-        //         style: TextStyle(
-        //           fontSize: 22.0,
-        //           fontWeight: FontWeight.bold,
-        //         ),
-        //       ),
-        //       Expanded(child:
-        //         Row(
-        //           children: [
-        //             Text("")
-        //           ],
-        //         ),
-        //       ),
-        //     ],
-        //   ),
-        // )
-      ],
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 55.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Image(
+                      width: MediaQuery.of(context).size.width / 8,
+                      image: AssetImage(snapshot.data[0] < 0 ? "assets/DownArrow.png" : "assets/UpArrow.png"),
+                    ),
+                    Text(
+                      snapshot.data[0] < 0 ? "Food wastage is \ndown ${snapshot.data[0]*-1}%" : "Food wastage is \nup ${snapshot.data[0]}%",
+                      textAlign: TextAlign.center,
+                    )
+                  ],
+                )
+              ),
+            ]
+          );
+        }else {
+          return Text("Loading...");
+        }
+      }
     );
   }
 }
