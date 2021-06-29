@@ -31,7 +31,7 @@ class _ExpirationPageState extends State<ExpirationPage> {
         elevation: 0,
         centerTitle: true,
         title: Text(
-          "My Fridge",
+          "Expiration",
           style: TextStyle(
               color: Colors.black,
               fontSize: 34.0
