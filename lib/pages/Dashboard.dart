@@ -59,13 +59,10 @@ class _DashboardState extends State<Dashboard> {
     for (String category in categories) {
       List<int> expired = await CalculateData(category);
       //print("expired yo ${expired[0]}");
-      inventoryCards?.add(
-          InventoryCard(
-            category: category,
-            isBreakdownCard: true,
-            expiredAmount: expired[0]
-          )
-      );
+      inventoryCards?.add(InventoryCard(
+          category: category,
+          isBreakdownCard: true,
+          expiredAmount: expired[0]));
       total += expired[1];
       expiredAmount += expired[2];
     }
@@ -91,24 +88,23 @@ class _DashboardState extends State<Dashboard> {
                     expandedHeight: MediaQuery.of(context).size.width,
                     automaticallyImplyLeading: false,
                     leading: IconButton(
-                      icon: Icon(Icons.arrow_back,
-                      size: 36, color: Colors.black),
-                      tooltip: 'Return to Inventory',
-                      onPressed: () {
-                        Navigator.pop(context);
-                      }
-                    ),
+                        icon: Icon(Icons.arrow_back,
+                            size: 36, color: Colors.black),
+                        tooltip: 'Return to Inventory',
+                        onPressed: () {
+                          Navigator.pop(context);
+                        }),
                     stretch: true,
                     pinned: true,
                     flexibleSpace: FlexibleSpaceBar(
                       titlePadding: EdgeInsets.symmetric(vertical: 10.0),
                       centerTitle: true,
                       title: Text(
-                        "Wastage",
+                        "Category Breakdown",
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.black,
-                          fontSize: 34.0,
+                          fontSize: 16.0,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -122,9 +118,8 @@ class _DashboardState extends State<Dashboard> {
                             ),
                           ),
                           ExpiryChart(
-                            expiredAmount: 1.0 * expiredAmount,
-                            total: 1.0 * total
-                          ),
+                              expiredAmount: 1.0 * expiredAmount,
+                              total: 1.0 * total),
                         ]),
                       ),
                     ),
