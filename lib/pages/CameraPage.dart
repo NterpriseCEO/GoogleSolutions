@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import "package:flutter/material.dart";
 import 'package:google_ml_kit/google_ml_kit.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:toast/toast.dart';
 
 import 'components/EditScan.dart';
@@ -74,19 +75,18 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
       for (Plane plane in cameraImage.planes) {
         allBytes.putUint8List(plane.bytes);
       }
-      final bytes = allBytes
-          .done()
-          .buffer
-          .asUint8List();
+      final bytes = allBytes.done().buffer.asUint8List();
 
       final Size imageSize =
-      Size(cameraImage.width.toDouble(), cameraImage.height.toDouble());
+          Size(cameraImage.width.toDouble(), cameraImage.height.toDouble());
 
-      final imageRotation = InputImageRotationMethods.fromRawValue(
-          camera.sensorOrientation) ?? InputImageRotation.Rotation_0deg;
+      final imageRotation =
+          InputImageRotationMethods.fromRawValue(camera.sensorOrientation) ??
+              InputImageRotation.Rotation_0deg;
 
-      final inputImageFormat = InputImageFormatMethods.fromRawValue(
-          cameraImage.format.raw) ?? InputImageFormat.NV21;
+      final inputImageFormat =
+          InputImageFormatMethods.fromRawValue(cameraImage.format.raw) ??
+              InputImageFormat.NV21;
 
       final planeData = cameraImage.planes.map((Plane plane) {
         return InputImagePlaneMetadata(
@@ -103,13 +103,15 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
         planeData: planeData,
       );
 
-      inputImage = InputImage.fromBytes(bytes: bytes, inputImageData: inputImageData);
+      inputImage =
+          InputImage.fromBytes(bytes: bytes, inputImageData: inputImageData);
 
-      final List<Barcode> barcodes = await barcodeScanner.processImage(inputImage);
+      final List<Barcode> barcodes =
+          await barcodeScanner.processImage(inputImage);
 
       scannerCounter++;
 
-      if(scannerCounter == 100000000) {
+      if (scannerCounter == 100000000) {
         controller?.stopImageStream();
       }
 
@@ -117,16 +119,17 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
         final BarcodeType type = barcode.type;
 
         // See API reference for complete list of supported types
-        if(type == BarcodeType.product && !hasScanned) {
+        if (type == BarcodeType.product && !hasScanned) {
           hasScanned = true;
           controller?.stopImageStream();
           this.barcode = barcode.value.displayValue;
           String itemName = await barcodeResult(this.barcode);
           //Sets the itemName depending on if data was found
           itemName = itemName != "noData" ? itemName : "";
-          if(itemName != "") {
-            confirmBarcode(itemName, context, (String itemName, String category, int amount, bool canceled) {
-              if(!canceled) {
+          if (itemName != "") {
+            confirmBarcode(itemName, context,
+                (String itemName, String category, int amount, bool canceled) {
+              if (!canceled) {
                 //Sets variables if not canceled
                 setState(() {
                   //Sets this variable to indicate that the barcode has been scanned
@@ -136,7 +139,8 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
                 widget.category = category;
                 widget.quantity = amount;
               }
-              Toast.show("Barcode Successfully Scanned", context, duration: Toast.LENGTH_LONG, gravity:  Toast.BOTTOM);
+              Toast.show("Barcode Successfully Scanned", context,
+                  duration: Toast.LENGTH_LONG, gravity: Toast.BOTTOM);
               readExpiry();
             });
           }
@@ -152,7 +156,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
     //Dispose of the controller when necessary
     try {
       controller.stopImageStream();
-    }catch(e) {
+    } catch (e) {
       print(e);
     }
     controller?.dispose();
@@ -175,29 +179,30 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
       children: <Widget>[
         //The camera viewfinder
         FutureBuilder<void>(
-          future: _initializeControllerFuture,
-          builder: (context, snapshot) {
-            if(snapshot.connectionState == ConnectionState.done) {
-              return CameraPreview(controller);
-            }else {
-              return Align(
-                child: Icon(
-                  Icons.camera_alt,
-                  size: 60.0,
-                ),
-              );
-            }
-          }
-        ),
+            future: _initializeControllerFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                return CameraPreview(controller);
+              } else {
+                return Align(
+                  child: Icon(
+                    Icons.camera_alt,
+                    size: 60.0,
+                  ),
+                );
+              }
+            }),
         //The container to hold the take picure button
         Positioned(
-          left: MediaQuery.of(context).size.width*0.125,
-          top: MediaQuery.of(context).size.height*0.375,
-          width: MediaQuery.of(context).size.width*0.75,
-          height: MediaQuery.of(context).size.height/8,
+          left: MediaQuery.of(context).size.width * 0.125,
+          top: MediaQuery.of(context).size.height * 0.375,
+          width: MediaQuery.of(context).size.width * 0.75,
+          height: MediaQuery.of(context).size.height / 8,
           child: Container(
             decoration: BoxDecoration(
-              color: scanningBarcode ? Colors.black.withOpacity(0.2) : Colors.transparent,
+              color: scanningBarcode
+                  ? Colors.black.withOpacity(0.2)
+                  : Colors.transparent,
               border: Border.all(
                 width: 3,
                 color: scanningBarcode ? Colors.amber[800] : Colors.transparent,
@@ -218,9 +223,8 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
               Container(
                 padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 15.0),
                 decoration: BoxDecoration(
-                  color: Colors.amber,
-                  borderRadius: BorderRadius.all(Radius.circular(20))
-                ),
+                    color: Colors.amber,
+                    borderRadius: BorderRadius.all(Radius.circular(20))),
                 child: Text(
                   //Sets the text based on if expiry date has been scanned yet
                   barCodeScanned ? "Scan Expiry Date" : "Scan Barcode",
@@ -234,9 +238,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Expanded(
-                      child: SizedBox(width:20.0)
-                  ),
+                  Expanded(child: SizedBox(width: 20.0)),
                   Expanded(
                     child: ConstrainedBox(
                       constraints: BoxConstraints.tightFor(
@@ -251,7 +253,7 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
                           });
 
                           //Determines which function to run on click
-                          if(!barCodeScanned) {
+                          if (!barCodeScanned) {
                             await scanBarcode();
                           }
                         },
@@ -270,32 +272,36 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
                   ),
                   Expanded(
                     child: IconButton(
-                      icon: Icon(Icons.keyboard),
-                      iconSize: 40.0,
-                      color: Colors.white,
-                      tooltip: "Enter details manually",
-                      onPressed: () {
-                        //Determines which popup to show on button click
-                        if(!barCodeScanned) {
-                          confirmBarcode("", context, (String itemName, String category, int amount, bool canceled) {
-                            if(!canceled) {
-                              setState(() {
-                                barCodeScanned = true;
-                              });
-                              widget.itemName = itemName;
-                              widget.category = category;
-                              widget.quantity = amount;
+                        icon: Icon(Icons.keyboard),
+                        iconSize: 40.0,
+                        color: Colors.white,
+                        tooltip: "Enter details manually",
+                        onPressed: () {
+                          //Determines which popup to show on button click
+                          FirebaseAnalytics().logEvent(
+                              name: 'camera_manual_input', parameters: null);
+                          if (!barCodeScanned) {
+                            confirmBarcode("", context, (String itemName,
+                                String category, int amount, bool canceled) {
+                              if (!canceled) {
+                                setState(() {
+                                  barCodeScanned = true;
+                                });
+                                widget.itemName = itemName;
+                                widget.category = category;
+                                widget.quantity = amount;
 
-                              enterExpiry(context, widget.itemName, widget.category, widget.quantity, null);
-                            }
-                          });
-                        }else {
-                          scanningBarcode = false;
-                          controller?.stopImageStream();
-                          enterExpiry(context, widget.itemName, widget.category, widget.quantity, null);
-                        }
-                      }
-                    ),
+                                enterExpiry(context, widget.itemName,
+                                    widget.category, widget.quantity, null);
+                              }
+                            });
+                          } else {
+                            scanningBarcode = false;
+                            controller?.stopImageStream();
+                            enterExpiry(context, widget.itemName,
+                                widget.category, widget.quantity, null);
+                          }
+                        }),
                   )
                 ],
               ),
@@ -311,11 +317,11 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
     DateTime expiry;
     int counter = 0;
     controller?.startImageStream((CameraImage cameraImage) async {
-      if(counter < 20) {
+      if (counter < 20) {
         counter++;
-      }else {
+      } else {
         counter = 0;
-        if(!isLooping) {
+        if (!isLooping) {
           isLooping = true;
           final WriteBuffer allBytes = WriteBuffer();
           for (Plane plane in cameraImage.planes) {
@@ -324,11 +330,15 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
           final bytes = allBytes.done().buffer.asUint8List();
 
           final Size imageSize =
-          Size(cameraImage.width.toDouble(), cameraImage.height.toDouble());
+              Size(cameraImage.width.toDouble(), cameraImage.height.toDouble());
 
-          final imageRotation = InputImageRotationMethods.fromRawValue(camera.sensorOrientation) ?? InputImageRotation.Rotation_0deg;
+          final imageRotation = InputImageRotationMethods.fromRawValue(
+                  camera.sensorOrientation) ??
+              InputImageRotation.Rotation_0deg;
 
-          final inputImageFormat = InputImageFormatMethods.fromRawValue(cameraImage.format.raw) ?? InputImageFormat.NV21;
+          final inputImageFormat =
+              InputImageFormatMethods.fromRawValue(cameraImage.format.raw) ??
+                  InputImageFormat.NV21;
 
           final planeData = cameraImage.planes.map((Plane plane) {
             return InputImagePlaneMetadata(
@@ -345,18 +355,20 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
             planeData: planeData,
           );
 
-          inputImage =
-              InputImage.fromBytes(bytes: bytes, inputImageData: inputImageData);
+          inputImage = InputImage.fromBytes(
+              bytes: bytes, inputImageData: inputImageData);
 
-          final RecognisedText recognisedText = await textDetector.processImage(inputImage);
+          final RecognisedText recognisedText =
+              await textDetector.processImage(inputImage);
           for (TextBlock block in recognisedText.blocks) {
-            if(scanningBarcode) {
+            if (scanningBarcode) {
               for (TextLine line in block.lines) {
                 // Same getters as TextBlock
                 if (expiry == null) {
                   expiry = checkIfExpiry(line.text);
-                  if(expiry != null) {
-                    enterExpiry(context, widget.itemName, widget.category, widget.quantity, expiry);
+                  if (expiry != null) {
+                    enterExpiry(context, widget.itemName, widget.category,
+                        widget.quantity, expiry);
                     textDetector.close();
                     controller?.stopImageStream();
 
@@ -377,27 +389,30 @@ class _ScanPictureState extends State<ScanPicture> with WidgetsBindingObserver {
     });
   }
 
-  void enterExpiry(BuildContext context, String productName, String category, int quantity, DateTime date) async {
+  void enterExpiry(BuildContext context, String productName, String category,
+      int quantity, DateTime date) async {
     date = date == null ? DateTime.now() : date;
     //Shows the date picker
     DateTime expiry = await showDatePicker(
-      context: context,
-      initialDate:date,
-      firstDate:DateTime.now().subtract(Duration(days: 10)),
-      lastDate: DateTime(2100)
-    );
+        context: context,
+        initialDate: date,
+        firstDate: DateTime.now().subtract(Duration(days: 10)),
+        lastDate: DateTime(2100));
     //Checks if the expiry date picker was not canceled
-    if(expiry != null) {
+    if (expiry != null) {
       //Adds the product to the database
       addItemToDB(productName, category, quantity, expiry.toString());
       DateTime now = DateTime.now();
-      int daysTillExpiry = expiry.difference(DateTime(now.year, now.month, now.day)).inDays;
-      print("this is the amount of days till it expires: $daysTillExpiry, this is the expiry date: $expiry");
+      int daysTillExpiry =
+          expiry.difference(DateTime(now.year, now.month, now.day)).inDays;
+      print(
+          "this is the amount of days till it expires: $daysTillExpiry, this is the expiry date: $expiry");
       //Creates a notification
 
       //Shows message saying that item was added to inventory
       final snackBar = SnackBar(
-        content: Text('$quantity $productName have been added to your inventory'),
+        content:
+            Text('$quantity $productName have been added to your inventory'),
         action: SnackBarAction(
           label: 'Ok',
           onPressed: () {},

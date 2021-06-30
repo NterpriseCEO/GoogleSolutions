@@ -1,4 +1,5 @@
 import "package:best_before_app/pages/components/ExpiryList.dart";
+import 'package:firebase_analytics/firebase_analytics.dart';
 import "package:flutter/material.dart";
 import 'package:toast/toast.dart';
 
@@ -11,12 +12,12 @@ class _ExpirationPageState extends State<ExpirationPage> {
   TextEditingController _controller;
   String search;
 
-
   @override
   void initState() {
     _controller = TextEditingController();
     super.initState();
   }
+
   @override
   void dispose() {
     _controller.dispose();
@@ -30,13 +31,8 @@ class _ExpirationPageState extends State<ExpirationPage> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
-        title: Text(
-          "Expiration",
-          style: TextStyle(
-              color: Colors.black,
-              fontSize: 34.0
-          )
-        ),
+        title: Text("Expiration",
+            style: TextStyle(color: Colors.black, fontSize: 34.0)),
       ),
       body: Container(
         color: Colors.white,
@@ -48,6 +44,10 @@ class _ExpirationPageState extends State<ExpirationPage> {
               Expanded(
                 flex: 1,
                 child: TextField(
+                  onTap: () {
+                    FirebaseAnalytics()
+                        .logEvent(name: 'expiration_search', parameters: null);
+                  },
                   controller: _controller,
                   //Change the search variable when typing
                   onChanged: (String val) async {

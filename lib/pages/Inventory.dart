@@ -1,6 +1,6 @@
-
 import 'package:best_before_app/UpdateDatabase.dart';
 import 'package:best_before_app/components/InventoryItem.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -23,6 +23,7 @@ class _InventoryState extends State<Inventory> {
     _controller = TextEditingController();
     super.initState();
   }
+
   @override
   void dispose() {
     _controller.dispose();
@@ -31,87 +32,89 @@ class _InventoryState extends State<Inventory> {
 
   @override
   Widget build(BuildContext context) {
-
     category = ModalRoute.of(context).settings.arguments;
 
     //Creates the list of expiry items
-    Widget dataList()  {
+    Widget dataList() {
       return StreamBuilder<QuerySnapshot>(
-        stream: firestore.collection(userCol).where("Category", isEqualTo: category["category"]).snapshots(),
-        builder: (context, snapshot){
-          List<Widget> itemWidgets = [];
-          if(snapshot.hasData){
-            final items = snapshot.data.docs;
+          stream: firestore
+              .collection(userCol)
+              .where("Category", isEqualTo: category["category"])
+              .snapshots(),
+          builder: (context, snapshot) {
+            List<Widget> itemWidgets = [];
+            if (snapshot.hasData) {
+              final items = snapshot.data.docs;
 
-            int increment = 0;
-            DateTime now = DateTime.now();
-            for(var item in items){
-              final itemExpiry = item.get('ExpiryDate');
-              DateTime expiry = DateTime.parse(itemExpiry);
-              int daysTillExpiry = expiry.difference(DateTime(now.year, now.month, now.day)).inDays;
-              String itemName = item.get('ProductName').toString();
-              int itemQuantity = int.parse(item.get('Quantity').toString());
+              int increment = 0;
+              DateTime now = DateTime.now();
+              for (var item in items) {
+                final itemExpiry = item.get('ExpiryDate');
+                DateTime expiry = DateTime.parse(itemExpiry);
+                int daysTillExpiry = expiry
+                    .difference(DateTime(now.year, now.month, now.day))
+                    .inDays;
+                String itemName = item.get('ProductName').toString();
+                int itemQuantity = int.parse(item.get('Quantity').toString());
 
-              if(itemName.toLowerCase().contains(search.toLowerCase()) || search == "") {
-                increment++;
-                final itemWidget = Dismissible(
-                  key: UniqueKey(),
-                  direction: DismissDirection.endToStart,
-                  child: InventoryItem(
-                    expiryDate: daysTillExpiry,
-                    product: itemName,
-                    quantity: itemQuantity,
-                    callback: (int direction) {
-                      updateItemAmount(item.id, false, itemQuantity, direction);
-                    },
-                  ),
-                  onDismissed: (direction) {
-                    updateItemAmount(item.id, true, itemQuantity, 0);
-                  },
-                  background: Container(
-                    color: Colors.red,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: <Widget>[
-                        Padding(
-                          padding: EdgeInsets.only(right: 15.0),
-                          child: Icon(
-                            Icons.delete,
-                            color: Colors.white,
-                          ),
-                        )
-                      ]
+                if (itemName.toLowerCase().contains(search.toLowerCase()) ||
+                    search == "") {
+                  increment++;
+                  final itemWidget = Dismissible(
+                    key: UniqueKey(),
+                    direction: DismissDirection.endToStart,
+                    child: InventoryItem(
+                      expiryDate: daysTillExpiry,
+                      product: itemName,
+                      quantity: itemQuantity,
+                      callback: (int direction) {
+                        updateItemAmount(
+                            item.id, false, itemQuantity, direction);
+                      },
                     ),
-                  ),
-                );
-                itemWidgets.add(itemWidget);
+                    onDismissed: (direction) {
+                      updateItemAmount(item.id, true, itemQuantity, 0);
+                    },
+                    background: Container(
+                      color: Colors.red,
+                      child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: <Widget>[
+                            Padding(
+                              padding: EdgeInsets.only(right: 15.0),
+                              child: Icon(
+                                Icons.delete,
+                                color: Colors.white,
+                              ),
+                            )
+                          ]),
+                    ),
+                  );
+                  itemWidgets.add(itemWidget);
+                }
               }
-            }
-            if(increment == 0) {
-              itemWidgets.add(Padding(
-                padding: const EdgeInsets.all(15.0),
-                child: Column(
-                  children: [
+              if (increment == 0) {
+                itemWidgets.add(Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: Column(children: [
                     Text(
-                      (search == null || search == "") ?
-                      "There's no ${category["category"].toLowerCase()} in your inventory" :
-                      "No results found!",
+                      (search == null || search == "")
+                          ? "There's no ${category["category"].toLowerCase()} in your inventory"
+                          : "No results found!",
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize:20.0,
+                        fontSize: 20.0,
                       ),
                     ),
                     Image(image: AssetImage("assets/icon.png")),
-                  ]
-                ),
-              ));
+                  ]),
+                ));
+              }
             }
-          }
-          return ListView(
-            children: itemWidgets,
-          );
-        }
-      );
+            return ListView(
+              children: itemWidgets,
+            );
+          });
     }
 
     // Expanded(
@@ -135,21 +138,14 @@ class _InventoryState extends State<Inventory> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back,
-          size: 36, color: Colors.black),
-          tooltip: 'Return to Inventory',
-          onPressed: () {
-            Navigator.pop(context);
-          }
-        ),
+            icon: Icon(Icons.arrow_back, size: 36, color: Colors.black),
+            tooltip: 'Return to Inventory',
+            onPressed: () {
+              Navigator.pop(context);
+            }),
         centerTitle: true,
-        title: Text(
-          category["category"],
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 34.0
-          )
-        ),
+        title: Text(category["category"],
+            style: TextStyle(color: Colors.black, fontSize: 34.0)),
       ),
       body: SafeArea(
         child: Column(
@@ -161,6 +157,10 @@ class _InventoryState extends State<Inventory> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: TextField(
+                  onTap: () {
+                    FirebaseAnalytics()
+                        .logEvent(name: 'inventory_search', parameters: null);
+                  },
                   controller: _controller,
                   //Change the search variable when typing
                   onChanged: (String val) async {
