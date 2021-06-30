@@ -85,47 +85,43 @@ class _DashboardState extends State<Dashboard> {
                 slivers: [
                   SliverAppBar(
                     backgroundColor: Colors.white,
-                    expandedHeight: MediaQuery.of(context).size.width,
+                    expandedHeight: MediaQuery.of(context).size.height*0.6,
                     automaticallyImplyLeading: false,
                     leading: IconButton(
-                        icon: Icon(Icons.arrow_back,
-                            size: 36, color: Colors.black),
-                        tooltip: 'Return to Inventory',
-                        onPressed: () {
-                          Navigator.pop(context);
-                        }),
+                      icon: Icon(Icons.arrow_back, size: 36, color: Colors.black),
+                      tooltip: 'Return to Inventory',
+                      onPressed: () {
+                        Navigator.pop(context);
+                      }
+                    ),
                     stretch: true,
                     pinned: true,
                     flexibleSpace: FlexibleSpaceBar(
-                      titlePadding: EdgeInsets.symmetric(vertical: 10.0),
                       centerTitle: true,
                       title: Text(
                         "Category Breakdown",
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Colors.black,
-                          fontSize: 16.0,
+                          fontSize: 20.0,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       background: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(children: [
-                          Text(
-                            "Do Not Remove",
-                            style: TextStyle(
-                              color: Colors.transparent,
-                            ),
-                          ),
-                          ExpiryChart(
+                        padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 16.0),
+                        child: Column(
+                          children: [
+                            ExpiryChart(
                               expiredAmount: 1.0 * expiredAmount,
-                              total: 1.0 * total),
-                        ]),
+                              total: 1.0 * total
+                            ),
+                          ]
+                        ),
                       ),
                     ),
                   ),
                   SliverPadding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.0),
+                    padding: EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 130.0),
                     sliver: SliverGrid.count(
                       crossAxisCount: 3,
                       children: [

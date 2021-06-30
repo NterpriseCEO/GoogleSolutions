@@ -179,7 +179,6 @@ Future<List<int>> CalculatePercent() async {
   //   lessWaste = 1;
   // }
   //return the change in % and if we wasted more or less in a bool in the return statement
-  print("useless fuck $percentExpired - $percentExpired2 = $expiryChange");
   return [expiryChange, percentExpired];
 }
 
